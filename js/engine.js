@@ -159,28 +159,30 @@ function weightedPick(options) {
   return options[options.length - 1].value;
 }
 
-// Cuántas concursantes ganan el reto esta semana: casi siempre 1, a veces hay empate.
+// Cuántas concursantes ganan el reto esta semana: casi siempre 1; el empate es un evento
+// poco probable.
 function pickWinCount() {
-  return weightedPick([{ value: 1, weight: 75 }, { value: 2, weight: 20 }, { value: 3, weight: 5 }]);
+  return weightedPick([{ value: 1, weight: 92 }, { value: 2, weight: 6 }, { value: 3, weight: 2 }]);
 }
-// Cuántas quedan HIGH: lo normal son 2, pero puede ser 1 o 3.
+// Cuántas quedan HIGH: lo normal son 2.
 function pickHighCount() {
-  return weightedPick([{ value: 2, weight: 60 }, { value: 1, weight: 25 }, { value: 3, weight: 15 }]);
+  return weightedPick([{ value: 2, weight: 80 }, { value: 1, weight: 12 }, { value: 3, weight: 8 }]);
 }
-// Cuántas quedan LOW: lo normal es 1, a veces ninguna o 2.
+// Cuántas quedan LOW: lo normal es 1.
 function pickLowCount() {
-  return weightedPick([{ value: 1, weight: 65 }, { value: 0, weight: 20 }, { value: 2, weight: 15 }]);
+  return weightedPick([{ value: 1, weight: 80 }, { value: 0, weight: 12 }, { value: 2, weight: 8 }]);
 }
-// Cuántas concursantes hacen lip sync por su vida: lo normal son 2, a veces 3 o 4.
+// Cuántas concursantes hacen lip sync por su vida: lo normal son 2.
 function pickBottomCount() {
-  return weightedPick([{ value: 2, weight: 75 }, { value: 3, weight: 18 }, { value: 4, weight: 7 }]);
+  return weightedPick([{ value: 2, weight: 90 }, { value: 3, weight: 8 }, { value: 4, weight: 2 }]);
 }
-// Cuántas pierden el lip sync (pueden ser más de 1: doble eliminación).
+// Cuántas pierden el lip sync: lo normal es 1 (de las 2 en peligro, una se salva y otra es
+// eliminada); la doble eliminación es un evento poco probable.
 function pickElimCount(bottomN) {
   if (bottomN <= 1) return 1;
-  const weights = [{ value: 1, weight: 70 }, { value: 2, weight: bottomN === 2 ? 12 : 25 }];
-  if (bottomN >= 3) weights.push({ value: 3, weight: 8 });
-  if (bottomN >= 4) weights.push({ value: 4, weight: 4 });
+  const weights = [{ value: 1, weight: 93 }, { value: 2, weight: bottomN === 2 ? 7 : 15 }];
+  if (bottomN >= 3) weights.push({ value: 3, weight: 4 });
+  if (bottomN >= 4) weights.push({ value: 4, weight: 2 });
   return Math.min(weightedPick(weights), bottomN);
 }
 

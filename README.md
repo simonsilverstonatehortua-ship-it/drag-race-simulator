@@ -81,11 +81,12 @@ las colocaciones finales (WINNER/RUNNER_UP/MISS_CONGENIALITY, que sí suman apar
 puntos de carrera) quedan fuera del promedio. Esto es configurable por estado (campo
 "Cuenta para el promedio (PPE)") desde la pestaña Estados.
 
-**Reparto de estados por episodio**: lo normal es 1 WIN, 2 HIGH, 1 LOW y 2 en el fondo (1
-BTM que sobrevive + 1 ELIM), pero cada episodio varía al azar: a veces hay empate en la
-victoria (2-3 ganadoras), más o menos HIGH/LOW, lipsyncs de 3-4 concursantes o incluso
-dobles eliminaciones. El motor nunca deja que una doble eliminación baje el reparto por
-debajo del tamaño de la final elegida.
+**Reparto de estados por episodio**: lo habitual (~90% de las veces en cada categoría) es
+1 WIN, 2 HIGH, 1 LOW y 2 en el fondo (1 BTM que sobrevive + 1 ELIM) — con reparto amplio,
+ese patrón exacto sale en torno a la mitad de los episodios. El resto es variación poco
+probable (~7-9%): empate en la victoria (2-3 ganadoras), más o menos HIGH/LOW, lipsyncs de
+3-4 concursantes o dobles eliminaciones. El motor nunca deja que una doble eliminación baje
+el reparto por debajo del tamaño de la final elegida.
 
 **Implementado de verdad:**
 - Estreno normal, estreno normal sin eliminación, doble estreno (con y sin eliminación),
