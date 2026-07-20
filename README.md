@@ -15,8 +15,11 @@ exportar/importar como JSON desde los botones de arriba.
 - **`js/data/formats.js`** — formatos de estreno, regreso, temporada y final, inspirados en
   el simulador de referencia (myrainboww.github.io) y en los formatos reales documentados
   en el fandom wiki.
-- **`js/data/roster.js`** — roster de prueba reducido (Temporada 1 real, 9 concursantes,
-  con enlace a su ficha del fandom wiki).
+- **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`), cada una con sus
+  concursantes, enlace a su ficha del fandom wiki y un bloque de **estadísticas** (Acting,
+  Comedy, Dance, Design, Improv, Runway, Lip Sync; 0–15, estimadas para el juego). En la
+  pestaña Simular puedes mezclar concursantes de cualquier temporada cargada en un mismo
+  reparto.
 - **Editor completo**: puedes añadir, editar y borrar estados/retos/formatos desde la UI.
   Los que vienen de la referencia están marcados `custom:false`; lo que tú añadas queda
   marcado como "personalizado".
@@ -59,6 +62,23 @@ episodio a episodio, con chips de color reutilizando el catálogo de Estados.
 **Todavía no implementado** (seleccionable en la UI, pero cae en el comportamiento
 estándar y se avisa con una nota en el resultado): Rate a Queen, entrada tardía, Lipsync
 Smackdown, Lipsync For Your Legacy, All Winners.
+
+### Estadísticas por concursante (Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync)
+
+Inspirado en el simulador de referencia (myrainboww.github.io/Drag-Race-Simulator/custom.html),
+cada concursante puede tener un bloque de 7 estadísticas (0–15). Cuando existen:
+- Cada reto (`js/data/challenges.js`) tiene marcadas sus estadísticas relevantes (p.ej.
+  Snatch Game usa Comedy + Acting); la puntuación de la concursante en ese reto se sesga
+  hacia esas estadísticas (65% habilidad / 35% azar), en vez de ser un número totalmente
+  aleatorio.
+- Todos los lip sync (fondo de la clasificación, LaLaParUza, Lipsync Assassin, finales)
+  usan específicamente la estadística de Lip Sync.
+- Las concursantes **sin** estadísticas definidas siguen puntuando totalmente al azar, sin
+  romper nada de lo anterior.
+
+Puedes crear tus propias **concursantes personalizadas** con sus 7 estadísticas (o
+aleatorizarlas con un botón) desde la pestaña **Roster**, y usarlas para simular igual que
+a las reales. También puedes editar qué estadísticas usa cada reto desde la pestaña Retos.
 
 ## Fase 3: panel de estadísticas (ya incluida)
 

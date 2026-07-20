@@ -283,6 +283,41 @@ main {
   font-size: 0.9rem;
 }
 .form-row input[type="color"] { padding: 0.15rem; height: 2.4rem; }
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+.stats-grid__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+.stats-grid__item input {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+.checkbox-group__item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+.checkbox-group__item input { accent-color: var(--magenta); }
+
 .modal__actions {
   display: flex;
   justify-content: flex-end;

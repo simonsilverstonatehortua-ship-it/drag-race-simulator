@@ -1,38 +1,42 @@
 // Catálogo de tipos de reto (maxi challenges), extraídos de tu hoja TRACKRECORDS.
 // category: "maxi" (reto principal) | "mini" (mini reto) | "runway" (solo pasarela)
+// stats: qué estadísticas de la concursante (js/data/roster.js) son relevantes para este
+// reto; el motor de simulación (js/engine.js) las usa para influir en la puntuación en
+// vez de puntuar totalmente al azar. Si se deja vacío (p.ej. en retos personalizados sin
+// estadísticas marcadas), el reto se puntúa con el promedio de todas las estadísticas.
 
 const DEFAULT_CHALLENGES = [
-  { id: "DESIGN", label: "Diseño / Confección", category: "maxi", custom: false,
+  { id: "DESIGN", label: "Diseño / Confección", category: "maxi", custom: false, stats: ["design"],
     description: "Confeccionar un look desde cero con un tiempo y presupuesto limitados." },
-  { id: "ACTING", label: "Actuación", category: "maxi", custom: false,
+  { id: "ACTING", label: "Actuación", category: "maxi", custom: false, stats: ["acting"],
     description: "Reto de interpretación dramática o comedia en un sketch/escena." },
-  { id: "IMPROV", label: "Improvisación", category: "maxi", custom: false,
+  { id: "IMPROV", label: "Improvisación", category: "maxi", custom: false, stats: ["improv", "comedy"],
     description: "Reto de improvisación cómica en personaje." },
-  { id: "SNATCH_GAME", label: "Snatch Game", category: "maxi", custom: false,
+  { id: "SNATCH_GAME", label: "Snatch Game", category: "maxi", custom: false, stats: ["comedy", "acting"],
     description: "El clásico concurso de imitación de celebridades." },
-  { id: "RUSICAL", label: "Rusical", category: "maxi", custom: false,
+  { id: "RUSICAL", label: "Rusical", category: "maxi", custom: false, stats: ["dance", "acting", "lipsync"],
     description: "Número musical con canto, baile y actuación en un musical original." },
-  { id: "BALL", label: "Ball / Eleganza", category: "runway", custom: false,
+  { id: "BALL", label: "Ball / Eleganza", category: "runway", custom: false, stats: ["runway", "design"],
     description: "Pasarela temática por categorías (Extravagant Eleganza, etc.)." },
-  { id: "TALENT_SHOW", label: "Talent Show", category: "maxi", custom: false,
+  { id: "TALENT_SHOW", label: "Talent Show", category: "maxi", custom: false, stats: ["improv", "dance", "comedy"],
     description: "Cada concursante presenta su propio número de talento." },
-  { id: "ROAST", label: "Roast de RuPaul", category: "maxi", custom: false,
+  { id: "ROAST", label: "Roast de RuPaul", category: "maxi", custom: false, stats: ["comedy"],
     description: "Comedia de improvisación burlándose de RuPaul y compañeras." },
-  { id: "GIRL_GROUP", label: "Girl Group", category: "maxi", custom: false,
+  { id: "GIRL_GROUP", label: "Girl Group", category: "maxi", custom: false, stats: ["dance", "lipsync"],
     description: "Formar un grupo musical, coreografía y canto en directo o playback." },
-  { id: "MAKEOVER", label: "Make Over", category: "maxi", custom: false,
+  { id: "MAKEOVER", label: "Make Over", category: "maxi", custom: false, stats: ["design", "runway"],
     description: "Transformar a una persona (familiar, fan, etc.) en una reina." },
-  { id: "STAND_UP", label: "Stand Up", category: "maxi", custom: false,
+  { id: "STAND_UP", label: "Stand Up", category: "maxi", custom: false, stats: ["comedy"],
     description: "Monólogo de comedia en directo." },
-  { id: "CHOREO", label: "Coreografía", category: "maxi", custom: false,
+  { id: "CHOREO", label: "Coreografía", category: "maxi", custom: false, stats: ["dance"],
     description: "Reto centrado en una coreografía de baile grupal o individual." },
-  { id: "ADVERT", label: "Anuncio comercial", category: "maxi", custom: false,
+  { id: "ADVERT", label: "Anuncio comercial", category: "maxi", custom: false, stats: ["acting", "comedy"],
     description: "Grabar un anuncio publicitario paródico." },
-  { id: "MUSIC_VIDEO", label: "Videoclip", category: "maxi", custom: false,
+  { id: "MUSIC_VIDEO", label: "Videoclip", category: "maxi", custom: false, stats: ["dance", "lipsync"],
     description: "Grabar el videoclip de una canción (a menudo de RuPaul)." },
-  { id: "PHOTO_SHOOT", label: "Sesión de fotos", category: "maxi", custom: false,
+  { id: "PHOTO_SHOOT", label: "Sesión de fotos", category: "maxi", custom: false, stats: ["runway"],
     description: "Sesión fotográfica editorial con un concepto concreto." },
-  { id: "RUNWAY", label: "Runway libre", category: "runway", custom: false,
+  { id: "RUNWAY", label: "Runway libre", category: "runway", custom: false, stats: ["runway"],
     description: "Pasarela sin categoría temática específica." },
 ];
 

@@ -7,7 +7,9 @@ function loadDB() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
-      return JSON.parse(raw);
+      const db = JSON.parse(raw);
+      if (!db.customContestants) db.customContestants = [];
+      return db;
     } catch (e) {
       console.warn("No se pudo leer la base de datos guardada, se reinicia.", e);
     }
@@ -17,6 +19,7 @@ function loadDB() {
     challenges: structuredClone(window.DEFAULT_CHALLENGES),
     formats: structuredClone(window.DEFAULT_FORMATS),
     scoreScale: structuredClone(window.DEFAULT_SCORE_SCALE),
+    customContestants: [],
   };
 }
 

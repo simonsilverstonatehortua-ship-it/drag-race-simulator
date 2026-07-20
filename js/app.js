@@ -70,7 +70,7 @@ function renderSimulate() {
   const wrap = el("div", { class: "section" });
   wrap.appendChild(el("div", { class: "section__head" }, [
     el("h2", { text: "Simular temporada" }),
-    el("p", { class: "muted", text: "Elige concursantes y formato, y genera una temporada completa episodio a episodio. Todo es aleatorio (con algo de peso según la puntuación del reto)." }),
+    el("p", { class: "muted", text: "Elige concursantes y formato, y genera una temporada completa episodio a episodio. Las concursantes con estadísticas definidas (ver pestaña Roster) puntúan sesgado hacia sus puntos fuertes; el resto puntúa totalmente al azar." }),
   ]));
 
   // Selección de concursantes: puedes mezclar concursantes de distintas temporadas
@@ -95,6 +95,25 @@ function renderSimulate() {
     });
     wrap.appendChild(rosterGrid);
   });
+
+  if (DB.customContestants.length) {
+    wrap.appendChild(el("h4", { class: "season-title", text: "Concursantes personalizadas" }));
+    const customGrid = el("div", { class: "grid" });
+    DB.customContestants.forEach((c) => {
+      const checked = simSelection.has(c.name);
+      const card = el("label", { class: "card card--queen card--selectable" + (checked ? " card--checked" : "") });
+      const checkbox = el("input", { type: "checkbox" });
+      checkbox.checked = checked;
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) simSelection.add(c.name); else simSelection.delete(c.name);
+        render();
+      });
+      card.appendChild(checkbox);
+      card.appendChild(el("strong", { text: c.name }));
+      customGrid.appendChild(card);
+    });
+    wrap.appendChild(customGrid);
+  }
 
   // Selección de formatos
   wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
@@ -122,10 +141,17 @@ function renderSimulate() {
   return wrap;
 }
 
+function buildStatsByName() {
+  const map = {};
+  window.ALL_CONTESTANTS.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
+  DB.customContestants.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
+  return map;
+}
+
 function runSimulation() {
   const names = [...simSelection];
   if (names.length < 3) return alert("Selecciona al menos 3 concursantes.");
-  const result = window.SimEngine.simulateSeason(names, formatChoice, DB);
+  const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName());
   lastSimResult = result;
   saveHistory(result);
   render();
@@ -399,6 +425,9 @@ function challengeCard(c) {
   ]));
   card.appendChild(el("strong", { text: c.label }));
   card.appendChild(el("p", { class: "muted small", text: c.description }));
+  card.appendChild(el("div", { class: "muted small", text: c.stats && c.stats.length
+    ? "Estadísticas: " + c.stats.map((k) => window.STAT_LABELS[k]).join(", ")
+    : "Sin estadísticas asignadas (puntúa con el promedio de todas)." }));
   card.appendChild(el("div", { class: "card__actions" }, [
     el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openChallengeForm(c) }),
     el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("challenges", c.id) }),
@@ -408,17 +437,19 @@ function challengeCard(c) {
 
 function openChallengeForm(existing) {
   const isNew = !existing;
-  const data = existing || { id: "", label: "", category: "maxi", description: "", custom: true };
+  const data = existing || { id: "", label: "", category: "maxi", description: "", stats: [], custom: true };
   openModal(isNew ? "Nuevo reto" : `Editar ${data.id}`, [
     field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
     field("Nombre", "label", data.label),
     selectField("Categoría", "category", data.category, [["maxi", "Maxi challenge"], ["mini", "Mini reto"], ["runway", "Pasarela"]]),
+    checkboxGroupField("Estadísticas relevantes", "stats", data.stats || [], window.STAT_KEYS.map((k) => [k, window.STAT_LABELS[k]])),
     textareaField("Descripción", "description", data.description),
   ], (values) => {
     const item = {
       id: values.id.trim().toUpperCase().replace(/\s+/g, "_"),
       label: values.label,
       category: values.category,
+      stats: values.stats,
       description: values.description,
       custom: true,
     };
@@ -480,13 +511,35 @@ function openFormatForm(existing) {
   });
 }
 
-// ---------- ROSTER (solo lectura, viene de tu Excel / fandom wiki) ----------
+// ---------- ROSTER (temporadas reales de solo lectura + concursantes personalizadas) ----------
 function renderRoster() {
   const wrap = el("div", { class: "section" });
   wrap.appendChild(el("div", { class: "section__head" }, [
     el("h2", { text: "Roster" }),
-    el("p", { class: "muted", text: "Temporadas reales cargadas, extraídas de tu hoja TRACKRECORDS / fandom wiki. En la pestaña Simular puedes mezclar concursantes de cualquiera de ellas en un mismo reparto." }),
+    el("p", { class: "muted", text: "Temporadas reales cargadas, extraídas de tu hoja TRACKRECORDS / fandom wiki. En la pestaña Simular puedes mezclar concursantes de cualquiera de ellas (o personalizadas) en un mismo reparto." }),
   ]));
+
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h3", { class: "group-title", text: "Concursantes personalizadas" }),
+    el("button", { class: "btn btn--accent", text: "+ Nueva concursante", onclick: () => openCustomQueenForm() }),
+  ]));
+  if (!DB.customContestants.length) {
+    wrap.appendChild(el("p", { class: "muted small", text: "Todavía no has creado ninguna. Crea una con sus 7 estadísticas (Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync) para usarla en el simulador." }));
+  } else {
+    const customGrid = el("div", { class: "grid" });
+    DB.customContestants.forEach((c) => {
+      const card = el("div", { class: "card card--queen" });
+      card.appendChild(el("strong", { text: c.name }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
+      card.appendChild(el("div", { class: "card__actions" }, [
+        el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openCustomQueenForm(c) }),
+        el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteCustomContestant(c.name) }),
+      ]));
+      customGrid.appendChild(card);
+    });
+    wrap.appendChild(customGrid);
+  }
+
   window.ALL_SEASONS.forEach((season) => {
     wrap.appendChild(el("h3", { class: "group-title", text: season.seasonName }));
     const grid = el("div", { class: "grid" });
@@ -494,6 +547,7 @@ function renderRoster() {
       const card = el("div", { class: "card card--queen" });
       card.appendChild(el("strong", { text: c.name }));
       card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
       card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
       grid.appendChild(card);
     });
@@ -505,6 +559,84 @@ function renderRoster() {
 function placementLabel(code) {
   const s = DB.statuses.find((s) => s.id === code);
   return s ? s.label : code;
+}
+
+function statsSummaryLine(stats) {
+  if (!stats) return "Sin estadísticas (puntúa totalmente al azar).";
+  return window.STAT_KEYS.map((k) => `${window.STAT_LABELS[k]} ${stats[k]}`).join(" · ");
+}
+
+// ---------- CONCURSANTES PERSONALIZADAS ----------
+function openCustomQueenForm(existing) {
+  const isNew = !existing;
+  const data = existing || { name: "", stats: window.randomStats() };
+
+  const overlay = document.getElementById("modal-overlay");
+  overlay.innerHTML = "";
+  overlay.classList.add("visible");
+  const modal = el("div", { class: "modal" });
+  modal.appendChild(el("h3", { text: isNew ? "Nueva concursante personalizada" : `Editar ${data.name}` }));
+
+  const nameRow = el("label", { class: "form-row" }, [el("span", { text: "Nombre" })]);
+  const nameInput = el("input", { type: "text" });
+  nameInput.value = data.name;
+  if (!isNew) nameInput.setAttribute("disabled", "disabled");
+  nameRow.appendChild(nameInput);
+  modal.appendChild(nameRow);
+
+  const statInputs = {};
+  const statsGrid = el("div", { class: "stats-grid" });
+  window.STAT_KEYS.forEach((key) => {
+    const row = el("div", { class: "stats-grid__item" });
+    row.appendChild(el("span", { class: "stats-grid__label", text: window.STAT_LABELS[key] }));
+    const input = el("input", { type: "number", min: "0", max: "15" });
+    input.value = data.stats[key];
+    statInputs[key] = input;
+    row.appendChild(input);
+    statsGrid.appendChild(row);
+  });
+  modal.appendChild(statsGrid);
+
+  modal.appendChild(el("div", { style: "margin: 0.6rem 0;" }, [
+    el("button", { class: "btn btn--ghost", text: "🎲 Aleatorizar stats", onclick: () => {
+      const randomized = window.randomStats();
+      window.STAT_KEYS.forEach((key) => { statInputs[key].value = randomized[key]; });
+    } }),
+  ]));
+
+  const actions = el("div", { class: "modal__actions" }, [
+    el("button", { class: "btn btn--ghost", text: "Cancelar", onclick: closeModal }),
+    el("button", { class: "btn btn--accent", text: "Guardar", onclick: () => {
+      const name = nameInput.value.trim();
+      if (!name) return alert("El nombre no puede estar vacío.");
+      const stats = {};
+      window.STAT_KEYS.forEach((key) => {
+        stats[key] = Math.max(0, Math.min(15, Number(statInputs[key].value) || 0));
+      });
+      const exists = DB.customContestants.some((c) => c.name === name);
+      if (isNew) {
+        if (exists) return alert("Ya existe una concursante personalizada con ese nombre.");
+        DB.customContestants.push({ name, stats });
+      } else {
+        const idx = DB.customContestants.findIndex((c) => c.name === data.name);
+        if (idx < 0) return alert("No se encontró la concursante a editar.");
+        DB.customContestants[idx] = { name, stats };
+      }
+      window.RulesStore.saveDB(DB);
+      closeModal();
+      render();
+    } }),
+  ]);
+  modal.appendChild(actions);
+  overlay.appendChild(modal);
+}
+
+function deleteCustomContestant(name) {
+  if (!confirm(`¿Eliminar a "${name}"? Esta acción no se puede deshacer.`)) return;
+  DB.customContestants = DB.customContestants.filter((c) => c.name !== name);
+  simSelection.delete(name);
+  window.RulesStore.saveDB(DB);
+  render();
 }
 
 // ---------- CRUD helpers ----------
@@ -540,6 +672,9 @@ function selectField(label, name, value, options) {
 function textareaField(label, name, value) {
   return { label, name, value, kind: "textarea" };
 }
+function checkboxGroupField(label, name, selected, options) {
+  return { label, name, selected, options, kind: "checkboxgroup" };
+}
 
 function openModal(title, fields, onSubmit) {
   const overlay = document.getElementById("modal-overlay");
@@ -550,6 +685,25 @@ function openModal(title, fields, onSubmit) {
 
   const inputs = {};
   fields.forEach((f) => {
+    if (f.kind === "checkboxgroup") {
+      const row = el("div", { class: "form-row" }, [el("span", { text: f.label })]);
+      const group = el("div", { class: "checkbox-group" });
+      const boxes = {};
+      f.options.forEach(([val, label]) => {
+        const boxLabel = el("label", { class: "checkbox-group__item" });
+        const box = el("input", { type: "checkbox" });
+        box.checked = f.selected.includes(val);
+        boxes[val] = box;
+        boxLabel.appendChild(box);
+        boxLabel.appendChild(el("span", { text: label }));
+        group.appendChild(boxLabel);
+      });
+      inputs[f.name] = boxes;
+      row.appendChild(group);
+      modal.appendChild(row);
+      return;
+    }
+
     const row = el("label", { class: "form-row" }, [el("span", { text: f.label })]);
     let input;
     if (f.kind === "select") {
@@ -576,7 +730,13 @@ function openModal(title, fields, onSubmit) {
     el("button", { class: "btn btn--ghost", text: "Cancelar", onclick: closeModal }),
     el("button", { class: "btn btn--accent", text: "Guardar", onclick: () => {
       const values = {};
-      for (const [name, node] of Object.entries(inputs)) values[name] = node.value;
+      fields.forEach((f) => {
+        if (f.kind === "checkboxgroup") {
+          values[f.name] = f.options.filter(([val]) => inputs[f.name][val].checked).map(([val]) => val);
+        } else {
+          values[f.name] = inputs[f.name].value;
+        }
+      });
       onSubmit(values);
     } }),
   ]);
@@ -610,6 +770,7 @@ function importJSON(file) {
         throw new Error("El archivo no tiene el formato esperado.");
       }
       DB = parsed;
+      if (!DB.customContestants) DB.customContestants = [];
       window.RulesStore.saveDB(DB);
       render();
     } catch (e) {
