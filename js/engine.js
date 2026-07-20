@@ -29,7 +29,9 @@ const FINALE_SIZE = {
   FINALE_LIPSYNC_CROWN: 4,
 };
 
-const ALL_STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway", "lipsync"];
+const ALL_STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway", "lipsync", "makeup", "singing", "verses"];
+
+const RELATIONSHIP_LEVELS = ["le cae muy bien", "le cae bien", "normal", "le cae mal", "le cae muy mal"];
 
 function randomScore(scoreScale) {
   const values = scoreScale.map((s) => s.value);
@@ -110,6 +112,26 @@ function describeTiedPlacements(entries) {
       : `${arr.slice(0, -1).join(", ")} y ${arr[arr.length - 1]}`;
   if (entries.length === 1) return `${entries[0].name} quedó en ${entries[0].placement}.`;
   return `${joinList(entries.map((e) => e.name))} quedaron en ${joinList(entries.map((e) => e.placement))}, respectivamente.`;
+}
+
+// Genera las relaciones (direccionales) entre todas las concursantes antes de empezar la
+// temporada: qué opina cada una de cada una de las demás, en 5 niveles. Cuanta más
+// Estrategia tenga una concursante, más marcadas (menos "normal") son sus opiniones —
+// juega sus alianzas y rivalidades de forma más calculada.
+function generateRelationships(names, statsByName) {
+  const relationships = {};
+  names.forEach((a) => {
+    relationships[a] = {};
+    const strategyA = statsByName[a] && typeof statsByName[a].strategy === "number" ? statsByName[a].strategy : 7.5;
+    const polarization = Math.max(0, Math.min(1, strategyA / 15));
+    const baseWeights = [15, 25, 30, 20, 10];
+    const weights = baseWeights.map((w, i) => (i === 2 ? w * (1 - polarization) : w * (1 + polarization * 0.6)));
+    names.forEach((b) => {
+      if (a === b) return;
+      relationships[a][b] = weightedPick(RELATIONSHIP_LEVELS.map((lvl, i) => ({ value: lvl, weight: weights[i] })));
+    });
+  });
+  return relationships;
 }
 
 // Miss Simpatía: si hay datos de Carisma, se sesga hacia quien tenga más; si no, al azar.
@@ -374,7 +396,7 @@ function runTeamsEpisode(activeNames, db, statsByName) {
 
 // --- Lipsync Assassin: la ganadora del reto reta a quien quiera a un lip sync directo,
 // sin pasar por el fondo de la clasificación. ---
-function runLipsyncAssassinEpisode(activeNames, db, statsByName) {
+function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships = {}) {
   const challenge = randomChallenge(db.challenges);
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
@@ -395,13 +417,18 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName) {
 
   let target, targetReason;
   if (playsStrategically) {
+    const rel = relationships[assassin] || {};
+    const relBonus = (name) => (rel[name] === "le cae muy mal" ? 6 : rel[name] === "le cae mal" ? 3 : rel[name] === "le cae muy bien" ? -3 : 0);
     const threatOf = (c) => {
       const stats = statsByName[c.name];
-      return stats ? average(ALL_STAT_KEYS.map((k) => stats[k] ?? 7.5)) : c.score;
+      const base = stats ? average(ALL_STAT_KEYS.map((k) => stats[k] ?? 7.5)) : c.score;
+      return base + relBonus(c.name);
     };
     const sorted = [...candidates].sort((a, b) => threatOf(b) - threatOf(a) || Math.random() - 0.5);
     target = sorted[0].name;
-    targetReason = "en una jugada estratégica, apunta a su mayor amenaza en la competencia";
+    targetReason = rel[target] === "le cae mal" || rel[target] === "le cae muy mal"
+      ? "en una jugada estratégica y personal, apunta a alguien que le cae mal y que además ve como una amenaza"
+      : "en una jugada estratégica, apunta a su mayor amenaza en la competencia";
   } else {
     const weights = candidates.map((c) => 11 - c.score);
     const total = weights.reduce((a, b) => a + b, 0);
@@ -528,6 +555,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   let active = [...contestantNames];
   let eliminated = [];
   const notes = [];
+  const relationships = generateRelationships(contestantNames, statsByName);
 
   // Procesa las eliminadas de un episodio, admitiendo tanto una sola (eliminatedName,
   // usado por Teams/Lipsync Assassin) como varias a la vez (eliminatedNames, para dobles
@@ -586,7 +614,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     let ep;
     const maxElim = Math.max(0, active.length - finaleSize);
     if (formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" && active.length >= 3) {
-      ep = runLipsyncAssassinEpisode(active, db, statsByName);
+      ep = runLipsyncAssassinEpisode(active, db, statsByName, relationships);
     } else if (formatChoice.season === "SEASON_LIPSYNC_LEGACY" && active.length >= 3) {
       ep = runLipsyncLegacyEpisode(active, db, statsByName, maxElim);
     } else if (formatChoice.season === "SEASON_TEAMS" && !teamsEpisodeDone && active.length >= 4) {
@@ -679,7 +707,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   const missCandidates = contestantNames.filter((n) => n !== winnerName);
   const missCongeniality = pickMissCongeniality(missCandidates, statsByName);
 
-  return { log, winnerName, runnerUpName, finalPlacements, missCongeniality, notes };
+  return { log, winnerName, runnerUpName, finalPlacements, missCongeniality, notes, relationships };
 }
 
 window.SimEngine = { simulateSeason };

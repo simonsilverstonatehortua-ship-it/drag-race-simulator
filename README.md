@@ -113,26 +113,37 @@ debajo del tamaño de la final elegida.
 estándar y se avisa con una nota en el resultado): Rate a Queen, entrada tardía, Lipsync
 Smackdown, All Winners.
 
-### Estadísticas por concursante (12: Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync +
-Strategy/Charisma/Uniqueness/Nerve/Talent)
+### Estadísticas por concursante (15: Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync/
+Makeup/Singing/Verses + Strategy/Charisma/Uniqueness/Nerve/Talent)
 
 Inspirado en el simulador de referencia (myrainboww.github.io/Drag-Race-Simulator/custom.html)
-y en el "C.U.N.T." clásico de RuPaul, cada concursante puede tener un bloque de 12
+y en el "C.U.N.T." clásico de RuPaul, cada concursante puede tener un bloque de 15
 estadísticas (0–15). Cuando existen:
 - Cada reto (`js/data/challenges.js`) tiene marcadas sus estadísticas relevantes (p.ej.
-  Snatch Game usa Comedy + Acting, Talent Show usa Talent); la puntuación de la
-  concursante en ese reto se sesga hacia esas estadísticas (65% habilidad / 35% azar), en
-  vez de ser un número totalmente aleatorio.
+  Snatch Game usa Comedy + Acting, Talent Show usa Talent, Rusical/Girl Group/Videoclip
+  usan Singing + Verses, Runway/Ball/Sesión de fotos/Make Over usan Makeup); la
+  puntuación de la concursante en ese reto se sesga hacia esas estadísticas (65%
+  habilidad / 35% azar), en vez de ser un número totalmente aleatorio.
 - Todos los lip sync (fondo de la clasificación, LaLaParUza, Lipsync Assassin, finales)
   usan específicamente la estadística de Lip Sync.
-- **Strategy** influye en Lipsync Assassin: cuanta más Estrategia tenga la asesina, más
-  probable que juegue "sucio" y rete a su mayor amenaza real en la competencia (alianzas
-  rotas, traiciones al estilo Mistress/Jorgeous en All Stars 10) en vez de a quien puntuó
-  más bajo.
+- **Strategy** influye en Lipsync Assassin (cuanta más Estrategia tenga la asesina, más
+  probable que juegue "sucio" y rete a su mayor amenaza real en la competencia — alianzas
+  rotas, traiciones al estilo Mistress/Jorgeous en All Stars 10 — en vez de a quien
+  puntuó más bajo) y en qué tan marcadas son sus **relaciones** con las demás (ver abajo).
 - **Charisma** influye en el voto del jurado (además de la puntuación de la final) y en
   quién gana Miss Simpatía.
 - Las concursantes **sin** estadísticas definidas siguen puntuando totalmente al azar, sin
   romper nada de lo anterior.
+
+### Relaciones entre concursantes
+
+Antes de cada simulación, el motor genera una matriz de relaciones (quién opina qué de
+quién, en 5 niveles: le cae muy bien / le cae bien / normal / le cae mal / le cae muy
+mal) que se muestra en una tabla al principio del resultado. Cuanta más **Estrategia**
+tenga una concursante, más marcadas (menos "normal") son sus opiniones — juega sus
+alianzas y rivalidades de forma más calculada. En el formato Lipsync Assassin, cuando la
+asesina juega "sucio", prioriza retar a alguien que le cae mal por encima de solo mirar
+quién es la mayor amenaza.
 
 Puedes crear tus propias **concursantes personalizadas** con sus 12 estadísticas (o
 aleatorizarlas con un botón) desde la pestaña **Roster**, y usarlas para simular igual que

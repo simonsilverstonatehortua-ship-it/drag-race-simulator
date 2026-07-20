@@ -226,6 +226,51 @@ function shortEpisodeLabel(label) {
   return m ? "Ep. " + m[1] : label;
 }
 
+const RELATIONSHIP_STYLE = {
+  "le cae muy bien": { symbol: "++", color: "#3FA796" },
+  "le cae bien": { symbol: "+", color: "#4FD1C5" },
+  "normal": { symbol: "•", color: "#7C8CA6" },
+  "le cae mal": { symbol: "−", color: "#E08A3E" },
+  "le cae muy mal": { symbol: "−−", color: "#C24E4E" },
+};
+
+function relationshipsTable(names, relationships) {
+  const tableWrap = el("div", { class: "table-wrap" });
+  const table = el("table", { class: "stats-table trackrecord-table relationships-table" });
+  const thead = el("thead");
+  const headRow = el("tr");
+  headRow.appendChild(el("th", { text: "¿Quién opina?" }));
+  names.forEach((name) => headRow.appendChild(el("th", { text: name })));
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = el("tbody");
+  names.forEach((rowName) => {
+    const tr = el("tr");
+    const nameCell = el("td", { class: "trackrecord-name" });
+    const avatar = avatarImg(rowName, "avatar--chip");
+    if (avatar) nameCell.appendChild(avatar);
+    nameCell.appendChild(el("span", { text: rowName }));
+    tr.appendChild(nameCell);
+    names.forEach((colName) => {
+      if (rowName === colName) { tr.appendChild(el("td", { class: "trackrecord-cell", text: "—" })); return; }
+      const level = relationships[rowName] && relationships[rowName][colName];
+      const style = RELATIONSHIP_STYLE[level];
+      tr.appendChild(el("td", { class: "trackrecord-cell", text: style ? style.symbol : "?",
+        title: level || "", style: style ? `background:${style.color};` : "" }));
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+
+  const legend = el("p", { class: "muted small", text: "++ le cae muy bien · + le cae bien · • normal · − le cae mal · −− le cae muy mal" });
+  const wrapAll = el("div", {});
+  wrapAll.appendChild(tableWrap);
+  wrapAll.appendChild(legend);
+  return wrapAll;
+}
+
 function trackRecordTable(track, shown, result) {
   const sortedRows = [...track.rows].sort((a, b) => {
     const aOut = a.eliminatedAtCol !== null && a.eliminatedAtCol <= shown - 1;
@@ -291,6 +336,12 @@ function renderSimResult(result, revealedCount) {
     wrap.appendChild(notesBox);
   }
 
+  if (result.relationships) {
+    wrap.appendChild(el("h3", { class: "group-title", text: "Relaciones antes de empezar" }));
+    wrap.appendChild(el("p", { class: "muted small", text: "Quién opina qué de quién (fila = quién opina, columna = sobre quién). Cuanta más Estrategia tenga una concursante, más marcadas son sus opiniones." }));
+    wrap.appendChild(relationshipsTable(Object.keys(result.relationships), result.relationships));
+  }
+
   wrap.appendChild(trackRecordTable(track, shown, result));
 
   // Narrativa (reto + nota de lip sync) de los episodios ya revelados, incluyendo
@@ -351,6 +402,7 @@ function saveHistory(result) {
     notes: result.notes,
     log: result.log,
     finalPlacements: result.finalPlacements,
+    relationships: result.relationships,
   });
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
@@ -418,6 +470,7 @@ function renderStats() {
       notes: entry.notes || [],
       finalPlacements: entry.finalPlacements || {},
       missCongeniality: entry.missCongeniality,
+      relationships: entry.relationships,
     }, Infinity));
   }
 
