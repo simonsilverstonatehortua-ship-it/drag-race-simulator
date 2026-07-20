@@ -1,0 +1,632 @@
+let DB = window.RulesStore.loadDB();
+
+const HISTORY_KEY = "dragRaceSimulator.history.v1";
+
+const TABS = ["simulate", "stats", "statuses", "challenges", "formats", "roster"];
+let currentTab = "simulate";
+let simSelection = new Set(window.TEST_ROSTER.contestants.map((c) => c.name));
+let lastSimResult = null;
+
+const GROUP_LABELS = {
+  premiere: "Estreno",
+  return: "Regreso",
+  season: "Temporada",
+  finale: "Final",
+};
+
+function uid(prefix) {
+  return prefix + "_" + Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+function el(tag, attrs = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") node.className = v;
+    else if (k === "text") node.textContent = v;
+    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  }
+  for (const child of [].concat(children)) {
+    if (child) node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+  }
+  return node;
+}
+
+function render() {
+  renderTabs();
+  const root = document.getElementById("panel");
+  root.innerHTML = "";
+  if (currentTab === "simulate") root.appendChild(renderSimulate());
+  if (currentTab === "stats") root.appendChild(renderStats());
+  if (currentTab === "statuses") root.appendChild(renderStatuses());
+  if (currentTab === "challenges") root.appendChild(renderChallenges());
+  if (currentTab === "formats") root.appendChild(renderFormats());
+  if (currentTab === "roster") root.appendChild(renderRoster());
+}
+
+function renderTabs() {
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  const labels = { simulate: "Simular", stats: "Estadísticas", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster de prueba" };
+  TABS.forEach((tab) => {
+    const btn = el("button", {
+      class: "tab" + (tab === currentTab ? " tab--active" : ""),
+      text: labels[tab],
+      onclick: () => { currentTab = tab; render(); },
+    });
+    nav.appendChild(btn);
+  });
+}
+
+// ---------- SIMULAR ----------
+let formatChoice = {
+  premiere: "PREMIERE_NORMAL",
+  return: "RETURN_NONE",
+  season: "SEASON_REGULAR",
+  finale: "FINALE_TOP2",
+};
+
+function renderSimulate() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Simular temporada" }),
+    el("p", { class: "muted", text: "Elige concursantes y formato, y genera una temporada completa episodio a episodio. Todo es aleatorio (con algo de peso según la puntuación del reto)." }),
+  ]));
+
+  // Selección de roster
+  wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes (${simSelection.size} seleccionadas)` }));
+  wrap.appendChild(el("p", { class: "muted small", text: "De momento solo está cargado el roster de prueba (Temporada 1). Amplía js/data/roster.js para añadir más." }));
+  const rosterGrid = el("div", { class: "grid" });
+  window.TEST_ROSTER.contestants.forEach((c) => {
+    const checked = simSelection.has(c.name);
+    const card = el("label", { class: "card card--queen card--selectable" + (checked ? " card--checked" : "") });
+    const checkbox = el("input", { type: "checkbox" });
+    checkbox.checked = checked;
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) simSelection.add(c.name); else simSelection.delete(c.name);
+      render();
+    });
+    card.appendChild(checkbox);
+    card.appendChild(el("strong", { text: c.name }));
+    rosterGrid.appendChild(card);
+  });
+  wrap.appendChild(rosterGrid);
+
+  // Selección de formatos
+  wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
+  const formatGrid = el("div", { class: "grid grid--formats" });
+  Object.entries(GROUP_LABELS).forEach(([group, label]) => {
+    const options = DB.formats.filter((f) => f.group === group);
+    const select = el("select", {
+      onchange: (e) => { formatChoice[group] = e.target.value; },
+    });
+    options.forEach((f) => {
+      const opt = el("option", { value: f.id, text: f.label });
+      if (f.id === formatChoice[group]) opt.setAttribute("selected", "selected");
+      select.appendChild(opt);
+    });
+    formatGrid.appendChild(el("label", { class: "form-row" }, [el("span", { text: label }), select]));
+  });
+  wrap.appendChild(formatGrid);
+
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
+    el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: runSimulation }),
+  ]));
+
+  if (lastSimResult) wrap.appendChild(renderSimResult(lastSimResult));
+
+  return wrap;
+}
+
+function runSimulation() {
+  const names = [...simSelection];
+  if (names.length < 3) return alert("Selecciona al menos 3 concursantes.");
+  const result = window.SimEngine.simulateSeason(names, formatChoice, DB);
+  lastSimResult = result;
+  saveHistory(result);
+  render();
+}
+
+function renderSimResult(result) {
+  const wrap = el("div", { class: "sim-result" });
+  wrap.appendChild(el("h3", { class: "group-title", text: "Resultado" }));
+
+  if (result.notes.length) {
+    const notesBox = el("div", { class: "notes-box" });
+    result.notes.forEach((n) => notesBox.appendChild(el("p", { class: "muted small", text: "⚠ " + n })));
+    wrap.appendChild(notesBox);
+  }
+
+  result.log.forEach((ep) => {
+    const epBox = el("div", { class: "episode" });
+    epBox.appendChild(el("div", { class: "episode__head" }, [
+      el("strong", { text: ep.label }),
+      ep.challenge ? el("span", { class: "muted small", text: " · " + ep.challenge }) : null,
+    ]));
+    if (ep.results && ep.results.length) {
+      const table = el("div", { class: "episode__results" });
+      ep.results.forEach((r) => table.appendChild(statusChip(r.name, r.status, r.score)));
+      epBox.appendChild(table);
+    }
+    if (ep.lipsyncNote) epBox.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
+    wrap.appendChild(epBox);
+  });
+
+  wrap.appendChild(el("h3", { class: "group-title", text: "Clasificación final" }));
+  const podium = el("div", { class: "grid" });
+  Object.entries(result.finalPlacements)
+    .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
+    .forEach(([name, place]) => {
+      const card = el("div", { class: "card card--queen" });
+      card.appendChild(el("strong", { text: name }));
+      card.appendChild(el("div", { class: "muted small", text: place }));
+      if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
+      podium.appendChild(card);
+    });
+  wrap.appendChild(podium);
+
+  return wrap;
+}
+
+function placementRank(place) {
+  if (place === "WINNER") return 0;
+  if (place === "RUNNER_UP") return 1;
+  const m = /^(\d+)º/.exec(place);
+  if (m) return Number(m[1]);
+  const m2 = /Eliminada #(\d+)/.exec(place);
+  if (m2) return 100 - Number(m2[1]);
+  return 999;
+}
+
+function statusChip(name, statusId, score) {
+  const status = DB.statuses.find((s) => s.id === statusId) || { label: statusId, color: "#7C8CA6" };
+  const chip = el("div", { class: "status-chip", style: `border-color:${status.color}` });
+  chip.appendChild(el("span", { class: "status-chip__name", text: name }));
+  chip.appendChild(el("span", { class: "status-chip__status", style: `color:${status.color}`, text: status.label }));
+  if (typeof score === "number") chip.appendChild(el("span", { class: "status-chip__score", text: score }));
+  return chip;
+}
+
+function saveHistory(result) {
+  const history = loadHistory();
+  history.push({
+    date: new Date().toISOString(),
+    winner: result.winnerName,
+    runnerUp: result.runnerUpName,
+    missCongeniality: result.missCongeniality,
+    notes: result.notes,
+    log: result.log,
+    finalPlacements: result.finalPlacements,
+  });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  } catch (e) {
+    console.warn("No se pudo leer el historial, se ignora.", e);
+    return [];
+  }
+}
+
+function clearHistory() {
+  if (!confirm("¿Borrar todo el historial de temporadas simuladas? Esta acción no se puede deshacer.")) return;
+  localStorage.removeItem(HISTORY_KEY);
+  render();
+}
+
+// ---------- ESTADÍSTICAS ----------
+let statsSeasonDetail = null;
+
+function renderStats() {
+  const wrap = el("div", { class: "section" });
+  const history = loadHistory();
+
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Estadísticas" }),
+    el("p", { class: "muted", text: `Basado en ${history.length} temporada(s) simulada(s) y guardada(s) en este navegador.` }),
+    history.length ? el("button", { class: "btn btn--ghost btn--danger", text: "Borrar historial", onclick: clearHistory }) : null,
+  ]));
+
+  if (!history.length) {
+    wrap.appendChild(el("p", { class: "muted", text: "Todavía no has simulado ninguna temporada. Ve a la pestaña \"Simular\" para generar la primera." }));
+    return wrap;
+  }
+
+  const stats = window.StatsEngine.computeStats(history, DB);
+
+  wrap.appendChild(el("h3", { class: "group-title", text: "Ranking de concursantes" }));
+  wrap.appendChild(el("p", { class: "muted small", text: "\"Puntos/ep.\" es el promedio de puntos por episodio semanal (WIN/HIGH/SAFE/LOW/BTM/ELIM), igual que en tu Excel. \"Puntos totales\" suma también la colocación final." }));
+  wrap.appendChild(statsTable(stats.contestants));
+
+  wrap.appendChild(el("h3", { class: "group-title", text: "Historial de temporadas" }));
+  const seasonsList = el("div", { class: "grid" });
+  history.forEach((entry, i) => {
+    const card = el("div", { class: "card card--queen" });
+    card.appendChild(el("strong", { text: entry.winner ? `👑 ${entry.winner}` : "Temporada" }));
+    card.appendChild(el("div", { class: "muted small", text: new Date(entry.date).toLocaleString() }));
+    card.appendChild(el("div", { class: "muted small", text: `${Object.keys(entry.finalPlacements || {}).length} concursantes · ${(entry.log || []).length} episodios` }));
+    if (entry.runnerUp) card.appendChild(el("div", { class: "muted small", text: `Runner-up: ${entry.runnerUp}` }));
+    card.appendChild(el("div", { class: "card__actions" }, [
+      el("button", { class: "btn btn--ghost", text: statsSeasonDetail === i ? "Ocultar detalle" : "Ver detalle",
+        onclick: () => { statsSeasonDetail = statsSeasonDetail === i ? null : i; render(); } }),
+    ]));
+    seasonsList.appendChild(card);
+  });
+  wrap.appendChild(seasonsList);
+
+  if (statsSeasonDetail !== null && history[statsSeasonDetail]) {
+    const entry = history[statsSeasonDetail];
+    wrap.appendChild(el("h3", { class: "group-title", text: "Detalle de la temporada" }));
+    wrap.appendChild(renderSimResult({
+      log: entry.log || [],
+      notes: entry.notes || [],
+      finalPlacements: entry.finalPlacements || {},
+      missCongeniality: entry.missCongeniality,
+    }));
+  }
+
+  return wrap;
+}
+
+function statsTable(contestants) {
+  const sorted = [...contestants].sort((a, b) =>
+    b.wins - a.wins || b.careerPoints - a.careerPoints || a.name.localeCompare(b.name));
+
+  const tableWrap = el("div", { class: "table-wrap" });
+  const table = el("table", { class: "stats-table" });
+  const thead = el("thead");
+  const headRow = el("tr");
+  ["Concursante", "Temp.", "WIN", "HIGH", "SAFE", "LOW", "BTM", "ELIM", "Coronas", "Runner-up", "Miss Simpatía", "Puntos/ep.", "Puntos totales"]
+    .forEach((h) => headRow.appendChild(el("th", { text: h })));
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = el("tbody");
+  sorted.forEach((c) => {
+    const row = el("tr");
+    [
+      c.name, c.seasons,
+      c.statusCounts.WIN || 0, c.statusCounts.HIGH || 0, c.statusCounts.SAFE || 0,
+      c.statusCounts.LOW || 0, c.statusCounts.BTM || 0, c.statusCounts.ELIM || 0,
+      c.wins, c.runnerUps, c.missCongeniality,
+      c.avgWeeklyPoints.toFixed(2), c.careerPoints,
+    ].forEach((v) => row.appendChild(el("td", { text: String(v) })));
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  return tableWrap;
+}
+
+// ---------- ESTADOS ----------
+function renderStatuses() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Catálogo de estados" }),
+    el("p", { class: "muted", text: "Resultados semanales y colocaciones finales. Los \"puntos\" son el valor que usará el motor de estadísticas." }),
+    el("button", { class: "btn btn--accent", text: "+ Nuevo estado", onclick: () => openStatusForm() }),
+  ]));
+
+  ["weekly", "final"].forEach((type) => {
+    const groupLabel = type === "weekly" ? "Semanales (por reto)" : "Colocación final";
+    wrap.appendChild(el("h3", { class: "group-title", text: groupLabel }));
+    const grid = el("div", { class: "grid" });
+    DB.statuses.filter((s) => s.type === type).forEach((s) => grid.appendChild(statusCard(s)));
+    wrap.appendChild(grid);
+  });
+
+  return wrap;
+}
+
+function statusCard(s) {
+  const card = el("div", { class: "card", style: `border-left-color:${s.color}` });
+  card.appendChild(el("div", { class: "card__top" }, [
+    el("span", { class: "chip", style: `background:${s.color}`, text: s.id }),
+    s.custom ? el("span", { class: "badge", text: "personalizado" }) : null,
+  ]));
+  card.appendChild(el("strong", { text: s.label }));
+  card.appendChild(el("p", { class: "muted small", text: s.description }));
+  card.appendChild(el("div", { class: "card__meta", text: `Puntos: ${s.points}` }));
+  card.appendChild(el("div", { class: "card__actions" }, [
+    el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openStatusForm(s) }),
+    el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("statuses", s.id) }),
+  ]));
+  return card;
+}
+
+function openStatusForm(existing) {
+  const isNew = !existing;
+  const data = existing || { id: "", label: "", type: "weekly", color: "#E4136B", points: 0, description: "", custom: true };
+  openModal(isNew ? "Nuevo estado" : `Editar ${data.id}`, [
+    field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
+    field("Nombre", "label", data.label),
+    selectField("Tipo", "type", data.type, [["weekly", "Semanal"], ["final", "Colocación final"]]),
+    field("Color", "color", data.color, "", "color"),
+    field("Puntos", "points", data.points, "", "number"),
+    textareaField("Descripción", "description", data.description),
+  ], (values) => {
+    const item = {
+      id: values.id.trim().toUpperCase().replace(/\s+/g, "_"),
+      label: values.label,
+      type: values.type,
+      color: values.color,
+      points: Number(values.points) || 0,
+      description: values.description,
+      custom: true,
+    };
+    if (!item.id) return alert("El código no puede estar vacío.");
+    upsertItem("statuses", item, isNew);
+  });
+}
+
+// ---------- RETOS ----------
+function renderChallenges() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Catálogo de tipos de reto" }),
+    el("p", { class: "muted", text: "Los maxi challenges, mini retos y pasarelas disponibles para tus temporadas." }),
+    el("button", { class: "btn btn--accent", text: "+ Nuevo reto", onclick: () => openChallengeForm() }),
+  ]));
+  const grid = el("div", { class: "grid" });
+  DB.challenges.forEach((c) => grid.appendChild(challengeCard(c)));
+  wrap.appendChild(grid);
+
+  wrap.appendChild(el("h3", { class: "group-title", text: "Escala de puntuación por reto" }));
+  const scaleWrap = el("div", { class: "scale" });
+  DB.scoreScale.forEach((s) => {
+    scaleWrap.appendChild(el("div", { class: "scale__item" }, [
+      el("span", { class: "scale__value", text: s.value }),
+      el("span", { class: "scale__label", text: s.label }),
+    ]));
+  });
+  wrap.appendChild(scaleWrap);
+
+  return wrap;
+}
+
+function challengeCard(c) {
+  const catLabel = { maxi: "Maxi challenge", mini: "Mini reto", runway: "Pasarela" }[c.category] || c.category;
+  const card = el("div", { class: "card" });
+  card.appendChild(el("div", { class: "card__top" }, [
+    el("span", { class: "chip chip--outline", text: catLabel }),
+    c.custom ? el("span", { class: "badge", text: "personalizado" }) : null,
+  ]));
+  card.appendChild(el("strong", { text: c.label }));
+  card.appendChild(el("p", { class: "muted small", text: c.description }));
+  card.appendChild(el("div", { class: "card__actions" }, [
+    el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openChallengeForm(c) }),
+    el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("challenges", c.id) }),
+  ]));
+  return card;
+}
+
+function openChallengeForm(existing) {
+  const isNew = !existing;
+  const data = existing || { id: "", label: "", category: "maxi", description: "", custom: true };
+  openModal(isNew ? "Nuevo reto" : `Editar ${data.id}`, [
+    field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
+    field("Nombre", "label", data.label),
+    selectField("Categoría", "category", data.category, [["maxi", "Maxi challenge"], ["mini", "Mini reto"], ["runway", "Pasarela"]]),
+    textareaField("Descripción", "description", data.description),
+  ], (values) => {
+    const item = {
+      id: values.id.trim().toUpperCase().replace(/\s+/g, "_"),
+      label: values.label,
+      category: values.category,
+      description: values.description,
+      custom: true,
+    };
+    if (!item.id) return alert("El código no puede estar vacío.");
+    upsertItem("challenges", item, isNew);
+  });
+}
+
+// ---------- FORMATOS ----------
+function renderFormats() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Catálogo de formatos" }),
+    el("p", { class: "muted", text: "Formatos de estreno, regreso, temporada y final, listos para el motor de simulación." }),
+    el("button", { class: "btn btn--accent", text: "+ Nuevo formato", onclick: () => openFormatForm() }),
+  ]));
+  Object.keys(GROUP_LABELS).forEach((group) => {
+    wrap.appendChild(el("h3", { class: "group-title", text: GROUP_LABELS[group] }));
+    const grid = el("div", { class: "grid" });
+    DB.formats.filter((f) => f.group === group).forEach((f) => grid.appendChild(formatCard(f)));
+    wrap.appendChild(grid);
+  });
+  return wrap;
+}
+
+function formatCard(f) {
+  const card = el("div", { class: "card" });
+  card.appendChild(el("div", { class: "card__top" }, [
+    el("span", { class: "chip chip--outline", text: GROUP_LABELS[f.group] }),
+    f.custom ? el("span", { class: "badge", text: "personalizado" }) : null,
+  ]));
+  card.appendChild(el("strong", { text: f.label }));
+  card.appendChild(el("p", { class: "muted small", text: f.description }));
+  card.appendChild(el("div", { class: "card__actions" }, [
+    el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openFormatForm(f) }),
+    el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("formats", f.id) }),
+  ]));
+  return card;
+}
+
+function openFormatForm(existing) {
+  const isNew = !existing;
+  const data = existing || { id: "", label: "", group: "season", description: "", custom: true };
+  openModal(isNew ? "Nuevo formato" : `Editar ${data.id}`, [
+    field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
+    field("Nombre", "label", data.label),
+    selectField("Grupo", "group", data.group, Object.entries(GROUP_LABELS).map(([k, v]) => [k, v])),
+    textareaField("Descripción / reglas", "description", data.description),
+  ], (values) => {
+    const item = {
+      id: values.id.trim().toUpperCase().replace(/\s+/g, "_"),
+      label: values.label,
+      group: values.group,
+      description: values.description,
+      custom: true,
+    };
+    if (!item.id) return alert("El código no puede estar vacío.");
+    upsertItem("formats", item, isNew);
+  });
+}
+
+// ---------- ROSTER DE PRUEBA (solo lectura, viene de tu Excel) ----------
+function renderRoster() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: window.TEST_ROSTER.seasonName }),
+    el("p", { class: "muted", text: "Roster reducido de prueba, extraído de tu hoja TRACKRECORDS. El motor de simulación (próxima fase) permitirá elegir entre todas tus temporadas." }),
+  ]));
+  const grid = el("div", { class: "grid" });
+  window.TEST_ROSTER.contestants.forEach((c) => {
+    const card = el("div", { class: "card card--queen" });
+    card.appendChild(el("strong", { text: c.name }));
+    card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
+    card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function placementLabel(code) {
+  const s = DB.statuses.find((s) => s.id === code);
+  return s ? s.label : code;
+}
+
+// ---------- CRUD helpers ----------
+function upsertItem(collection, item, isNew) {
+  const list = DB[collection];
+  const idx = list.findIndex((x) => x.id === item.id);
+  if (isNew) {
+    if (idx >= 0) return alert("Ya existe un elemento con ese código.");
+    list.push(item);
+  } else {
+    if (idx < 0) return alert("No se encontró el elemento a editar.");
+    list[idx] = item;
+  }
+  window.RulesStore.saveDB(DB);
+  closeModal();
+  render();
+}
+
+function deleteItem(collection, id) {
+  if (!confirm(`¿Eliminar "${id}"? Esta acción no se puede deshacer.`)) return;
+  DB[collection] = DB[collection].filter((x) => x.id !== id);
+  window.RulesStore.saveDB(DB);
+  render();
+}
+
+// ---------- Modal genérico ----------
+function field(label, name, value, extra = "", type = "text") {
+  return { label, name, value, extra, type, kind: "input" };
+}
+function selectField(label, name, value, options) {
+  return { label, name, value, options, kind: "select" };
+}
+function textareaField(label, name, value) {
+  return { label, name, value, kind: "textarea" };
+}
+
+function openModal(title, fields, onSubmit) {
+  const overlay = document.getElementById("modal-overlay");
+  overlay.innerHTML = "";
+  overlay.classList.add("visible");
+  const modal = el("div", { class: "modal" });
+  modal.appendChild(el("h3", { text: title }));
+
+  const inputs = {};
+  fields.forEach((f) => {
+    const row = el("label", { class: "form-row" }, [el("span", { text: f.label })]);
+    let input;
+    if (f.kind === "select") {
+      input = el("select", { name: f.name });
+      f.options.forEach(([val, label]) => {
+        const opt = el("option", { value: val, text: label });
+        if (val === f.value) opt.setAttribute("selected", "selected");
+        input.appendChild(opt);
+      });
+    } else if (f.kind === "textarea") {
+      input = el("textarea", { name: f.name, rows: "3" });
+      input.value = f.value || "";
+    } else {
+      input = el("input", { name: f.name, type: f.type || "text" });
+      if (f.extra === "disabled") input.setAttribute("disabled", "disabled");
+      input.value = f.value ?? "";
+    }
+    inputs[f.name] = input;
+    row.appendChild(input);
+    modal.appendChild(row);
+  });
+
+  const actions = el("div", { class: "modal__actions" }, [
+    el("button", { class: "btn btn--ghost", text: "Cancelar", onclick: closeModal }),
+    el("button", { class: "btn btn--accent", text: "Guardar", onclick: () => {
+      const values = {};
+      for (const [name, node] of Object.entries(inputs)) values[name] = node.value;
+      onSubmit(values);
+    } }),
+  ]);
+  modal.appendChild(actions);
+  overlay.appendChild(modal);
+}
+
+function closeModal() {
+  const overlay = document.getElementById("modal-overlay");
+  overlay.classList.remove("visible");
+  overlay.innerHTML = "";
+}
+
+// ---------- Export / Import ----------
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: "reglas-drag-race-simulator.json" });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed.statuses || !parsed.challenges || !parsed.formats) {
+        throw new Error("El archivo no tiene el formato esperado.");
+      }
+      DB = parsed;
+      window.RulesStore.saveDB(DB);
+      render();
+    } catch (e) {
+      alert("No se pudo importar el archivo: " + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm("Esto borrará tus cambios personalizados y volverá a los catálogos por defecto. ¿Continuar?")) return;
+  DB = window.RulesStore.resetDB();
+  render();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  render();
+  document.getElementById("btn-export").addEventListener("click", exportJSON);
+  document.getElementById("btn-reset").addEventListener("click", resetAll);
+  document.getElementById("file-import").addEventListener("change", (e) => {
+    if (e.target.files[0]) importJSON(e.target.files[0]);
+    e.target.value = "";
+  });
+  document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "modal-overlay") closeModal();
+  });
+});
