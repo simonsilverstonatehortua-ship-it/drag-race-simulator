@@ -9,12 +9,14 @@
 // Dance, Design, Improv, Runway y Lip Sync. Son estimaciones de ambientación para que el
 // motor de simulación (js/engine.js) las use al puntuar retos, NO datos oficiales.
 //
-// "image": foto de la concursante. De momento apunta a las imágenes públicas de
+// "image": foto de la concursante. La mayoría apuntan a las imágenes públicas de
 // MochaMishu/Drag-Race-Simulator (un fork público del simulador de referencia,
-// myrainboww.github.io/Drag-Race-Simulator) alojadas en raw.githubusercontent.com. Es un
-// hotlink a un repositorio de terceros: si algún día se borra o renombra, esas fotos
-// dejarán de cargar (se ve un icono roto, no rompe el resto de la app). Puedes sustituir
-// cualquiera por tu propia URL en cualquier momento.
+// myrainboww.github.io/Drag-Race-Simulator) alojadas en raw.githubusercontent.com — son
+// su foto promocional original de esa temporada. Unas pocas (marcadas abajo) usan en su
+// lugar una foto más reciente de Wikimedia Commons, cuando ese fork solo tenía el look de
+// su temporada de debut. Todo esto es hotlink a repositorios de terceros: si algún día se
+// borran o renombran, esas fotos dejarán de cargar (se oculta el icono roto, no rompe el
+// resto de la app). Puedes sustituir cualquiera por tu propia URL en cualquier momento.
 
 const STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway", "lipsync"];
 const STAT_LABELS = {
@@ -50,7 +52,7 @@ const ALL_SEASONS = [
         image: IMG_BASE + "Rebecca.webp",
         stats: { acting: 7, comedy: 6, dance: 8, design: 9, improv: 6, runway: 11, lipsync: 7 } },
       { name: "Shannel", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Shannel",
-        image: IMG_BASE + "Shannel.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Shannel_at_RuPaul%27s_DragCon_LA_2024_%28cropped%29.jpg/330px-Shannel_at_RuPaul%27s_DragCon_LA_2024_%28cropped%29.jpg",
         stats: { acting: 7, comedy: 5, dance: 8, design: 12, improv: 6, runway: 12, lipsync: 8 } },
       { name: "Ongina", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Ongina",
         image: IMG_BASE + "Ongina.webp",
@@ -77,7 +79,7 @@ const ALL_SEASONS = [
         image: IMG_BASE + "Tyra.webp",
         stats: { acting: 6, comedy: 5, dance: 8, design: 13, improv: 6, runway: 14, lipsync: 9 } },
       { name: "Raven", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Raven",
-        image: IMG_BASE + "Raven.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Raven_%28cropped%29.jpg/330px-Raven_%28cropped%29.jpg",
         stats: { acting: 9, comedy: 10, dance: 9, design: 14, improv: 9, runway: 13, lipsync: 10 } },
       { name: "Jujubee", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Jujubee",
         image: IMG_BASE + "Jujubee.webp",
@@ -89,22 +91,22 @@ const ALL_SEASONS = [
         image: IMG_BASE + "Pandora.webp",
         stats: { acting: 8, comedy: 13, dance: 6, design: 6, improv: 11, runway: 6, lipsync: 7 } },
       { name: "Jessica Wild", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Jessica_Wild",
-        image: IMG_BASE + "Jessica.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/DragCon_2023_%40_DVSROSS_Photgraphy_-172_%28cropped2%29.jpg/330px-DragCon_2023_%40_DVSROSS_Photgraphy_-172_%28cropped2%29.jpg",
         stats: { acting: 6, comedy: 7, dance: 10, design: 6, improv: 6, runway: 7, lipsync: 8 } },
       { name: "Sahara Davenport", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Sahara_Davenport",
         image: IMG_BASE + "Sahara.webp",
         stats: { acting: 6, comedy: 5, dance: 11, design: 8, improv: 5, runway: 9, lipsync: 7 } },
       { name: "Morgan McMichaels", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Morgan_McMichaels",
-        image: IMG_BASE + "Morgan.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/DragCon_2023_%40_DVSROSS_Photgraphy_-61_%28cropped%29.jpg/330px-DragCon_2023_%40_DVSROSS_Photgraphy_-61_%28cropped%29.jpg",
         stats: { acting: 6, comedy: 6, dance: 8, design: 10, improv: 6, runway: 11, lipsync: 8 } },
       { name: "Kylie Sonique Love", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Kylie_Sonique_Love",
         image: IMG_BASE + "Kylie.webp",
         stats: { acting: 6, comedy: 5, dance: 7, design: 8, improv: 5, runway: 9, lipsync: 7 } },
       { name: "Mystique Summers", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Mystique_Summers",
-        image: IMG_BASE + "Mystique.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/RuPaul_DragCon_2022_%2852073257151%29.jpg/330px-RuPaul_DragCon_2022_%2852073257151%29.jpg",
         stats: { acting: 5, comedy: 5, dance: 6, design: 5, improv: 5, runway: 6, lipsync: 5 } },
       { name: "Nicole Paige Brooks", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Nicole_Paige_Brooks",
-        image: IMG_BASE + "Nicole.webp",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/RuPaul_DragCon_2022_%2852073483624%29_%28cropped%29.jpg/330px-RuPaul_DragCon_2022_%2852073483624%29_%28cropped%29.jpg",
         stats: { acting: 4, comedy: 5, dance: 5, design: 5, improv: 5, runway: 6, lipsync: 5 } },
       { name: "Shangela", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Shangela",
         image: IMG_BASE + "Shangela.webp",
