@@ -204,6 +204,10 @@ function buildTrackRecord(result) {
   return { columns, rows, indexed };
 }
 
+function statusCountsForPoints(status) {
+  return status.countsForPoints !== undefined ? status.countsForPoints : status.type === "weekly";
+}
+
 function shortEpisodeLabel(label) {
   if (label === "Final") return "Final";
   const m = /Episodio (\w+)/.exec(label);
@@ -246,10 +250,11 @@ function trackRecordTable(track, shown, result) {
 
     let pointsSum = 0, pointsCount = 0;
     row.cells.slice(0, shown).forEach((cell) => {
-      if (!cell) { tr.appendChild(el("td", { text: "—" })); return; }
+      if (!cell) { tr.appendChild(el("td", { class: "trackrecord-cell", text: "—" })); return; }
       const status = DB.statuses.find((s) => s.id === cell.status);
-      tr.appendChild(el("td", { text: cell.status, style: status ? `color:${status.color};font-weight:700;` : "" }));
-      if (status) { pointsSum += status.points; pointsCount++; }
+      tr.appendChild(el("td", { class: "trackrecord-cell", text: cell.status,
+        style: status ? `background:${status.color};` : "" }));
+      if (status && statusCountsForPoints(status)) { pointsSum += status.points; pointsCount++; }
     });
 
     tr.appendChild(el("td", { text: pointsCount ? (pointsSum / pointsCount).toFixed(2) : "–" }));
@@ -465,7 +470,7 @@ function statusCard(s) {
   ]));
   card.appendChild(el("strong", { text: s.label }));
   card.appendChild(el("p", { class: "muted small", text: s.description }));
-  card.appendChild(el("div", { class: "card__meta", text: `Puntos: ${s.points}` }));
+  card.appendChild(el("div", { class: "card__meta", text: `Puntos: ${s.points}${statusCountsForPoints(s) ? " (cuenta para PPE)" : ""}` }));
   card.appendChild(el("div", { class: "card__actions" }, [
     el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openStatusForm(s) }),
     el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("statuses", s.id) }),
@@ -475,13 +480,15 @@ function statusCard(s) {
 
 function openStatusForm(existing) {
   const isNew = !existing;
-  const data = existing || { id: "", label: "", type: "weekly", color: "#E4136B", points: 0, description: "", custom: true };
+  const data = existing || { id: "", label: "", type: "weekly", color: "#E4136B", points: 0, countsForPoints: true, description: "", custom: true };
+  const currentCounts = data.countsForPoints !== undefined ? data.countsForPoints : data.type === "weekly";
   openModal(isNew ? "Nuevo estado" : `Editar ${data.id}`, [
     field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
     field("Nombre", "label", data.label),
     selectField("Tipo", "type", data.type, [["weekly", "Semanal"], ["final", "Colocación final"]]),
     field("Color", "color", data.color, "", "color"),
     field("Puntos", "points", data.points, "", "number"),
+    selectField("Cuenta para el promedio (PPE)", "countsForPoints", String(currentCounts), [["true", "Sí"], ["false", "No"]]),
     textareaField("Descripción", "description", data.description),
   ], (values) => {
     const item = {
@@ -490,6 +497,7 @@ function openStatusForm(existing) {
       type: values.type,
       color: values.color,
       points: Number(values.points) || 0,
+      countsForPoints: values.countsForPoints === "true",
       description: values.description,
       custom: true,
     };

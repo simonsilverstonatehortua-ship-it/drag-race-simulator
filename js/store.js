@@ -3,12 +3,26 @@
 
 const STORAGE_KEY = "dragRaceSimulator.rulesDB.v1";
 
+// Refresca en `list` las entradas NO personalizadas (custom:false) con los valores por
+// defecto actuales (por si esta versión trae ajustes, p.ej. nuevos puntos). Lo que el
+// usuario haya editado o creado (custom:true) se respeta tal cual.
+function refreshUntouchedDefaults(list, defaults) {
+  if (!Array.isArray(list)) return;
+  defaults.forEach((def) => {
+    const idx = list.findIndex((x) => x.id === def.id && x.custom === false);
+    if (idx >= 0) list[idx] = structuredClone(def);
+  });
+}
+
 function loadDB() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
       const db = JSON.parse(raw);
       if (!db.customContestants) db.customContestants = [];
+      refreshUntouchedDefaults(db.statuses, window.DEFAULT_STATUSES);
+      refreshUntouchedDefaults(db.challenges, window.DEFAULT_CHALLENGES);
+      refreshUntouchedDefaults(db.formats, window.DEFAULT_FORMATS);
       return db;
     } catch (e) {
       console.warn("No se pudo leer la base de datos guardada, se reinicia.", e);

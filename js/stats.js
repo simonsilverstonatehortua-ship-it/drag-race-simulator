@@ -6,8 +6,12 @@
 // hacía en la hoja de Excel original.
 
 function computeStats(history, db) {
+  const statusById = {};
+  db.statuses.forEach((s) => { statusById[s.id] = s; });
   const pointsByStatus = {};
   db.statuses.forEach((s) => { pointsByStatus[s.id] = s.points; });
+  const countsForPoints = (status) =>
+    status && (status.countsForPoints !== undefined ? status.countsForPoints : status.type === "weekly");
 
   const perContestant = {};
   function ensure(name) {
@@ -35,10 +39,12 @@ function computeStats(history, db) {
         const c = ensure(r.name);
         namesThisSeason.add(r.name);
         c.statusCounts[r.status] = (c.statusCounts[r.status] || 0) + 1;
-        const pts = pointsByStatus[r.status] ?? 0;
-        c.weeklyPoints += pts;
-        c.weeklyEpisodes += 1;
-        c.careerPoints += pts;
+        const status = statusById[r.status];
+        if (countsForPoints(status)) {
+          c.weeklyPoints += status.points;
+          c.weeklyEpisodes += 1;
+          c.careerPoints += status.points;
+        }
       });
     });
 

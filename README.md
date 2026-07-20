@@ -62,11 +62,19 @@ Pestaña "Simular": eliges concursantes del roster de prueba y el formato de est
 regreso / temporada / final, y el motor (`js/engine.js`) genera la temporada completa de
 golpe puertas adentro, pero el resultado se **revela episodio a episodio** en una tabla de
 trackrecord (Rank / Concursante / Ep. 1 / Ep. 2 / ... / PPE) al estilo de tu hoja Excel o
-del simulador de referencia: cada click en "▶ Siguiente episodio" añade una columna más;
-"Revelar todo" salta al final. El "Rank" de cada fila se queda en "TBA" hasta que se revela
-su eliminación (o el episodio Final si llega hasta el podio). El historial guardado
-(pestaña Estadísticas → "Ver detalle") sí se muestra completo de una vez, sin revelado
-progresivo, porque ya es una temporada pasada.
+del simulador de referencia: cada celda tiene el fondo del color de su estado (igual que
+las hojas de cálculo con formato condicional), cada click en "▶ Siguiente episodio" añade
+una columna más, y "Revelar todo" salta al final. El "Rank" de cada fila se queda en "TBA"
+hasta que se revela su eliminación (o el episodio Final si llega hasta el podio). El
+historial guardado (pestaña Estadísticas → "Ver detalle") sí se muestra completo de una
+vez, sin revelado progresivo, porque ya es una temporada pasada.
+
+**Puntos por estado (PPE)**: WIN=10, TOP2=9, HIGH=8, SAFE=5, LOW=3, BTM=1, ELIM=0. Solo
+estos 7 estados semanales cuentan para el promedio de puntos por episodio (columna "PPE"
+de la tabla y "Puntos/ep." en Estadísticas); el resto (MVQ, ADV, RTRN, QUIT, DISQ, GUEST) y
+las colocaciones finales (WINNER/RUNNER_UP/MISS_CONGENIALITY, que sí suman aparte como
+puntos de carrera) quedan fuera del promedio. Esto es configurable por estado (campo
+"Cuenta para el promedio (PPE)") desde la pestaña Estados.
 
 **Implementado de verdad:**
 - Estreno normal, estreno normal sin eliminación, doble estreno (con y sin eliminación),

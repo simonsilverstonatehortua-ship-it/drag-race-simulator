@@ -474,6 +474,13 @@ footer {
   align-items: center;
   gap: 0.4rem;
 }
+.trackrecord-cell {
+  text-align: center !important;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #141019;
+}
 
 @media (max-width: 600px) {
   .marquee { padding: 1.8rem 1rem 1.2rem; }
