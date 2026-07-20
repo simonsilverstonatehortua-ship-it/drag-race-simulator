@@ -4,7 +4,7 @@ const HISTORY_KEY = "dragRaceSimulator.history.v1";
 
 const TABS = ["simulate", "stats", "statuses", "challenges", "formats", "roster"];
 let currentTab = "simulate";
-let simSelection = new Set(window.TEST_ROSTER.contestants.map((c) => c.name));
+let simSelection = new Set(window.ALL_SEASONS[0].contestants.map((c) => c.name));
 let lastSimResult = null;
 
 const GROUP_LABELS = {
@@ -73,24 +73,28 @@ function renderSimulate() {
     el("p", { class: "muted", text: "Elige concursantes y formato, y genera una temporada completa episodio a episodio. Todo es aleatorio (con algo de peso según la puntuación del reto)." }),
   ]));
 
-  // Selección de roster
+  // Selección de concursantes: puedes mezclar concursantes de distintas temporadas
+  // cargadas en un mismo reparto, no estás atado a un solo cast.
   wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes (${simSelection.size} seleccionadas)` }));
-  wrap.appendChild(el("p", { class: "muted small", text: "De momento solo está cargado el roster de prueba (Temporada 1). Amplía js/data/roster.js para añadir más." }));
-  const rosterGrid = el("div", { class: "grid" });
-  window.TEST_ROSTER.contestants.forEach((c) => {
-    const checked = simSelection.has(c.name);
-    const card = el("label", { class: "card card--queen card--selectable" + (checked ? " card--checked" : "") });
-    const checkbox = el("input", { type: "checkbox" });
-    checkbox.checked = checked;
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) simSelection.add(c.name); else simSelection.delete(c.name);
-      render();
+  wrap.appendChild(el("p", { class: "muted small", text: "Elige libremente entre concursantes de cualquier temporada cargada; puedes mezclar de varias en un mismo reparto. Amplía js/data/roster.js para añadir más temporadas." }));
+  window.ALL_SEASONS.forEach((season) => {
+    wrap.appendChild(el("h4", { class: "season-title", text: season.seasonName }));
+    const rosterGrid = el("div", { class: "grid" });
+    season.contestants.forEach((c) => {
+      const checked = simSelection.has(c.name);
+      const card = el("label", { class: "card card--queen card--selectable" + (checked ? " card--checked" : "") });
+      const checkbox = el("input", { type: "checkbox" });
+      checkbox.checked = checked;
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) simSelection.add(c.name); else simSelection.delete(c.name);
+        render();
+      });
+      card.appendChild(checkbox);
+      card.appendChild(el("strong", { text: c.name }));
+      rosterGrid.appendChild(card);
     });
-    card.appendChild(checkbox);
-    card.appendChild(el("strong", { text: c.name }));
-    rosterGrid.appendChild(card);
+    wrap.appendChild(rosterGrid);
   });
-  wrap.appendChild(rosterGrid);
 
   // Selección de formatos
   wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
@@ -476,22 +480,25 @@ function openFormatForm(existing) {
   });
 }
 
-// ---------- ROSTER DE PRUEBA (solo lectura, viene de tu Excel) ----------
+// ---------- ROSTER (solo lectura, viene de tu Excel / fandom wiki) ----------
 function renderRoster() {
   const wrap = el("div", { class: "section" });
   wrap.appendChild(el("div", { class: "section__head" }, [
-    el("h2", { text: window.TEST_ROSTER.seasonName }),
-    el("p", { class: "muted", text: "Roster reducido de prueba, extraído de tu hoja TRACKRECORDS. El motor de simulación (próxima fase) permitirá elegir entre todas tus temporadas." }),
+    el("h2", { text: "Roster" }),
+    el("p", { class: "muted", text: "Temporadas reales cargadas, extraídas de tu hoja TRACKRECORDS / fandom wiki. En la pestaña Simular puedes mezclar concursantes de cualquiera de ellas en un mismo reparto." }),
   ]));
-  const grid = el("div", { class: "grid" });
-  window.TEST_ROSTER.contestants.forEach((c) => {
-    const card = el("div", { class: "card card--queen" });
-    card.appendChild(el("strong", { text: c.name }));
-    card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
-    card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
-    grid.appendChild(card);
+  window.ALL_SEASONS.forEach((season) => {
+    wrap.appendChild(el("h3", { class: "group-title", text: season.seasonName }));
+    const grid = el("div", { class: "grid" });
+    season.contestants.forEach((c) => {
+      const card = el("div", { class: "card card--queen" });
+      card.appendChild(el("strong", { text: c.name }));
+      card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
+      card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
   });
-  wrap.appendChild(grid);
   return wrap;
 }
 
