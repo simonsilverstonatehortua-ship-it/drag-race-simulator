@@ -18,7 +18,7 @@
 
 const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP"];
 const IMPLEMENTED_RETURN = ["RETURN_NONE", "RETURN_RANDOM", "RETURN_LALAPARUZA"];
-const IMPLEMENTED_SEASON = ["SEASON_REGULAR", "SEASON_TEAMS", "SEASON_LIPSYNC_ASSASSIN"];
+const IMPLEMENTED_SEASON = ["SEASON_REGULAR", "SEASON_TEAMS", "SEASON_LIPSYNC_ASSASSIN", "SEASON_LIPSYNC_LEGACY"];
 const IMPLEMENTED_FINALE = ["FINALE_TOP2", "FINALE_TOP3", "FINALE_TOP4", "FINALE_JURY_VOTE", "FINALE_LIPSYNC_CROWN"];
 
 const FINALE_SIZE = {
@@ -100,6 +100,32 @@ function loseLipsyncBattle(names, db, statsByName) {
   return scored[0].name;
 }
 
+// Junta nombres y puestos en una frase: "A y B quedaron en Xº lugar y Yº lugar,
+// respectivamente." (o "A quedó en Xº lugar." si solo hay una entrada).
+function describeTiedPlacements(entries) {
+  const joinList = (arr) => arr.length <= 1
+    ? arr.join("")
+    : arr.length === 2
+      ? arr.join(" y ")
+      : `${arr.slice(0, -1).join(", ")} y ${arr[arr.length - 1]}`;
+  if (entries.length === 1) return `${entries[0].name} quedó en ${entries[0].placement}.`;
+  return `${joinList(entries.map((e) => e.name))} quedaron en ${joinList(entries.map((e) => e.placement))}, respectivamente.`;
+}
+
+// Miss Simpatía: si hay datos de Carisma, se sesga hacia quien tenga más; si no, al azar.
+function pickMissCongeniality(candidates, statsByName) {
+  const withStats = candidates.filter((n) => statsByName[n] && typeof statsByName[n].charisma === "number");
+  if (!withStats.length) return candidates[Math.floor(Math.random() * candidates.length)];
+  const weights = candidates.map((n) => (statsByName[n] ? statsByName[n].charisma + 1 : 8));
+  const total = weights.reduce((a, b) => a + b, 0);
+  let roll = Math.random() * total;
+  for (let i = 0; i < candidates.length; i++) {
+    roll -= weights[i];
+    if (roll <= 0) return candidates[i];
+  }
+  return candidates[candidates.length - 1];
+}
+
 // Elige un valor al azar de una lista de {value, weight}.
 function weightedPick(options) {
   const total = options.reduce((sum, o) => sum + o.weight, 0);
@@ -136,6 +162,48 @@ function pickElimCount(bottomN) {
   return Math.min(weightedPick(weights), bottomN);
 }
 
+// Reparte HIGH/LOW/fondo+eliminación sobre quienes en "results" sigan "SAFE" (deja
+// intactas las casillas ya asignadas antes, p.ej. WIN/TOP2 de Lipsync For Your Legacy).
+// "maxElim" limita cuántas puede eliminar (para no bajar del tamaño de la final).
+// Devuelve { eliminatedNames, lipsyncNote }.
+function assignMidTierAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity } = {}) {
+  const pool = results.filter((r) => r.status === "SAFE");
+  const n = pool.length;
+  const canEliminate = !noElim && maxElim > 0;
+
+  let highCount = 0, lowCount = 0, bottomN = 0;
+  if (canEliminate) {
+    bottomN = Math.max(0, Math.min(pickBottomCount(), n));
+    highCount = Math.max(0, Math.min(pickHighCount(), n - bottomN));
+    lowCount = Math.max(0, Math.min(pickLowCount(), n - bottomN - highCount));
+  } else {
+    highCount = Math.max(0, Math.min(pickHighCount(), n));
+  }
+
+  for (let i = 0; i < highCount; i++) pool[i].status = "HIGH";
+  for (let i = 0; i < lowCount; i++) pool[n - bottomN - 1 - i].status = "LOW";
+
+  let eliminatedNames = [];
+  let lipsyncNote = "";
+  if (canEliminate && bottomN > 0) {
+    const bottomSlice = pool.slice(n - bottomN);
+    bottomSlice.forEach((r) => (r.status = "BTM"));
+    const elimCount = Math.max(1, Math.min(pickElimCount(bottomN), bottomN, maxElim));
+    const lipScored = bottomSlice.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
+    lipScored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
+    eliminatedNames = lipScored.slice(0, elimCount).map((r) => r.name);
+    eliminatedNames.forEach((name) => { bottomSlice.find((r) => r.name === name).status = "ELIM"; });
+    const survivors = bottomSlice.filter((r) => r.status !== "ELIM").map((r) => r.name);
+    lipsyncNote = eliminatedNames.length > 1
+      ? `Lip sync múltiple: se eliminan ${eliminatedNames.join(", ")}. ${survivors.length ? "Se salva " + survivors.join(", ") + "." : ""}`
+      : `Lip sync: se salva ${survivors.join(", ")}.`;
+  } else if (!noElim) {
+    lipsyncNote = "Grupo demasiado reducido para lip sync esta semana: nadie es eliminada.";
+  }
+
+  return { eliminatedNames, lipsyncNote };
+}
+
 // Simula un único reto entre un grupo de concursantes activas. El reparto de estados
 // normalmente es 1 WIN / 2 HIGH / 1 LOW / 2 en el fondo (1 BTM + 1 ELIM), pero varía: a
 // veces hay empate en la victoria, más o menos HIGH/LOW, lipsyncs de 3-4 concursantes o
@@ -154,39 +222,33 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   const winCount = Math.max(1, Math.min(pickWinCount(), Math.floor(n / 2) || 1));
   for (let i = 0; i < winCount; i++) results[i].status = "WIN";
 
-  const canEliminate = !noElim && maxElim > 0;
-  const remaining = n - winCount;
-  let highCount = 0, lowCount = 0, bottomN = 0;
-  if (canEliminate) {
-    bottomN = Math.max(0, Math.min(pickBottomCount(), remaining));
-    highCount = Math.max(0, Math.min(pickHighCount(), remaining - bottomN));
-    lowCount = Math.max(0, Math.min(pickLowCount(), remaining - bottomN - highCount));
-  } else {
-    highCount = Math.max(0, Math.min(pickHighCount(), remaining));
-  }
-
-  for (let i = 0; i < highCount; i++) results[winCount + i].status = "HIGH";
-  for (let i = 0; i < lowCount; i++) results[n - bottomN - 1 - i].status = "LOW";
-
-  let eliminatedNames = [];
-  let lipsyncNote = "";
-  if (canEliminate && bottomN > 0) {
-    const bottomSlice = results.slice(n - bottomN);
-    bottomSlice.forEach((r) => (r.status = "BTM"));
-    const elimCount = Math.max(1, Math.min(pickElimCount(bottomN), bottomN, maxElim));
-    const lipScored = bottomSlice.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
-    lipScored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
-    eliminatedNames = lipScored.slice(0, elimCount).map((r) => r.name);
-    eliminatedNames.forEach((name) => { bottomSlice.find((r) => r.name === name).status = "ELIM"; });
-    const survivors = bottomSlice.filter((r) => r.status !== "ELIM").map((r) => r.name);
-    lipsyncNote = eliminatedNames.length > 1
-      ? `Lip sync múltiple: se eliminan ${eliminatedNames.join(", ")}. ${survivors.length ? "Se salva " + survivors.join(", ") + "." : ""}`
-      : `Lip sync: se salva ${survivors.join(", ")}.`;
-  } else if (!noElim) {
-    lipsyncNote = "Grupo demasiado reducido para lip sync esta semana: nadie es eliminada.";
-  }
-
+  const { eliminatedNames, lipsyncNote } = assignMidTierAndElimination(results, db, statsByName, { noElim, maxElim });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
+}
+
+// --- Lipsync For Your Legacy: las dos mejores puntuadas de la semana hacen lip sync por
+// su legado (la ganadora se queda con el WIN, la perdedora queda TOP2: a salvo pero sin
+// puntos de victoria). El resto sigue el reparto normal de HIGH/LOW/fondo+eliminación. ---
+function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinity) {
+  const challenge = randomChallenge(db.challenges);
+  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
+  scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
+  const results = scored.map((s) => ({ ...s, status: "SAFE" }));
+
+  let legacyNote = "";
+  if (results.length >= 2) {
+    const [first, second] = results;
+    const winner = lipsyncWinner(first.name, second.name, db, statsByName);
+    const loser = winner === first.name ? second.name : first.name;
+    first.status = first.name === winner ? "WIN" : "TOP2";
+    second.status = second.name === winner ? "WIN" : "TOP2";
+    legacyNote = `${first.name} y ${second.name} empatan como mejores de la semana y hacen Lip Sync For Your Legacy: gana ${winner}. ${loser} se queda como TOP2 (a salvo, sin puntos de victoria).`;
+  } else if (results.length === 1) {
+    results[0].status = "WIN";
+  }
+
+  const { eliminatedNames, lipsyncNote } = assignMidTierAndElimination(results, db, statsByName, { maxElim });
+  return { challenge: challenge.label, results, eliminatedNames, lipsyncNote: `${legacyNote} ${lipsyncNote}`.trim() };
 }
 
 // --- Estreno Porkchop: llegan por parejas, un mini reto decide quién compite esa
@@ -324,20 +386,38 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName) {
 
   const assassin = results[0].name;
   const candidates = results.slice(1);
-  // El asesino tiende a retar a quien puntuó más bajo, pero puede retar a cualquiera.
-  const weights = candidates.map((c) => 11 - c.score);
-  const total = weights.reduce((a, b) => a + b, 0);
-  let roll = Math.random() * total;
-  let targetIdx = candidates.length - 1;
-  for (let i = 0; i < weights.length; i++) {
-    roll -= weights[i];
-    if (roll <= 0) { targetIdx = i; break; }
+
+  // Cuanta más Estrategia tenga la asesina, más probable que juegue "sucio": en vez de
+  // retar a quien puntuó más bajo (jugada segura), apunta a su mayor amenaza real en la
+  // competencia (alianzas rotas, traiciones al estilo Mistress/Jorgeous en All Stars 10).
+  const assassinStrategy = statsByName[assassin] && typeof statsByName[assassin].strategy === "number" ? statsByName[assassin].strategy : 7.5;
+  const playsStrategically = Math.random() * 15 < assassinStrategy;
+
+  let target, targetReason;
+  if (playsStrategically) {
+    const threatOf = (c) => {
+      const stats = statsByName[c.name];
+      return stats ? average(ALL_STAT_KEYS.map((k) => stats[k] ?? 7.5)) : c.score;
+    };
+    const sorted = [...candidates].sort((a, b) => threatOf(b) - threatOf(a) || Math.random() - 0.5);
+    target = sorted[0].name;
+    targetReason = "en una jugada estratégica, apunta a su mayor amenaza en la competencia";
+  } else {
+    const weights = candidates.map((c) => 11 - c.score);
+    const total = weights.reduce((a, b) => a + b, 0);
+    let roll = Math.random() * total;
+    let targetIdx = candidates.length - 1;
+    for (let i = 0; i < weights.length; i++) {
+      roll -= weights[i];
+      if (roll <= 0) { targetIdx = i; break; }
+    }
+    target = candidates[targetIdx].name;
+    targetReason = "reta a quien puntuó más bajo";
   }
-  const target = candidates[targetIdx].name;
 
   const winner = lipsyncWinner(assassin, target, db, statsByName);
   let eliminatedName = null;
-  let lipsyncNote = `${assassin} gana el reto y se convierte en la Lipsync Assassin: reta a ${target} a un lip sync sin red.`;
+  let lipsyncNote = `${assassin} gana el reto y se convierte en la Lipsync Assassin: ${targetReason}, retando a ${target} a un lip sync sin red.`;
   if (winner === assassin) {
     eliminatedName = target;
     results.find((r) => r.name === target).status = "ELIM";
@@ -354,13 +434,19 @@ function runJuryFinale(finalists, eliminatedPool, db, statsByName) {
   const finaleScored = finalists.map((name) => ({ name, score: challengeScore(name, null, db, statsByName) }));
   finaleScored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
+  // El jurado premia tanto la mejor actuación de la final como el Carisma (si hay stats).
+  const favorability = {};
+  finalists.forEach((name) => {
+    const scoreRank = finaleScored.findIndex((f) => f.name === name);
+    const scoreWeight = (finalists.length - scoreRank) * 2;
+    const charisma = statsByName[name] && typeof statsByName[name].charisma === "number" ? statsByName[name].charisma : 7.5;
+    favorability[name] = scoreWeight + charisma;
+  });
+
   const votes = {};
   finalists.forEach((n) => (votes[n] = 0));
   eliminatedPool.forEach(() => {
-    // El jurado tiende a premiar la mejor actuación de la final, pero no siempre.
-    const votedFor = Math.random() < 0.65
-      ? finaleScored[0].name
-      : finalists[Math.floor(Math.random() * finalists.length)];
+    const votedFor = weightedPick(finalists.map((n) => ({ value: n, weight: favorability[n] })));
     votes[votedFor]++;
   });
 
@@ -501,6 +587,8 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     const maxElim = Math.max(0, active.length - finaleSize);
     if (formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" && active.length >= 3) {
       ep = runLipsyncAssassinEpisode(active, db, statsByName);
+    } else if (formatChoice.season === "SEASON_LIPSYNC_LEGACY" && active.length >= 3) {
+      ep = runLipsyncLegacyEpisode(active, db, statsByName, maxElim);
     } else if (formatChoice.season === "SEASON_TEAMS" && !teamsEpisodeDone && active.length >= 4) {
       ep = runTeamsEpisode(active, db, statsByName);
       teamsEpisodeDone = true;
@@ -555,14 +643,15 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     finaleLipsyncNote = `${winnerName} gana el lip sync final y se corona.`;
   }
 
-  log.push({
+  const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
     results: finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
       status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" })),
-    eliminatedName: null,
+    eliminatedNames: [],
     lipsyncNote: finaleLipsyncNote,
-  });
+  };
+  log.push(finalLogEntry);
 
   const finalPlacements = { [winnerName]: "WINNER", [runnerUpName]: "RUNNER_UP" };
   restNames.forEach((name, i) => { finalPlacements[name] = `${i + 3}º lugar`; });
@@ -572,9 +661,23 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     if (!finalPlacements[name]) finalPlacements[name] = `${finaleSize + i + 1}º lugar`;
   });
 
-  // Miss Simpatía: al azar entre quienes no ganaron
+  // Narrativa: quiénes quedaron en qué puesto cuando hay más de una implicada a la vez
+  // (dobles+ eliminaciones durante la temporada, o finalistas que no llegan al lip sync
+  // final en formatos Top3/Top4/jurado/bracket).
+  log.forEach((ep) => {
+    if (ep.eliminatedNames && ep.eliminatedNames.length > 1) {
+      const entries = ep.eliminatedNames.map((name) => ({ name, placement: finalPlacements[name] }));
+      ep.lipsyncNote += ` ${describeTiedPlacements(entries)}`;
+    }
+  });
+  if (restNames.length > 0) {
+    const entries = restNames.map((name) => ({ name, placement: finalPlacements[name] }));
+    finalLogEntry.lipsyncNote += ` ${describeTiedPlacements(entries)}`;
+  }
+
+  // Miss Simpatía: se favorece a quien tenga más Carisma (si hay stats), si no, al azar.
   const missCandidates = contestantNames.filter((n) => n !== winnerName);
-  const missCongeniality = missCandidates[Math.floor(Math.random() * missCandidates.length)];
+  const missCongeniality = pickMissCongeniality(missCandidates, statsByName);
 
   return { log, winnerName, runnerUpName, finalPlacements, missCongeniality, notes };
 }

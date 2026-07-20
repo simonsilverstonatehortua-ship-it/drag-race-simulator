@@ -18,7 +18,7 @@ const DEFAULT_CHALLENGES = [
     description: "Número musical con canto, baile y actuación en un musical original." },
   { id: "BALL", label: "Ball / Eleganza", category: "runway", custom: false, stats: ["runway", "design"],
     description: "Pasarela temática por categorías (Extravagant Eleganza, etc.)." },
-  { id: "TALENT_SHOW", label: "Talent Show", category: "maxi", custom: false, stats: ["improv", "dance", "comedy"],
+  { id: "TALENT_SHOW", label: "Talent Show", category: "maxi", custom: false, stats: ["talent", "improv", "dance"],
     description: "Cada concursante presenta su propio número de talento." },
   { id: "ROAST", label: "Roast de RuPaul", category: "maxi", custom: false, stats: ["comedy"],
     description: "Comedia de improvisación burlándose de RuPaul y compañeras." },

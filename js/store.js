@@ -20,6 +20,7 @@ function loadDB() {
     try {
       const db = JSON.parse(raw);
       if (!db.customContestants) db.customContestants = [];
+      if (!db.contestantOverrides) db.contestantOverrides = {};
       refreshUntouchedDefaults(db.statuses, window.DEFAULT_STATUSES);
       refreshUntouchedDefaults(db.challenges, window.DEFAULT_CHALLENGES);
       refreshUntouchedDefaults(db.formats, window.DEFAULT_FORMATS);
@@ -34,6 +35,7 @@ function loadDB() {
     formats: structuredClone(window.DEFAULT_FORMATS),
     scoreScale: structuredClone(window.DEFAULT_SCORE_SCALE),
     customContestants: [],
+    contestantOverrides: {},
   };
 }
 

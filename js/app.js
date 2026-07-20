@@ -27,6 +27,17 @@ function contestantImage(name) {
   return null;
 }
 
+// Stats de una concursante: si el usuario editó las de una concursante real, esa
+// personalización (guardada en DB.contestantOverrides) gana sobre las de fábrica.
+function contestantStats(name) {
+  if (DB.contestantOverrides[name]) return DB.contestantOverrides[name];
+  const real = window.ALL_CONTESTANTS.find((c) => c.name === name);
+  if (real && real.stats) return real.stats;
+  const custom = DB.customContestants.find((c) => c.name === name);
+  if (custom && custom.stats) return custom.stats;
+  return null;
+}
+
 function avatarImg(name, sizeClass) {
   const src = contestantImage(name);
   if (!src) return null;
@@ -169,6 +180,7 @@ function buildStatsByName() {
   const map = {};
   window.ALL_CONTESTANTS.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
   DB.customContestants.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
+  Object.entries(DB.contestantOverrides).forEach(([name, stats]) => { map[name] = stats; });
   return map;
 }
 
@@ -647,7 +659,7 @@ function renderRoster() {
       const avatar = avatarImg(c.name, "avatar--card");
       if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
-      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
       card.appendChild(el("div", { class: "card__actions" }, [
         el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openCustomQueenForm(c) }),
         el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteCustomContestant(c.name) }),
@@ -666,8 +678,12 @@ function renderRoster() {
       if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
       card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
-      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
+      if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
       card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+      card.appendChild(el("div", { class: "card__actions" }, [
+        el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
+      ]));
       grid.appendChild(card);
     });
     wrap.appendChild(grid);
@@ -763,6 +779,63 @@ function deleteCustomContestant(name) {
   simSelection.delete(name);
   window.RulesStore.saveDB(DB);
   render();
+}
+
+// ---------- EDITAR STATS DE UNA CONCURSANTE REAL ----------
+function openRealStatsForm(contestant) {
+  const hasOverride = !!DB.contestantOverrides[contestant.name];
+  const data = DB.contestantOverrides[contestant.name] || contestant.stats || window.randomStats();
+
+  const overlay = document.getElementById("modal-overlay");
+  overlay.innerHTML = "";
+  overlay.classList.add("visible");
+  const modal = el("div", { class: "modal" });
+  modal.appendChild(el("h3", { text: `Editar stats: ${contestant.name}` }));
+  if (hasOverride) modal.appendChild(el("p", { class: "muted small", text: "Estas stats ya están personalizadas por ti." }));
+
+  const statInputs = {};
+  const statsGrid = el("div", { class: "stats-grid" });
+  window.STAT_KEYS.forEach((key) => {
+    const row = el("div", { class: "stats-grid__item" });
+    row.appendChild(el("span", { class: "stats-grid__label", text: window.STAT_LABELS[key] }));
+    const input = el("input", { type: "number", min: "0", max: "15" });
+    input.value = data[key] ?? 0;
+    statInputs[key] = input;
+    row.appendChild(input);
+    statsGrid.appendChild(row);
+  });
+  modal.appendChild(statsGrid);
+
+  modal.appendChild(el("div", { style: "margin: 0.6rem 0;" }, [
+    el("button", { class: "btn btn--ghost", text: "🎲 Aleatorizar stats", onclick: () => {
+      const randomized = window.randomStats();
+      window.STAT_KEYS.forEach((key) => { statInputs[key].value = randomized[key]; });
+    } }),
+  ]));
+
+  const actions = [
+    el("button", { class: "btn btn--ghost", text: "Cancelar", onclick: closeModal }),
+  ];
+  if (hasOverride) {
+    actions.push(el("button", { class: "btn btn--ghost btn--danger", text: "Restablecer original", onclick: () => {
+      delete DB.contestantOverrides[contestant.name];
+      window.RulesStore.saveDB(DB);
+      closeModal();
+      render();
+    } }));
+  }
+  actions.push(el("button", { class: "btn btn--accent", text: "Guardar", onclick: () => {
+    const stats = {};
+    window.STAT_KEYS.forEach((key) => {
+      stats[key] = Math.max(0, Math.min(15, Number(statInputs[key].value) || 0));
+    });
+    DB.contestantOverrides[contestant.name] = stats;
+    window.RulesStore.saveDB(DB);
+    closeModal();
+    render();
+  } }));
+  modal.appendChild(el("div", { class: "modal__actions" }, actions));
+  overlay.appendChild(modal);
 }
 
 // ---------- CRUD helpers ----------
@@ -897,6 +970,7 @@ function importJSON(file) {
       }
       DB = parsed;
       if (!DB.customContestants) DB.customContestants = [];
+      if (!DB.contestantOverrides) DB.contestantOverrides = {};
       window.RulesStore.saveDB(DB);
       render();
     } catch (e) {

@@ -15,11 +15,11 @@ exportar/importar como JSON desde los botones de arriba.
 - **`js/data/formats.js`** — formatos de estreno, regreso, temporada y final, inspirados en
   el simulador de referencia (myrainboww.github.io) y en los formatos reales documentados
   en el fandom wiki.
-- **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`), cada una con sus
-  concursantes, enlace a su ficha del fandom wiki, **foto** y un bloque de **estadísticas**
-  (Acting, Comedy, Dance, Design, Improv, Runway, Lip Sync; 0–15, estimadas para el juego).
-  En la pestaña Simular puedes mezclar concursantes de cualquier temporada cargada en un
-  mismo reparto.
+- **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`: Temporadas 1, 2 y 3
+  de EE.UU. por ahora), cada una con sus concursantes, enlace a su ficha del fandom wiki,
+  **foto** y un bloque de **12 estadísticas** (0–15, estimadas para el juego: ver sección de
+  abajo). En la pestaña Simular puedes mezclar concursantes de cualquier temporada cargada
+  en un mismo reparto.
 
 ### Fotos de concursantes
 
@@ -33,12 +33,15 @@ Benet → All Stars 3, Shannel → All Stars 9, Ongina → All Stars 5, Tammie B
 1, Raven → Down Under vs The World T1, Jujubee → UK vs The World T1, Tatianna → All Stars
 2, Pandora Boxx → All Stars 6, Jessica Wild → All Stars 8, Morgan McMichaels → All Stars
 11, Kylie Sonique Love → All Stars 6, Mystique Summers → All Stars 11, Nicole Paige Brooks
-→ Down Under vs The World T1, Shangela → All Stars 3) se usa la foto promocional oficial
-de esa temporada más reciente, alojada en `static.wikia.nocookie.net` (el CDN de imágenes
-del fandom wiki). Todo esto es hotlink a terceros: si algún día se borra o renombra, esa
-foto concreta deja de cargar (solo se oculta el icono roto, no rompe nada más). Puedes
-sustituir la URL de cualquier concursante editando `js/data/roster.js`, y las concursantes
-personalizadas tienen su propio campo "Foto (URL)" editable desde la UI.
+→ Down Under vs The World T1, Shangela → All Stars 3, Raja → All Stars 7, Manila Luzon →
+All Stars 4, Alexis Mateo → Canada's Drag Race vs The World T2, Yara Sofia → All Stars 6,
+Mariah Balenciaga → UK vs The World T3, Mimi Imfurst → All Stars 1, Phoenix → All Stars 10)
+se usa la foto promocional oficial de esa temporada más reciente, alojada en
+`static.wikia.nocookie.net` (el CDN de imágenes del fandom wiki). Todo esto es hotlink a
+terceros: si algún día se borra o renombra, esa foto concreta deja de cargar (solo se
+oculta el icono roto, no rompe nada más). Puedes sustituir la URL de cualquier concursante
+editando `js/data/roster.js`, y las concursantes personalizadas tienen su propio campo
+"Foto (URL)" editable desde la UI.
 - **Editor completo**: puedes añadir, editar y borrar estados/retos/formatos desde la UI.
   Los que vienen de la referencia están marcados `custom:false`; lo que tú añadas queda
   marcado como "personalizado".
@@ -93,33 +96,50 @@ debajo del tamaño de la final elegida.
   equipos** (un episodio con equipos de 2; el equipo peor puntuado hace lip sync
   interno), y **Lipsync Assassin** (la ganadora del reto reta a quien quiera a un lip
   sync directo, sin pasar por el fondo de la clasificación).
+  o **Lipsync For Your Legacy** (las dos mejor puntuadas de la semana hacen lip sync por
+  su legado; la perdedora queda TOP2: a salvo pero sin puntos de victoria).
 - Final Top 2, Top 3 y Top 4 (lip sync final entre las dos mejor puntuadas), **voto del
-  jurado** (las eliminadas de la temporada votan a la ganadora entre las finalistas) y
-  **Lip Sync For The Crown por rondas** (bracket eliminatorio entre las finalistas).
-- Miss Simpatía (al azar entre las no ganadoras).
+  jurado** (las eliminadas de la temporada votan a la ganadora entre las finalistas,
+  ponderado también por Carisma) y **Lip Sync For The Crown por rondas** (bracket
+  eliminatorio entre las finalistas).
+- Miss Simpatía (ponderada por Carisma si hay estadísticas; si no, al azar).
+- Cuando hay una doble+ eliminación en un mismo episodio, o finalistas que no llegan al
+  lip sync final en Top3/Top4/jurado/bracket, el resultado indica explícitamente el puesto
+  de cada una ("Fulana y Mengana quedaron en 5º lugar y 4º lugar, respectivamente").
 - Cada temporada simulada se guarda en `localStorage` (`dragRaceSimulator.history.v1`)
   para que el panel de estadísticas pueda leerlas.
 
 **Todavía no implementado** (seleccionable en la UI, pero cae en el comportamiento
 estándar y se avisa con una nota en el resultado): Rate a Queen, entrada tardía, Lipsync
-Smackdown, Lipsync For Your Legacy, All Winners.
+Smackdown, All Winners.
 
-### Estadísticas por concursante (Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync)
+### Estadísticas por concursante (12: Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync +
+Strategy/Charisma/Uniqueness/Nerve/Talent)
 
-Inspirado en el simulador de referencia (myrainboww.github.io/Drag-Race-Simulator/custom.html),
-cada concursante puede tener un bloque de 7 estadísticas (0–15). Cuando existen:
+Inspirado en el simulador de referencia (myrainboww.github.io/Drag-Race-Simulator/custom.html)
+y en el "C.U.N.T." clásico de RuPaul, cada concursante puede tener un bloque de 12
+estadísticas (0–15). Cuando existen:
 - Cada reto (`js/data/challenges.js`) tiene marcadas sus estadísticas relevantes (p.ej.
-  Snatch Game usa Comedy + Acting); la puntuación de la concursante en ese reto se sesga
-  hacia esas estadísticas (65% habilidad / 35% azar), en vez de ser un número totalmente
-  aleatorio.
+  Snatch Game usa Comedy + Acting, Talent Show usa Talent); la puntuación de la
+  concursante en ese reto se sesga hacia esas estadísticas (65% habilidad / 35% azar), en
+  vez de ser un número totalmente aleatorio.
 - Todos los lip sync (fondo de la clasificación, LaLaParUza, Lipsync Assassin, finales)
   usan específicamente la estadística de Lip Sync.
+- **Strategy** influye en Lipsync Assassin: cuanta más Estrategia tenga la asesina, más
+  probable que juegue "sucio" y rete a su mayor amenaza real en la competencia (alianzas
+  rotas, traiciones al estilo Mistress/Jorgeous en All Stars 10) en vez de a quien puntuó
+  más bajo.
+- **Charisma** influye en el voto del jurado (además de la puntuación de la final) y en
+  quién gana Miss Simpatía.
 - Las concursantes **sin** estadísticas definidas siguen puntuando totalmente al azar, sin
   romper nada de lo anterior.
 
-Puedes crear tus propias **concursantes personalizadas** con sus 7 estadísticas (o
+Puedes crear tus propias **concursantes personalizadas** con sus 12 estadísticas (o
 aleatorizarlas con un botón) desde la pestaña **Roster**, y usarlas para simular igual que
-a las reales. También puedes editar qué estadísticas usa cada reto desde la pestaña Retos.
+a las reales. También puedes **editar las estadísticas de cualquier concursante real**
+(botón "Editar stats" en su tarjeta de Roster) sin perder sus datos originales — un botón
+"Restablecer original" los recupera en cualquier momento. Y puedes editar qué estadísticas
+usa cada reto desde la pestaña Retos.
 
 ## Fase 3: panel de estadísticas (ya incluida)
 
@@ -135,7 +155,7 @@ Pestaña "Estadísticas": lee todo el historial de temporadas simuladas guardado
 ## Próximas fases (pendientes)
 
 1. Completar los formatos que faltan del motor: Rate a Queen, entrada tardía, Lipsync
-   Smackdown, Lipsync For Your Legacy, All Winners.
+   Smackdown, All Winners.
 2. **Comparador de concursantes**: cabeza a cabeza entre dos o más participantes de
    distintas temporadas/franquicias.
 3. **Estrategias entre temporadas**: guardar "builds" o estrategias de simulación
