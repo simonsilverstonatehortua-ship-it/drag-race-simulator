@@ -24,17 +24,21 @@ exportar/importar como JSON desde los botones de arriba.
 ### Fotos de concursantes
 
 Cada concursante real tiene una foto (se ve en Roster, en los chips de cada reto y en el
-podio final). La mayoría apuntan a las imágenes públicas de
+podio final): la de su **última aparición** en la franquicia Drag Race. Para quienes no
+han vuelto en ninguna temporada posterior, es la foto de
 [MochaMishu/Drag-Race-Simulator](https://github.com/MochaMishu/Drag-Race-Simulator) (un
-fork del simulador de referencia, myrainboww.github.io/Drag-Race-Simulator), alojadas en
-`raw.githubusercontent.com` — es la foto promocional original de su temporada de debut.
-Para Shannel, Raven, Jessica Wild, Morgan McMichaels, Mystique Summers y Nicole Paige
-Brooks (ese fork solo tenía su look de debut, más antiguo) se usa en su lugar una foto más
-reciente de Wikimedia Commons (apariciones en DragCon 2022-2024). Todo esto es hotlink a
-repositorios de terceros: si algún día se borran o renombran, esas fotos dejarán de cargar
-(solo se oculta la imagen, no rompe nada más). Puedes sustituir la URL de cualquier
-concursante editando `js/data/roster.js`, y las concursantes personalizadas tienen su
-propio campo "Foto (URL)" editable desde la UI.
+fork del simulador de referencia, myrainboww.github.io/Drag-Race-Simulator, alojada en
+`raw.githubusercontent.com`) — su única temporada. Para quienes sí han vuelto (BeBe Zahara
+Benet → All Stars 3, Shannel → All Stars 9, Ongina → All Stars 5, Tammie Brown → All Stars
+1, Raven → Down Under vs The World T1, Jujubee → UK vs The World T1, Tatianna → All Stars
+2, Pandora Boxx → All Stars 6, Jessica Wild → All Stars 8, Morgan McMichaels → All Stars
+11, Kylie Sonique Love → All Stars 6, Mystique Summers → All Stars 11, Nicole Paige Brooks
+→ Down Under vs The World T1, Shangela → All Stars 3) se usa la foto promocional oficial
+de esa temporada más reciente, alojada en `static.wikia.nocookie.net` (el CDN de imágenes
+del fandom wiki). Todo esto es hotlink a terceros: si algún día se borra o renombra, esa
+foto concreta deja de cargar (solo se oculta el icono roto, no rompe nada más). Puedes
+sustituir la URL de cualquier concursante editando `js/data/roster.js`, y las concursantes
+personalizadas tienen su propio campo "Foto (URL)" editable desde la UI.
 - **Editor completo**: puedes añadir, editar y borrar estados/retos/formatos desde la UI.
   Los que vienen de la referencia están marcados `custom:false`; lo que tú añadas queda
   marcado como "personalizado".
