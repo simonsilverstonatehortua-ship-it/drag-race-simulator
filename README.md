@@ -16,10 +16,21 @@ exportar/importar como JSON desde los botones de arriba.
   el simulador de referencia (myrainboww.github.io) y en los formatos reales documentados
   en el fandom wiki.
 - **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`), cada una con sus
-  concursantes, enlace a su ficha del fandom wiki y un bloque de **estadísticas** (Acting,
-  Comedy, Dance, Design, Improv, Runway, Lip Sync; 0–15, estimadas para el juego). En la
-  pestaña Simular puedes mezclar concursantes de cualquier temporada cargada en un mismo
-  reparto.
+  concursantes, enlace a su ficha del fandom wiki, **foto** y un bloque de **estadísticas**
+  (Acting, Comedy, Dance, Design, Improv, Runway, Lip Sync; 0–15, estimadas para el juego).
+  En la pestaña Simular puedes mezclar concursantes de cualquier temporada cargada en un
+  mismo reparto.
+
+### Fotos de concursantes
+
+Cada concursante real tiene una foto (se ve en Roster, en los chips de cada reto y en el
+podio final). Por ahora apuntan a las imágenes públicas de
+[MochaMishu/Drag-Race-Simulator](https://github.com/MochaMishu/Drag-Race-Simulator) (un
+fork del simulador de referencia, myrainboww.github.io/Drag-Race-Simulator), alojadas en
+`raw.githubusercontent.com`. Es un hotlink a un repositorio de terceros: si algún día se
+borra o renombra, esas fotos dejarán de cargar (solo se oculta la imagen, no rompe nada
+más). Puedes sustituir la URL de cualquier concursante editando `js/data/roster.js`, y las
+concursantes personalizadas tienen su propio campo "Foto (URL)" editable desde la UI.
 - **Editor completo**: puedes añadir, editar y borrar estados/retos/formatos desde la UI.
   Los que vienen de la referencia están marcados `custom:false`; lo que tú añadas queda
   marcado como "personalizado".

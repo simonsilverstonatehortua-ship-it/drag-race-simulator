@@ -18,6 +18,22 @@ function uid(prefix) {
   return prefix + "_" + Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
+function contestantImage(name) {
+  const real = window.ALL_CONTESTANTS.find((c) => c.name === name);
+  if (real && real.image) return real.image;
+  const custom = DB.customContestants.find((c) => c.name === name);
+  if (custom && custom.image) return custom.image;
+  return null;
+}
+
+function avatarImg(name, sizeClass) {
+  const src = contestantImage(name);
+  if (!src) return null;
+  const img = el("img", { src, alt: name, class: "avatar" + (sizeClass ? " " + sizeClass : "") });
+  img.addEventListener("error", () => { img.remove(); });
+  return img;
+}
+
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -195,6 +211,8 @@ function renderSimResult(result) {
     .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
     .forEach(([name, place]) => {
       const card = el("div", { class: "card card--queen" });
+      const avatar = avatarImg(name, "avatar--podium");
+      if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: name }));
       card.appendChild(el("div", { class: "muted small", text: place }));
       if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
@@ -218,6 +236,8 @@ function placementRank(place) {
 function statusChip(name, statusId, score) {
   const status = DB.statuses.find((s) => s.id === statusId) || { label: statusId, color: "#7C8CA6" };
   const chip = el("div", { class: "status-chip", style: `border-color:${status.color}` });
+  const avatar = avatarImg(name, "avatar--chip");
+  if (avatar) chip.appendChild(avatar);
   chip.appendChild(el("span", { class: "status-chip__name", text: name }));
   chip.appendChild(el("span", { class: "status-chip__status", style: `color:${status.color}`, text: status.label }));
   if (typeof score === "number") chip.appendChild(el("span", { class: "status-chip__score", text: score }));
@@ -536,6 +556,8 @@ function renderRoster() {
     const customGrid = el("div", { class: "grid" });
     DB.customContestants.forEach((c) => {
       const card = el("div", { class: "card card--queen" });
+      const avatar = avatarImg(c.name, "avatar--card");
+      if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
       card.appendChild(el("div", { class: "card__actions" }, [
@@ -552,6 +574,8 @@ function renderRoster() {
     const grid = el("div", { class: "grid" });
     season.contestants.forEach((c) => {
       const card = el("div", { class: "card card--queen" });
+      const avatar = avatarImg(c.name, "avatar--card");
+      if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
       card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(c.stats) }));
@@ -576,7 +600,7 @@ function statsSummaryLine(stats) {
 // ---------- CONCURSANTES PERSONALIZADAS ----------
 function openCustomQueenForm(existing) {
   const isNew = !existing;
-  const data = existing || { name: "", stats: window.randomStats() };
+  const data = existing || { name: "", image: "", stats: window.randomStats() };
 
   const overlay = document.getElementById("modal-overlay");
   overlay.innerHTML = "";
@@ -590,6 +614,12 @@ function openCustomQueenForm(existing) {
   if (!isNew) nameInput.setAttribute("disabled", "disabled");
   nameRow.appendChild(nameInput);
   modal.appendChild(nameRow);
+
+  const imageRow = el("label", { class: "form-row" }, [el("span", { text: "Foto (URL, opcional)" })]);
+  const imageInput = el("input", { type: "text", placeholder: "https://..." });
+  imageInput.value = data.image || "";
+  imageRow.appendChild(imageInput);
+  modal.appendChild(imageRow);
 
   const statInputs = {};
   const statsGrid = el("div", { class: "stats-grid" });
@@ -620,14 +650,15 @@ function openCustomQueenForm(existing) {
       window.STAT_KEYS.forEach((key) => {
         stats[key] = Math.max(0, Math.min(15, Number(statInputs[key].value) || 0));
       });
+      const image = imageInput.value.trim();
       const exists = DB.customContestants.some((c) => c.name === name);
       if (isNew) {
         if (exists) return alert("Ya existe una concursante personalizada con ese nombre.");
-        DB.customContestants.push({ name, stats });
+        DB.customContestants.push({ name, image, stats });
       } else {
         const idx = DB.customContestants.findIndex((c) => c.name === data.name);
         if (idx < 0) return alert("No se encontró la concursante a editar.");
-        DB.customContestants[idx] = { name, stats };
+        DB.customContestants[idx] = { name, image, stats };
       }
       window.RulesStore.saveDB(DB);
       closeModal();
