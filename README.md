@@ -15,11 +15,21 @@ exportar/importar como JSON desde los botones de arriba.
 - **`js/data/formats.js`** — formatos de estreno, regreso, temporada y final, inspirados en
   el simulador de referencia (myrainboww.github.io) y en los formatos reales documentados
   en el fandom wiki.
-- **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`: Temporadas 1, 2 y 3
-  de EE.UU. por ahora), cada una con sus concursantes, enlace a su ficha del fandom wiki,
-  **foto** y un bloque de **12 estadísticas** (0–15, estimadas para el juego: ver sección de
-  abajo). En la pestaña Simular puedes mezclar concursantes de cualquier temporada cargada
-  en un mismo reparto.
+- **`js/data/roster.js`** — temporadas reales cargadas (`ALL_SEASONS`: Temporadas 1-10 de
+  EE.UU. por ahora, 126 concursantes), cada una con sus concursantes, enlace a su ficha del
+  fandom wiki, **foto** y un bloque de **15 estadísticas** (0–15: ver sección de abajo). En
+  la pestaña Simular puedes mezclar concursantes de cualquier temporada cargada en un mismo
+  reparto.
+
+  Las 7 estadísticas "core" (Acting/Comedy/Dance/Design/Improv/Runway/Lip Sync) de las
+  Temporadas 1-10 vienen de la base de datos curada del simulador de referencia
+  (myrainboww.github.io/Drag-Race-Simulator, extraída de su código fuente público — tiene
+  676 concursantes de decenas de temporadas y franquicias, así que hay mucho margen para
+  seguir ampliando el roster). Las 8 estadísticas extra que no existen ahí
+  (Makeup/Singing/Verses/Strategy/Charisma/Uniqueness/Nerve/Talent) están hechas a mano
+  para las Temporadas 1-3, y derivadas automáticamente de las 7 "core" con una fórmula
+  simple para las Temporadas 4-10 (ver `deriveStats()` en `js/data/roster.js`) — no son
+  estimaciones cualitativas individuales como en las primeras 3 temporadas.
 
 ### Fotos de concursantes
 
@@ -37,11 +47,14 @@ Benet → All Stars 3, Shannel → All Stars 9, Ongina → All Stars 5, Tammie B
 All Stars 4, Alexis Mateo → Canada's Drag Race vs The World T2, Yara Sofia → All Stars 6,
 Mariah Balenciaga → UK vs The World T3, Mimi Imfurst → All Stars 1, Phoenix → All Stars 10)
 se usa la foto promocional oficial de esa temporada más reciente, alojada en
-`static.wikia.nocookie.net` (el CDN de imágenes del fandom wiki). Todo esto es hotlink a
-terceros: si algún día se borra o renombra, esa foto concreta deja de cargar (solo se
-oculta el icono roto, no rompe nada más). Puedes sustituir la URL de cualquier concursante
-editando `js/data/roster.js`, y las concursantes personalizadas tienen su propio campo
-"Foto (URL)" editable desde la UI.
+`static.wikia.nocookie.net` (el CDN de imágenes del fandom wiki). Las concursantes de las
+Temporadas 4-10 usan por ahora la foto de su temporada de debut (no se ha investigado
+retorno a temporadas posteriores para todas ellas todavía, a diferencia de las Temporadas
+1-3); si vuelves a pedir una actualización puntual para alguna, se hace igual que las de
+arriba. Todo esto es hotlink a terceros: si algún día se borra o renombra, esa foto
+concreta deja de cargar (solo se oculta el icono roto, no rompe nada más). Puedes sustituir
+la URL de cualquier concursante editando `js/data/roster.js`, y las concursantes
+personalizadas tienen su propio campo "Foto (URL)" editable desde la UI.
 - **Editor completo**: puedes añadir, editar y borrar estados/retos/formatos desde la UI.
   Los que vienen de la referencia están marcados `custom:false`; lo que tú añadas queda
   marcado como "personalizado".
