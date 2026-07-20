@@ -100,9 +100,50 @@ function loseLipsyncBattle(names, db, statsByName) {
   return scored[0].name;
 }
 
-// Simula un único reto entre un grupo de concursantes activas.
-// Devuelve { results: [{name, score, status}], eliminatedName, notes }
-function runEpisode(activeNames, db, { noElim = false, bottomCount = 2 } = {}, statsByName = {}) {
+// Elige un valor al azar de una lista de {value, weight}.
+function weightedPick(options) {
+  const total = options.reduce((sum, o) => sum + o.weight, 0);
+  let roll = Math.random() * total;
+  for (const o of options) {
+    roll -= o.weight;
+    if (roll <= 0) return o.value;
+  }
+  return options[options.length - 1].value;
+}
+
+// Cuántas concursantes ganan el reto esta semana: casi siempre 1, a veces hay empate.
+function pickWinCount() {
+  return weightedPick([{ value: 1, weight: 75 }, { value: 2, weight: 20 }, { value: 3, weight: 5 }]);
+}
+// Cuántas quedan HIGH: lo normal son 2, pero puede ser 1 o 3.
+function pickHighCount() {
+  return weightedPick([{ value: 2, weight: 60 }, { value: 1, weight: 25 }, { value: 3, weight: 15 }]);
+}
+// Cuántas quedan LOW: lo normal es 1, a veces ninguna o 2.
+function pickLowCount() {
+  return weightedPick([{ value: 1, weight: 65 }, { value: 0, weight: 20 }, { value: 2, weight: 15 }]);
+}
+// Cuántas concursantes hacen lip sync por su vida: lo normal son 2, a veces 3 o 4.
+function pickBottomCount() {
+  return weightedPick([{ value: 2, weight: 75 }, { value: 3, weight: 18 }, { value: 4, weight: 7 }]);
+}
+// Cuántas pierden el lip sync (pueden ser más de 1: doble eliminación).
+function pickElimCount(bottomN) {
+  if (bottomN <= 1) return 1;
+  const weights = [{ value: 1, weight: 70 }, { value: 2, weight: bottomN === 2 ? 12 : 25 }];
+  if (bottomN >= 3) weights.push({ value: 3, weight: 8 });
+  if (bottomN >= 4) weights.push({ value: 4, weight: 4 });
+  return Math.min(weightedPick(weights), bottomN);
+}
+
+// Simula un único reto entre un grupo de concursantes activas. El reparto de estados
+// normalmente es 1 WIN / 2 HIGH / 1 LOW / 2 en el fondo (1 BTM + 1 ELIM), pero varía: a
+// veces hay empate en la victoria, más o menos HIGH/LOW, lipsyncs de 3-4 concursantes o
+// dobles eliminaciones.
+// "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
+// final cuando hay dobles eliminaciones); por defecto sin límite.
+// Devuelve { results: [{name, score, status}], eliminatedNames, lipsyncNote }
+function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}, statsByName = {}) {
   const challenge = randomChallenge(db.challenges);
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
@@ -110,33 +151,47 @@ function runEpisode(activeNames, db, { noElim = false, bottomCount = 2 } = {}, s
   const n = scored.length;
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
 
-  results[0].status = "WIN";
-  if (n >= 6) results[1].status = "HIGH";
-  if (!noElim && n >= 6) results[n - 2].status = "LOW";
+  const winCount = Math.max(1, Math.min(pickWinCount(), Math.floor(n / 2) || 1));
+  for (let i = 0; i < winCount; i++) results[i].status = "WIN";
 
-  let eliminatedName = null;
-  let lipsyncNote = "";
-  if (!noElim) {
-    const bottomN = Math.min(bottomCount, n - 1);
-    const bottomSlice = results.slice(n - bottomN);
-    if (bottomSlice.length > 0) {
-      bottomSlice.forEach((r) => (r.status = "BTM"));
-      const loserName = loseLipsyncBattle(bottomSlice.map((r) => r.name), db, statsByName);
-      const loser = bottomSlice.find((r) => r.name === loserName);
-      eliminatedName = loser.name;
-      loser.status = "ELIM";
-      lipsyncNote = `Lip sync: se salva ${bottomSlice.filter((r) => r.name !== loser.name).map((r) => r.name).join(", ")}.`;
-    } else {
-      lipsyncNote = "Grupo demasiado reducido para lip sync esta semana: nadie es eliminada.";
-    }
+  const canEliminate = !noElim && maxElim > 0;
+  const remaining = n - winCount;
+  let highCount = 0, lowCount = 0, bottomN = 0;
+  if (canEliminate) {
+    bottomN = Math.max(0, Math.min(pickBottomCount(), remaining));
+    highCount = Math.max(0, Math.min(pickHighCount(), remaining - bottomN));
+    lowCount = Math.max(0, Math.min(pickLowCount(), remaining - bottomN - highCount));
+  } else {
+    highCount = Math.max(0, Math.min(pickHighCount(), remaining));
   }
 
-  return { challenge: challenge.label, results, eliminatedName, lipsyncNote };
+  for (let i = 0; i < highCount; i++) results[winCount + i].status = "HIGH";
+  for (let i = 0; i < lowCount; i++) results[n - bottomN - 1 - i].status = "LOW";
+
+  let eliminatedNames = [];
+  let lipsyncNote = "";
+  if (canEliminate && bottomN > 0) {
+    const bottomSlice = results.slice(n - bottomN);
+    bottomSlice.forEach((r) => (r.status = "BTM"));
+    const elimCount = Math.max(1, Math.min(pickElimCount(bottomN), bottomN, maxElim));
+    const lipScored = bottomSlice.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
+    lipScored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
+    eliminatedNames = lipScored.slice(0, elimCount).map((r) => r.name);
+    eliminatedNames.forEach((name) => { bottomSlice.find((r) => r.name === name).status = "ELIM"; });
+    const survivors = bottomSlice.filter((r) => r.status !== "ELIM").map((r) => r.name);
+    lipsyncNote = eliminatedNames.length > 1
+      ? `Lip sync múltiple: se eliminan ${eliminatedNames.join(", ")}. ${survivors.length ? "Se salva " + survivors.join(", ") + "." : ""}`
+      : `Lip sync: se salva ${survivors.join(", ")}.`;
+  } else if (!noElim) {
+    lipsyncNote = "Grupo demasiado reducido para lip sync esta semana: nadie es eliminada.";
+  }
+
+  return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
 }
 
 // --- Estreno Porkchop: llegan por parejas, un mini reto decide quién compite esa
 // semana en el reto principal (el resto queda a salvo sin competir). ---
-function runPorkchopPremiere(activeNames, db, statsByName) {
+function runPorkchopPremiere(activeNames, db, statsByName, maxElim = Infinity) {
   const shuffled = shuffle(activeNames);
   const pairs = [];
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -166,12 +221,12 @@ function runPorkchopPremiere(activeNames, db, statsByName) {
     return {
       challenge: "Mini reto Porkchop",
       results: safeFromMini.map((name) => ({ name, score: null, status: "SAFE" })),
-      eliminatedName: null,
+      eliminatedNames: [],
       lipsyncNote: `${miniNotes.join(" ")} Reparto demasiado reducido para un reto principal aparte: nadie es eliminada esta semana.`,
     };
   }
 
-  const maxi = runEpisode(competing, db, {}, statsByName);
+  const maxi = runEpisode(competing, db, { maxElim }, statsByName);
   const results = [
     ...safeFromMini.map((name) => ({ name, score: null, status: "SAFE" })),
     ...maxi.results,
@@ -179,7 +234,7 @@ function runPorkchopPremiere(activeNames, db, statsByName) {
   return {
     challenge: `Mini reto Porkchop + ${maxi.challenge}`,
     results,
-    eliminatedName: maxi.eliminatedName,
+    eliminatedNames: maxi.eliminatedNames,
     lipsyncNote: `${miniNotes.join(" ")} ${competing.length} concursantes compiten por sus vidas en el reto principal ("${maxi.challenge}"). ${maxi.lipsyncNote}`,
   };
 }
@@ -388,6 +443,17 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   let eliminated = [];
   const notes = [];
 
+  // Procesa las eliminadas de un episodio, admitiendo tanto una sola (eliminatedName,
+  // usado por Teams/Lipsync Assassin) como varias a la vez (eliminatedNames, para dobles
+  // eliminaciones del reto regular).
+  function processElimination(ep) {
+    const names = ep.eliminatedNames || (ep.eliminatedName ? [ep.eliminatedName] : []);
+    names.forEach((name) => {
+      active = active.filter((n) => n !== name);
+      eliminated.push(name);
+    });
+  }
+
   function noteIfUnimplemented(list, id, group) {
     if (!list.includes(id)) notes.push(`Formato de ${group} "${id}" aún no implementado: se ha simulado como el formato estándar.`);
   }
@@ -404,33 +470,27 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   const porkchopPremiere = formatChoice.premiere === "PREMIERE_PORKCHOP";
 
   if (porkchopPremiere) {
-    const ep = runPorkchopPremiere(active, db, statsByName);
+    const maxElim = Math.max(0, active.length - finaleSize);
+    const ep = runPorkchopPremiere(active, db, statsByName, maxElim);
     log.push({ label: "Episodio 1 (Porkchop)", ...ep });
-    if (ep.eliminatedName) {
-      active = active.filter((n) => n !== ep.eliminatedName);
-      eliminated.push(ep.eliminatedName);
-    }
+    processElimination(ep);
   } else if (doublePremiere) {
     const shuffled = shuffle(active);
     const groupA = shuffled.slice(0, Math.ceil(shuffled.length / 2));
     const groupB = shuffled.slice(Math.ceil(shuffled.length / 2));
-    const epA = runEpisode(groupA, db, { noElim: noElimPremiere }, statsByName);
-    const epB = runEpisode(groupB, db, { noElim: noElimPremiere }, statsByName);
+    const maxElimA = Math.max(0, active.length - finaleSize);
+    const epA = runEpisode(groupA, db, { noElim: noElimPremiere, maxElim: maxElimA }, statsByName);
     log.push({ label: "Episodio 1a (grupo A)", ...epA });
+    processElimination(epA);
+    const maxElimB = Math.max(0, active.length - finaleSize);
+    const epB = runEpisode(groupB, db, { noElim: noElimPremiere, maxElim: maxElimB }, statsByName);
     log.push({ label: "Episodio 1b (grupo B)", ...epB });
-    [epA, epB].forEach((ep) => {
-      if (ep.eliminatedName) {
-        active = active.filter((n) => n !== ep.eliminatedName);
-        eliminated.push(ep.eliminatedName);
-      }
-    });
+    processElimination(epB);
   } else {
-    const ep = runEpisode(active, db, { noElim: noElimPremiere }, statsByName);
+    const maxElim = Math.max(0, active.length - finaleSize);
+    const ep = runEpisode(active, db, { noElim: noElimPremiere, maxElim }, statsByName);
     log.push({ label: "Episodio 1", ...ep });
-    if (ep.eliminatedName) {
-      active = active.filter((n) => n !== ep.eliminatedName);
-      eliminated.push(ep.eliminatedName);
-    }
+    processElimination(ep);
   }
 
   // --- Temporada regular hasta llegar al tamaño de la final ---
@@ -438,19 +498,17 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   let teamsEpisodeDone = false;
   while (active.length > finaleSize) {
     let ep;
+    const maxElim = Math.max(0, active.length - finaleSize);
     if (formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" && active.length >= 3) {
       ep = runLipsyncAssassinEpisode(active, db, statsByName);
     } else if (formatChoice.season === "SEASON_TEAMS" && !teamsEpisodeDone && active.length >= 4) {
       ep = runTeamsEpisode(active, db, statsByName);
       teamsEpisodeDone = true;
     } else {
-      ep = runEpisode(active, db, {}, statsByName);
+      ep = runEpisode(active, db, { maxElim }, statsByName);
     }
     log.push({ label: `Episodio ${episodeNum}`, ...ep });
-    if (ep.eliminatedName) {
-      active = active.filter((n) => n !== ep.eliminatedName);
-      eliminated.push(ep.eliminatedName);
-    }
+    processElimination(ep);
 
     // Regreso al azar: una eliminada vuelve (solo si hay eliminadas disponibles)
     if (formatChoice.return === "RETURN_RANDOM" && eliminated.length > 0 && Math.random() < 0.3) {
