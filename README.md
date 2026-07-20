@@ -67,7 +67,9 @@ las hojas de cálculo con formato condicional), cada click en "▶ Siguiente epi
 una columna más, y "Revelar todo" salta al final. El "Rank" de cada fila se queda en "TBA"
 hasta que se revela su eliminación (o el episodio Final si llega hasta el podio). El
 historial guardado (pestaña Estadísticas → "Ver detalle") sí se muestra completo de una
-vez, sin revelado progresivo, porque ya es una temporada pasada.
+vez, sin revelado progresivo, porque ya es una temporada pasada. Las colocaciones se
+muestran como puesto real de la clasificación final ("9º lugar" para la primera eliminada
+de un cast de 9, y así sucesivamente), no como "Eliminada #N".
 
 **Puntos por estado (PPE)**: WIN=10, TOP2=9, HIGH=8, SAFE=5, LOW=3, BTM=1, ELIM=0. Solo
 estos 7 estados semanales cuentan para el promedio de puntos por episodio (columna "PPE"

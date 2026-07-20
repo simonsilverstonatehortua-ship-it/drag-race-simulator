@@ -508,8 +508,10 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
 
   const finalPlacements = { [winnerName]: "WINNER", [runnerUpName]: "RUNNER_UP" };
   restNames.forEach((name, i) => { finalPlacements[name] = `${i + 3}º lugar`; });
+  // Las eliminadas durante la temporada siguen el mismo puesto de la clasificación final:
+  // la última en salir queda justo detrás de las finalistas, la primera en salir queda última.
   [...eliminated].reverse().forEach((name, i) => {
-    if (!finalPlacements[name]) finalPlacements[name] = `Eliminada #${eliminated.length - i}`;
+    if (!finalPlacements[name]) finalPlacements[name] = `${finaleSize + i + 1}º lugar`;
   });
 
   // Miss Simpatía: al azar entre quienes no ganaron
