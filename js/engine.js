@@ -38,8 +38,15 @@ function randomScore(scoreScale) {
   return values[Math.floor(Math.random() * values.length)];
 }
 
-function randomChallenge(challenges) {
-  const maxis = challenges.filter((c) => c.category !== "runway");
+// "requireElim": excluye retos marcados "noElim" (p.ej. Meet the Queens) para formatos
+// (equipos, Lipsync Assassin, Lipsync For Your Legacy) cuya lógica exige que alguien se
+// vaya esa semana.
+function randomChallenge(challenges, { requireElim = false } = {}) {
+  let maxis = challenges.filter((c) => c.category !== "runway");
+  if (requireElim) {
+    const withElim = maxis.filter((c) => !c.noElim);
+    if (withElim.length) maxis = withElim;
+  }
   return maxis[Math.floor(Math.random() * maxis.length)];
 }
 
@@ -237,6 +244,11 @@ function assignMidTierAndElimination(results, db, statsByName, { noElim = false,
 // Devuelve { results: [{name, score, status}], eliminatedNames, lipsyncNote }
 function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}, statsByName = {}) {
   const challenge = randomChallenge(db.challenges);
+
+  if (challenge.noElim && challenge.presentationStats && challenge.lookStats) {
+    return runNoElimSpotlightEpisode(activeNames, db, statsByName, challenge);
+  }
+
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
@@ -250,11 +262,45 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
 }
 
+// --- Reto sin eliminación con doble reconocimiento (p.ej. Meet the Queens): se juzga
+// quién se presenta mejor y quién luce el mejor look de promo, pero nadie es eliminada. ---
+function runNoElimSpotlightEpisode(activeNames, db, statsByName, challenge) {
+  const results = activeNames.map((name) => ({
+    name,
+    score: challengeScore(name, challenge.stats, db, statsByName),
+    status: "SAFE",
+  }));
+
+  const presentationScored = activeNames
+    .map((name) => ({ name, score: challengeScore(name, challenge.presentationStats, db, statsByName) }))
+    .sort((a, b) => b.score - a.score || Math.random() - 0.5);
+  const bestPresentation = presentationScored[0].name;
+
+  const lookScored = activeNames
+    .map((name) => ({ name, score: challengeScore(name, challenge.lookStats, db, statsByName) }))
+    .sort((a, b) => b.score - a.score || Math.random() - 0.5);
+  const bestLook = lookScored[0].name;
+
+  results.find((r) => r.name === bestPresentation).status = "WIN";
+  results.find((r) => r.name === bestLook).status = "WIN";
+
+  const lipsyncNote = bestPresentation === bestLook
+    ? `${bestPresentation} es quien mejor se presenta y también luce el mejor look de promo esta semana.`
+    : `${bestPresentation} es quien mejor se presenta esta semana. ${bestLook} luce el mejor look de promo.`;
+
+  return {
+    challenge: challenge.label,
+    results,
+    eliminatedNames: [],
+    lipsyncNote: `${lipsyncNote} Al ser un capítulo de presentación, no hay reto principal ni eliminación esta semana.`,
+  };
+}
+
 // --- Lipsync For Your Legacy: las dos mejores puntuadas de la semana hacen lip sync por
 // su legado (la ganadora se queda con el WIN, la perdedora queda TOP2: a salvo pero sin
 // puntos de victoria). El resto sigue el reparto normal de HIGH/LOW/fondo+eliminación. ---
 function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinity) {
-  const challenge = randomChallenge(db.challenges);
+  const challenge = randomChallenge(db.challenges, { requireElim: true });
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
@@ -352,7 +398,7 @@ function runLaLaParUza(pool, db, statsByName) {
 // --- Temporada por equipos: se divide el reparto en equipos, el equipo peor puntuado
 // hace lip sync interno para decidir quién se va. ---
 function runTeamsEpisode(activeNames, db, statsByName) {
-  const challenge = randomChallenge(db.challenges);
+  const challenge = randomChallenge(db.challenges, { requireElim: true });
   const shuffled = shuffle(activeNames);
   const teams = [];
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -399,7 +445,7 @@ function runTeamsEpisode(activeNames, db, statsByName) {
 // --- Lipsync Assassin: la ganadora del reto reta a quien quiera a un lip sync directo,
 // sin pasar por el fondo de la clasificación. ---
 function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships = {}) {
-  const challenge = randomChallenge(db.challenges);
+  const challenge = randomChallenge(db.challenges, { requireElim: true });
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const n = scored.length;

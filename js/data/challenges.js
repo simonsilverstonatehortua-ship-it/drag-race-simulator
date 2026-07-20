@@ -38,6 +38,13 @@ const DEFAULT_CHALLENGES = [
     description: "Sesión fotográfica editorial con un concepto concreto." },
   { id: "RUNWAY", label: "Runway libre", category: "runway", custom: false, stats: ["runway", "makeup"],
     description: "Pasarela sin categoría temática específica." },
+  { id: "MEET_THE_QUEENS", label: "Meet the Queens", category: "maxi", custom: false, noElim: true,
+    stats: ["charisma", "nerve", "runway", "design", "makeup"],
+    presentationStats: ["charisma", "nerve"], lookStats: ["runway", "design", "makeup"],
+    description: "Presentación inicial: no hay eliminación esta semana. Se destaca a quien mejor se presenta y a quien luce el mejor look de promo." },
+  { id: "CHOREO_LOOKS", label: "Coreografía y looks de coreo", category: "maxi", custom: false,
+    stats: ["dance", "design", "makeup"],
+    description: "Reto doble: montar una coreografía grupal/individual y diseñar los looks que se lucirán en ella." },
 ];
 
 // Escala de puntuación por reto usada en tu hoja (0 a 10).

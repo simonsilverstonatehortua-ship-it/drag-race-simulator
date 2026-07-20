@@ -116,6 +116,13 @@ el reparto por debajo del tamaño de la final elegida.
   jurado** (las eliminadas de la temporada votan a la ganadora entre las finalistas,
   ponderado también por Carisma) y **Lip Sync For The Crown por rondas** (bracket
   eliminatorio entre las finalistas).
+- Dos retos especiales en el catálogo (pestaña Retos): **Meet the Queens** (capítulo de
+  presentación sin reto principal ni eliminación; se destaca a quien mejor se presenta
+  —Carisma/Nervio— y a quien luce el mejor look de promo —Runway/Diseño/Maquillaje—,
+  ambas quedan como WIN esa semana) y **Coreografía y looks de coreo** (reto normal con
+  eliminación que puntúa Baile, Diseño y Maquillaje a la vez). Meet the Queens nunca sale
+  sorteado en episodios de equipos, Lipsync Assassin o Lipsync For Your Legacy, porque esos
+  formatos necesitan que alguien se vaya esa semana sí o sí.
 - Miss Simpatía (ponderada por Carisma si hay estadísticas; si no, al azar).
 - Cuando hay una doble+ eliminación en un mismo episodio, o finalistas que no llegan al
   lip sync final en Top3/Top4/jurado/bracket, el resultado indica explícitamente el puesto
