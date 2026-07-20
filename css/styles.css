@@ -425,25 +425,6 @@ footer {
   background: var(--bg-panel);
 }
 .episode__head { margin-bottom: 0.5rem; }
-.episode__results {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.status-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: 1px solid;
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.8rem;
-  background: var(--bg-card);
-}
-.status-chip__name { font-weight: 600; }
-.status-chip__status { font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; }
-.status-chip__score { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.7rem; }
 
 .table-wrap {
   overflow-x: auto;
@@ -483,6 +464,15 @@ footer {
 
 .stats-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.trackrecord-table th:nth-child(2), .trackrecord-table td:nth-child(2) {
+  text-align: left;
+}
+.trackrecord-name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 @media (max-width: 600px) {

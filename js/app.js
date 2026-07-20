@@ -6,6 +6,7 @@ const TABS = ["simulate", "stats", "statuses", "challenges", "formats", "roster"
 let currentTab = "simulate";
 let simSelection = new Set(window.ALL_SEASONS[0].contestants.map((c) => c.name));
 let lastSimResult = null;
+let revealedEpisodes = 1;
 
 const GROUP_LABELS = {
   premiere: "Estreno",
@@ -159,7 +160,7 @@ function renderSimulate() {
     el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: runSimulation }),
   ]));
 
-  if (lastSimResult) wrap.appendChild(renderSimResult(lastSimResult));
+  if (lastSimResult) wrap.appendChild(renderSimResult(lastSimResult, revealedEpisodes));
 
   return wrap;
 }
@@ -176,12 +177,95 @@ function runSimulation() {
   if (names.length < 3) return alert("Selecciona al menos 3 concursantes.");
   const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName());
   lastSimResult = result;
+  revealedEpisodes = 1;
   saveHistory(result);
   render();
 }
 
-function renderSimResult(result) {
+// Agrupa el log de la temporada en columnas de trackrecord (solo los episodios que
+// reparten estados por concursante; los regresos/LaLaParUza quedan como texto aparte) y
+// en filas por concursante con su historial de casillas, al estilo de una hoja TRACKRECORDS.
+function buildTrackRecord(result) {
+  const indexed = result.log.map((ep, idx) => ({ ep, idx }));
+  const columns = indexed.filter(({ ep }) => ep.results && ep.results.length > 0);
+
+  const names = new Set();
+  columns.forEach(({ ep }) => ep.results.forEach((r) => names.add(r.name)));
+
+  const rows = [...names].map((name) => {
+    const cells = columns.map(({ ep }) => ep.results.find((r) => r.name === name) || null);
+    let eliminatedAtCol = null;
+    for (let i = cells.length - 1; i >= 0; i--) {
+      if (cells[i]) { eliminatedAtCol = cells[i].status === "ELIM" ? i : null; break; }
+    }
+    return { name, cells, eliminatedAtCol };
+  });
+
+  return { columns, rows, indexed };
+}
+
+function shortEpisodeLabel(label) {
+  if (label === "Final") return "Final";
+  const m = /Episodio (\w+)/.exec(label);
+  return m ? "Ep. " + m[1] : label;
+}
+
+function trackRecordTable(track, shown, result) {
+  const sortedRows = [...track.rows].sort((a, b) => {
+    const aOut = a.eliminatedAtCol !== null && a.eliminatedAtCol <= shown - 1;
+    const bOut = b.eliminatedAtCol !== null && b.eliminatedAtCol <= shown - 1;
+    if (aOut !== bOut) return aOut ? 1 : -1;
+    if (aOut && bOut) return b.eliminatedAtCol - a.eliminatedAtCol;
+    return 0;
+  });
+
+  const tableWrap = el("div", { class: "table-wrap" });
+  const table = el("table", { class: "stats-table trackrecord-table" });
+  const thead = el("thead");
+  const headRow = el("tr");
+  headRow.appendChild(el("th", { text: "Rank" }));
+  headRow.appendChild(el("th", { text: "Concursante" }));
+  track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", { text: shortEpisodeLabel(ep.label) })));
+  headRow.appendChild(el("th", { text: "PPE" }));
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = el("tbody");
+  sortedRows.forEach((row) => {
+    const tr = el("tr");
+    const isOut = row.eliminatedAtCol !== null && row.eliminatedAtCol <= shown - 1;
+    const revealedAll = shown >= track.columns.length;
+    const rankText = (isOut || revealedAll) ? (result.finalPlacements[row.name] || "TBA") : "TBA";
+    tr.appendChild(el("td", { text: rankText }));
+
+    const nameCell = el("td", { class: "trackrecord-name" });
+    const avatar = avatarImg(row.name, "avatar--chip");
+    if (avatar) nameCell.appendChild(avatar);
+    nameCell.appendChild(el("span", { text: row.name }));
+    tr.appendChild(nameCell);
+
+    let pointsSum = 0, pointsCount = 0;
+    row.cells.slice(0, shown).forEach((cell) => {
+      if (!cell) { tr.appendChild(el("td", { text: "—" })); return; }
+      const status = DB.statuses.find((s) => s.id === cell.status);
+      tr.appendChild(el("td", { text: cell.status, style: status ? `color:${status.color};font-weight:700;` : "" }));
+      if (status) { pointsSum += status.points; pointsCount++; }
+    });
+
+    tr.appendChild(el("td", { text: pointsCount ? (pointsSum / pointsCount).toFixed(2) : "–" }));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  return tableWrap;
+}
+
+function renderSimResult(result, revealedCount) {
   const wrap = el("div", { class: "sim-result" });
+  const track = buildTrackRecord(result);
+  const totalCols = track.columns.length;
+  const shown = Math.min(revealedCount, totalCols);
+
   wrap.appendChild(el("h3", { class: "group-title", text: "Resultado" }));
 
   if (result.notes.length) {
@@ -190,35 +274,42 @@ function renderSimResult(result) {
     wrap.appendChild(notesBox);
   }
 
-  result.log.forEach((ep) => {
+  wrap.appendChild(trackRecordTable(track, shown, result));
+
+  // Narrativa (reto + nota de lip sync) de los episodios ya revelados, incluyendo
+  // regresos/LaLaParUza que no forman su propia columna en la tabla.
+  const cutoff = shown <= 0 ? -1 : (track.columns[shown] ? track.columns[shown].idx : track.indexed.length) - 1;
+  result.log.slice(0, cutoff + 1).forEach((ep) => {
     const epBox = el("div", { class: "episode" });
     epBox.appendChild(el("div", { class: "episode__head" }, [
       el("strong", { text: ep.label }),
       ep.challenge ? el("span", { class: "muted small", text: " · " + ep.challenge }) : null,
     ]));
-    if (ep.results && ep.results.length) {
-      const table = el("div", { class: "episode__results" });
-      ep.results.forEach((r) => table.appendChild(statusChip(r.name, r.status, r.score)));
-      epBox.appendChild(table);
-    }
     if (ep.lipsyncNote) epBox.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
     wrap.appendChild(epBox);
   });
 
-  wrap.appendChild(el("h3", { class: "group-title", text: "Clasificación final" }));
-  const podium = el("div", { class: "grid" });
-  Object.entries(result.finalPlacements)
-    .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
-    .forEach(([name, place]) => {
-      const card = el("div", { class: "card card--queen" });
-      const avatar = avatarImg(name, "avatar--podium");
-      if (avatar) card.appendChild(avatar);
-      card.appendChild(el("strong", { text: name }));
-      card.appendChild(el("div", { class: "muted small", text: place }));
-      if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
-      podium.appendChild(card);
-    });
-  wrap.appendChild(podium);
+  if (shown < totalCols) {
+    wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
+      el("button", { class: "btn btn--accent", text: "▶ Siguiente episodio", onclick: () => { revealedEpisodes = shown + 1; render(); } }),
+      el("button", { class: "btn btn--ghost", text: "Revelar todo", onclick: () => { revealedEpisodes = totalCols; render(); } }),
+    ]));
+  } else {
+    wrap.appendChild(el("h3", { class: "group-title", text: "Clasificación final" }));
+    const podium = el("div", { class: "grid" });
+    Object.entries(result.finalPlacements)
+      .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
+      .forEach(([name, place]) => {
+        const card = el("div", { class: "card card--queen" });
+        const avatar = avatarImg(name, "avatar--podium");
+        if (avatar) card.appendChild(avatar);
+        card.appendChild(el("strong", { text: name }));
+        card.appendChild(el("div", { class: "muted small", text: place }));
+        if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
+        podium.appendChild(card);
+      });
+    wrap.appendChild(podium);
+  }
 
   return wrap;
 }
@@ -231,17 +322,6 @@ function placementRank(place) {
   const m2 = /Eliminada #(\d+)/.exec(place);
   if (m2) return 100 - Number(m2[1]);
   return 999;
-}
-
-function statusChip(name, statusId, score) {
-  const status = DB.statuses.find((s) => s.id === statusId) || { label: statusId, color: "#7C8CA6" };
-  const chip = el("div", { class: "status-chip", style: `border-color:${status.color}` });
-  const avatar = avatarImg(name, "avatar--chip");
-  if (avatar) chip.appendChild(avatar);
-  chip.appendChild(el("span", { class: "status-chip__name", text: name }));
-  chip.appendChild(el("span", { class: "status-chip__status", style: `color:${status.color}`, text: status.label }));
-  if (typeof score === "number") chip.appendChild(el("span", { class: "status-chip__score", text: score }));
-  return chip;
 }
 
 function saveHistory(result) {
@@ -321,7 +401,7 @@ function renderStats() {
       notes: entry.notes || [],
       finalPlacements: entry.finalPlacements || {},
       missCongeniality: entry.missCongeniality,
-    }));
+    }, Infinity));
   }
 
   return wrap;

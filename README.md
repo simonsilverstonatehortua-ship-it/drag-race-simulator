@@ -59,8 +59,14 @@ No hace falta ningún paso de build ni dependencias de Node: todo es HTML/CSS/JS
 ## Fase 2: motor de simulación (ya incluida)
 
 Pestaña "Simular": eliges concursantes del roster de prueba y el formato de estreno /
-regreso / temporada / final, y el motor (`js/engine.js`) genera la temporada completa
-episodio a episodio, con chips de color reutilizando el catálogo de Estados.
+regreso / temporada / final, y el motor (`js/engine.js`) genera la temporada completa de
+golpe puertas adentro, pero el resultado se **revela episodio a episodio** en una tabla de
+trackrecord (Rank / Concursante / Ep. 1 / Ep. 2 / ... / PPE) al estilo de tu hoja Excel o
+del simulador de referencia: cada click en "▶ Siguiente episodio" añade una columna más;
+"Revelar todo" salta al final. El "Rank" de cada fila se queda en "TBA" hasta que se revela
+su eliminación (o el episodio Final si llega hasta el podio). El historial guardado
+(pestaña Estadísticas → "Ver detalle") sí se muestra completo de una vez, sin revelado
+progresivo, porque ya es una temporada pasada.
 
 **Implementado de verdad:**
 - Estreno normal, estreno normal sin eliminación, doble estreno (con y sin eliminación),
