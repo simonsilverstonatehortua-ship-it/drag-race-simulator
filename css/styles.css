@@ -313,33 +313,40 @@ main {
 }
 
 .chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 0.7rem;
   min-height: 2.2rem;
   margin-bottom: 0.6rem;
 }
 .name-chip {
-  display: inline-flex;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
   background: var(--bg-card);
   border: 1px solid var(--teal);
-  border-radius: 999px;
-  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+  border-radius: 10px;
+  padding: 0.9rem 0.5rem;
+  font-family: inherit;
   font-size: 0.85rem;
-}
-.name-chip__remove {
-  background: transparent;
-  border: none;
-  color: var(--muted);
+  color: var(--text);
+  text-align: center;
   cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.name-chip:hover { border-color: var(--magenta); transform: translateY(-2px); }
+.name-chip__remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  color: var(--muted);
   font-size: 1rem;
   line-height: 1;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
 }
-.name-chip__remove:hover { color: var(--magenta); background: var(--bg-panel); }
+.name-chip:hover .name-chip__remove { color: var(--magenta); }
 
 .name-input {
   background: var(--bg-card);

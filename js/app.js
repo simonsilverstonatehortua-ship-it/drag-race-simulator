@@ -178,12 +178,12 @@ function renderSimulate() {
   const chipsWrap = el("div", { class: "chip-list" });
   if (!simSelection.size) chipsWrap.appendChild(el("span", { class: "muted small", text: "Ninguna concursante seleccionada todavía." }));
   [...simSelection].forEach((name) => {
-    const chip = el("span", { class: "name-chip" });
-    const avatar = avatarImg(name, "avatar--chip");
+    const chip = el("button", { type: "button", class: "name-chip", title: "Quitar",
+      onclick: () => { simSelection.delete(name); render(); } });
+    const avatar = avatarImg(name, "avatar--result");
     if (avatar) chip.appendChild(avatar);
     chip.appendChild(el("span", { text: name }));
-    chip.appendChild(el("button", { type: "button", class: "name-chip__remove", text: "×", title: "Quitar",
-      onclick: () => { simSelection.delete(name); render(); } }));
+    chip.appendChild(el("span", { class: "name-chip__remove", text: "×" }));
     chipsWrap.appendChild(chip);
   });
   wrap.appendChild(chipsWrap);
