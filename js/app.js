@@ -73,7 +73,7 @@ function render() {
 function renderTabs() {
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
-  const labels = { simulate: "Simular", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster de prueba" };
+  const labels = { simulate: "Simular", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster" };
   TABS.forEach((tab) => {
     const btn = el("button", {
       class: "tab" + (tab === currentTab ? " tab--active" : ""),
