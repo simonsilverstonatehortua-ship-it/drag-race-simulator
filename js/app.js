@@ -634,24 +634,47 @@ function renderRoster() {
     wrap.appendChild(customGrid);
   }
 
+  // Agrupa las temporadas por franquicia (p.ej. "Estados Unidos") en un <details>
+  // colapsable por franquicia, y dentro cada temporada en su propia sección, con las
+  // concursantes ordenadas alfabéticamente (no por orden de eliminación/colocación).
+  const franchises = [];
   window.ALL_SEASONS.forEach((season) => {
-    wrap.appendChild(el("h3", { class: "group-title", text: season.seasonName }));
-    const grid = el("div", { class: "grid" });
-    season.contestants.forEach((c) => {
-      const card = el("div", { class: "card card--queen" });
-      const avatar = avatarImg(c.name, "avatar--card");
-      if (avatar) card.appendChild(avatar);
-      card.appendChild(el("strong", { text: c.name }));
-      card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
-      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
-      if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
-      card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
-      card.appendChild(el("div", { class: "card__actions" }, [
-        el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
-      ]));
-      grid.appendChild(card);
+    const key = season.franchise || "Otras";
+    let group = franchises.find((f) => f.name === key);
+    if (!group) { group = { name: key, seasons: [] }; franchises.push(group); }
+    group.seasons.push(season);
+  });
+
+  franchises.forEach((franchise) => {
+    const totalContestants = franchise.seasons.reduce((sum, s) => sum + s.contestants.length, 0);
+    const details = el("details", { class: "franchise-drawer", open: "open" });
+    const summary = el("summary", { class: "franchise-drawer__summary" });
+    summary.appendChild(el("span", { class: "franchise-drawer__title", text: franchise.name }));
+    summary.appendChild(el("span", { class: "muted small", text: ` ${franchise.seasons.length} temporada(s) · ${totalContestants} concursantes` }));
+    details.appendChild(summary);
+
+    franchise.seasons.forEach((season) => {
+      details.appendChild(el("h4", { class: "season-title", text: season.seasonName }));
+      const grid = el("div", { class: "grid" });
+      const sortedContestants = [...season.contestants].sort((a, b) => a.name.localeCompare(b.name));
+      sortedContestants.forEach((c) => {
+        const card = el("div", { class: "card card--queen" });
+        const avatar = avatarImg(c.name, "avatar--card");
+        if (avatar) card.appendChild(avatar);
+        card.appendChild(el("strong", { text: c.name }));
+        card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
+        card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
+        if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
+        card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+        card.appendChild(el("div", { class: "card__actions" }, [
+          el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
+        ]));
+        grid.appendChild(card);
+      });
+      details.appendChild(grid);
     });
-    wrap.appendChild(grid);
+
+    wrap.appendChild(details);
   });
   return wrap;
 }

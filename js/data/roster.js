@@ -75,6 +75,7 @@ const ALL_SEASONS = [
   {
     id: "US_S1",
     seasonName: "RuPaul's Drag Race — Temporada 1 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "BeBe Zahara Benet", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/BeBe_Zahara_Benet",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/ea/BeBeAS3Promo.png/revision/latest/scale-to-width-down/300?cb=20181021181328",
@@ -108,6 +109,7 @@ const ALL_SEASONS = [
   {
     id: "US_S2",
     seasonName: "RuPaul's Drag Race — Temporada 2 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Tyra Sanchez", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Tyra_Sanchez",
         image: IMG_BASE + "Tyra.webp",
@@ -150,6 +152,7 @@ const ALL_SEASONS = [
   {
     id: "US_S3",
     seasonName: "RuPaul's Drag Race — Temporada 3 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Raja", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Raja",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/dd/RajaAS7Promo.jpg/revision/latest/scale-to-width-down/300?cb=20220413174234",
@@ -192,6 +195,7 @@ const ALL_SEASONS = [
   {
     id: "US_S4",
     seasonName: "RuPaul's Drag Race — Temporada 4 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Sharon Needles", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Sharon_Needles",
         image: IMG_BASE + "SharonNeedles.webp", stats: deriveStats({ acting: 12, comedy: 12, dance: 8, design: 12, improv: 11, runway: 10, lipsync: 8 }) },
@@ -224,6 +228,7 @@ const ALL_SEASONS = [
   {
     id: "US_S5",
     seasonName: "RuPaul's Drag Race — Temporada 5 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Jinkx Monsoon", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Jinkx_Monsoon",
         image: IMG_BASE + "Jinkx.webp", stats: deriveStats({ acting: 15, comedy: 15, dance: 9, design: 8, improv: 15, runway: 9, lipsync: 8 }) },
@@ -258,6 +263,7 @@ const ALL_SEASONS = [
   {
     id: "US_S6",
     seasonName: "RuPaul's Drag Race — Temporada 6 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Bianca Del Rio", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Bianca_Del_Rio",
         image: IMG_BASE + "Bianca.webp", stats: deriveStats({ acting: 11, comedy: 15, dance: 7, design: 13, improv: 15, runway: 10, lipsync: 5 }) },
@@ -292,6 +298,7 @@ const ALL_SEASONS = [
   {
     id: "US_S7",
     seasonName: "RuPaul's Drag Race — Temporada 7 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Violet Chachki", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Violet_Chachki",
         image: IMG_BASE + "Violet.webp", stats: deriveStats({ acting: 6, comedy: 7, dance: 8, design: 15, improv: 8, runway: 13, lipsync: 8 }) },
@@ -326,6 +333,7 @@ const ALL_SEASONS = [
   {
     id: "US_S8",
     seasonName: "RuPaul's Drag Race — Temporada 8 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Bob the Drag Queen", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Bob_the_Drag_Queen",
         image: IMG_BASE + "Bob.webp", stats: deriveStats({ acting: 15, comedy: 15, dance: 8, design: 9, improv: 15, runway: 8, lipsync: 12 }) },
@@ -356,6 +364,7 @@ const ALL_SEASONS = [
   {
     id: "US_S9",
     seasonName: "RuPaul's Drag Race — Temporada 9 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Sasha Velour", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Sasha_Velour",
         image: IMG_BASE + "Sasha.webp", stats: deriveStats({ acting: 9, comedy: 10, dance: 8, design: 10, improv: 11, runway: 13, lipsync: 11 }) },
@@ -386,6 +395,7 @@ const ALL_SEASONS = [
   {
     id: "US_S10",
     seasonName: "RuPaul's Drag Race — Temporada 10 (US)",
+    franchise: "Estados Unidos",
     contestants: [
       { name: "Aquaria", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Aquaria",
         image: IMG_BASE + "Aquaria.webp", stats: deriveStats({ acting: 6, comedy: 11, dance: 8, design: 15, improv: 12, runway: 14, lipsync: 11 }) },
