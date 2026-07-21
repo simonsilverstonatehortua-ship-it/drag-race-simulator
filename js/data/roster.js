@@ -71,6 +71,13 @@ function deriveStats(core) {
 
 const IMG_BASE = "https://raw.githubusercontent.com/MochaMishu/Drag-Race-Simulator/main/image/queens/";
 
+// Bandera a mostrar junto al nombre de cada franquicia en la pestaña Roster (ver
+// "franchise" en cada temporada de ALL_SEASONS). Añade aquí la bandera al incorporar
+// franquicias de otros países.
+const FRANCHISE_FLAGS = {
+  "Estados Unidos": "🇺🇸",
+};
+
 const ALL_SEASONS = [
   {
     id: "US_S1",
@@ -441,3 +448,4 @@ window.STAT_LABELS = STAT_LABELS;
 window.randomStats = randomStats;
 window.ALL_SEASONS = ALL_SEASONS;
 window.ALL_CONTESTANTS = ALL_CONTESTANTS;
+window.FRANCHISE_FLAGS = FRANCHISE_FLAGS;

@@ -5,6 +5,7 @@ let currentTab = "simulate";
 let simSelection = new Set();
 let lastSimResult = null;
 let revealedEpisodes = 1;
+let rosterSeasonTab = {};
 
 const GROUP_LABELS = {
   premiere: "Estreno",
@@ -647,32 +648,50 @@ function renderRoster() {
 
   franchises.forEach((franchise) => {
     const totalContestants = franchise.seasons.reduce((sum, s) => sum + s.contestants.length, 0);
+    const flag = window.FRANCHISE_FLAGS[franchise.name] || "";
     const details = el("details", { class: "franchise-drawer", open: "open" });
     const summary = el("summary", { class: "franchise-drawer__summary" });
-    summary.appendChild(el("span", { class: "franchise-drawer__title", text: franchise.name }));
+    summary.appendChild(el("span", { class: "franchise-drawer__title", text: `${flag} ${franchise.name}`.trim() }));
     summary.appendChild(el("span", { class: "muted small", text: ` ${franchise.seasons.length} temporada(s) · ${totalContestants} concursantes` }));
     details.appendChild(summary);
 
+    // Pestañas por temporada dentro de la franquicia: solo se muestra el roster de la
+    // temporada activa, para no tener que desplazarte por todas las anteriores si quieres
+    // editar, p.ej., la Temporada 9.
+    const activeSeasonId = rosterSeasonTab[franchise.name] || franchise.seasons[0].id;
+    const activeSeason = franchise.seasons.find((s) => s.id === activeSeasonId) || franchise.seasons[0];
+
+    const seasonTabs = el("div", { class: "season-tabs" });
     franchise.seasons.forEach((season) => {
-      details.appendChild(el("h4", { class: "season-title", text: season.seasonName }));
-      const grid = el("div", { class: "grid" });
-      const sortedContestants = [...season.contestants].sort((a, b) => a.name.localeCompare(b.name));
-      sortedContestants.forEach((c) => {
-        const card = el("div", { class: "card card--queen" });
-        const avatar = avatarImg(c.name, "avatar--card");
-        if (avatar) card.appendChild(avatar);
-        card.appendChild(el("strong", { text: c.name }));
-        card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
-        card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
-        if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
-        card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
-        card.appendChild(el("div", { class: "card__actions" }, [
-          el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
-        ]));
-        grid.appendChild(card);
-      });
-      details.appendChild(grid);
+      const num = season.id.replace(/^\D+/, "") || season.seasonName;
+      seasonTabs.appendChild(el("button", {
+        type: "button",
+        class: "tab tab--sm" + (season.id === activeSeason.id ? " tab--active" : ""),
+        text: num,
+        title: season.seasonName,
+        onclick: () => { rosterSeasonTab[franchise.name] = season.id; render(); },
+      }));
     });
+    details.appendChild(seasonTabs);
+
+    details.appendChild(el("h4", { class: "season-title", text: activeSeason.seasonName }));
+    const grid = el("div", { class: "grid" });
+    const sortedContestants = [...activeSeason.contestants].sort((a, b) => a.name.localeCompare(b.name));
+    sortedContestants.forEach((c) => {
+      const card = el("div", { class: "card card--queen" });
+      const avatar = avatarImg(c.name, "avatar--card");
+      if (avatar) card.appendChild(avatar);
+      card.appendChild(el("strong", { text: c.name }));
+      card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
+      if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
+      card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+      card.appendChild(el("div", { class: "card__actions" }, [
+        el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
+      ]));
+      grid.appendChild(card);
+    });
+    details.appendChild(grid);
 
     wrap.appendChild(details);
   });
