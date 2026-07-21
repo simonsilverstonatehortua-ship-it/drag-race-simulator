@@ -81,15 +81,13 @@ trackrecord (Rank / Concursante / Ep. 1 / Ep. 2 / ... / PPE) al estilo de tu hoj
 del simulador de referencia: cada celda tiene el fondo del color de su estado (igual que
 las hojas de cálculo con formato condicional), cada click en "▶ Siguiente episodio" añade
 una columna más, y "Revelar todo" salta al final. El "Rank" de cada fila se queda en "TBA"
-hasta que se revela su eliminación (o el episodio Final si llega hasta el podio). El
-historial guardado (pestaña Estadísticas → "Ver detalle") sí se muestra completo de una
-vez, sin revelado progresivo, porque ya es una temporada pasada. Las colocaciones se
-muestran como puesto real de la clasificación final ("9º lugar" para la primera eliminada
-de un cast de 9, y así sucesivamente), no como "Eliminada #N".
+hasta que se revela su eliminación (o el episodio Final si llega hasta el podio). Las
+colocaciones se muestran como puesto real de la clasificación final ("9º lugar" para la
+primera eliminada de un cast de 9, y así sucesivamente), no como "Eliminada #N".
 
 **Puntos por estado (PPE)**: WIN=10, TOP2=9, HIGH=8, SAFE=5, LOW=3, BTM=1, ELIM=0. Solo
 estos 7 estados semanales cuentan para el promedio de puntos por episodio (columna "PPE"
-de la tabla y "Puntos/ep." en Estadísticas); el resto (MVQ, ADV, RTRN, QUIT, DISQ, GUEST) y
+de la tabla); el resto (MVQ, ADV, RTRN, QUIT, DISQ, GUEST) y
 las colocaciones finales (WINNER/RUNNER_UP/MISS_CONGENIALITY, que sí suman aparte como
 puntos de carrera) quedan fuera del promedio. Esto es configurable por estado (campo
 "Cuenta para el promedio (PPE)") desde la pestaña Estados.
@@ -127,8 +125,6 @@ el reparto por debajo del tamaño de la final elegida.
 - Cuando hay una doble+ eliminación en un mismo episodio, o finalistas que no llegan al
   lip sync final en Top3/Top4/jurado/bracket, el resultado indica explícitamente el puesto
   de cada una ("Fulana y Mengana quedaron en 5º lugar y 4º lugar, respectivamente").
-- Cada temporada simulada se guarda en `localStorage` (`dragRaceSimulator.history.v1`)
-  para que el panel de estadísticas pueda leerlas.
 
 **Todavía no implementado** (seleccionable en la UI, pero cae en el comportamiento
 estándar y se avisa con una nota en el resultado): Rate a Queen, entrada tardía, Lipsync
@@ -172,17 +168,6 @@ a las reales. También puedes **editar las estadísticas de cualquier concursant
 (botón "Editar stats" en su tarjeta de Roster) sin perder sus datos originales — un botón
 "Restablecer original" los recupera en cualquier momento. Y puedes editar qué estadísticas
 usa cada reto desde la pestaña Retos.
-
-## Fase 3: panel de estadísticas (ya incluida)
-
-Pestaña "Estadísticas": lee todo el historial de temporadas simuladas guardado en
-`localStorage` (`js/stats.js`) y muestra:
-- Un ranking de concursantes con veces en WIN/HIGH/SAFE/LOW/BTM/ELIM, coronaciones,
-  runner-ups, Miss Simpatía, puntos promedio por episodio ("Puntos" tal como se
-  calculaba en el Excel original) y puntos totales de carrera.
-- Un listado de las temporadas simuladas con opción de ver el detalle episodio a
-  episodio de cualquiera de ellas.
-- Botón para borrar el historial guardado.
 
 ## Próximas fases (pendientes)
 

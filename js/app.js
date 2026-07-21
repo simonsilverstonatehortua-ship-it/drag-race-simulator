@@ -1,8 +1,6 @@
 let DB = window.RulesStore.loadDB();
 
-const HISTORY_KEY = "dragRaceSimulator.history.v1";
-
-const TABS = ["simulate", "stats", "statuses", "challenges", "formats", "roster"];
+const TABS = ["simulate", "statuses", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set(window.ALL_SEASONS[0].contestants.map((c) => c.name));
 let lastSimResult = null;
@@ -65,7 +63,6 @@ function render() {
   const root = document.getElementById("panel");
   root.innerHTML = "";
   if (currentTab === "simulate") root.appendChild(renderSimulate());
-  if (currentTab === "stats") root.appendChild(renderStats());
   if (currentTab === "statuses") root.appendChild(renderStatuses());
   if (currentTab === "challenges") root.appendChild(renderChallenges());
   if (currentTab === "formats") root.appendChild(renderFormats());
@@ -75,7 +72,7 @@ function render() {
 function renderTabs() {
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
-  const labels = { simulate: "Simular", stats: "Estadísticas", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster de prueba" };
+  const labels = { simulate: "Simular", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster de prueba" };
   TABS.forEach((tab) => {
     const btn = el("button", {
       class: "tab" + (tab === currentTab ? " tab--active" : ""),
@@ -190,7 +187,6 @@ function runSimulation() {
   const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName());
   lastSimResult = result;
   revealedEpisodes = 1;
-  saveHistory(result);
   render();
 }
 
@@ -390,121 +386,6 @@ function placementRank(place) {
   const m2 = /Eliminada #(\d+)/.exec(place);
   if (m2) return 100 - Number(m2[1]);
   return 999;
-}
-
-function saveHistory(result) {
-  const history = loadHistory();
-  history.push({
-    date: new Date().toISOString(),
-    winner: result.winnerName,
-    runnerUp: result.runnerUpName,
-    missCongeniality: result.missCongeniality,
-    notes: result.notes,
-    log: result.log,
-    finalPlacements: result.finalPlacements,
-    relationships: result.relationships,
-  });
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-}
-
-function loadHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-  } catch (e) {
-    console.warn("No se pudo leer el historial, se ignora.", e);
-    return [];
-  }
-}
-
-function clearHistory() {
-  if (!confirm("¿Borrar todo el historial de temporadas simuladas? Esta acción no se puede deshacer.")) return;
-  localStorage.removeItem(HISTORY_KEY);
-  render();
-}
-
-// ---------- ESTADÍSTICAS ----------
-let statsSeasonDetail = null;
-
-function renderStats() {
-  const wrap = el("div", { class: "section" });
-  const history = loadHistory();
-
-  wrap.appendChild(el("div", { class: "section__head" }, [
-    el("h2", { text: "Estadísticas" }),
-    el("p", { class: "muted", text: `Basado en ${history.length} temporada(s) simulada(s) y guardada(s) en este navegador.` }),
-    history.length ? el("button", { class: "btn btn--ghost btn--danger", text: "Borrar historial", onclick: clearHistory }) : null,
-  ]));
-
-  if (!history.length) {
-    wrap.appendChild(el("p", { class: "muted", text: "Todavía no has simulado ninguna temporada. Ve a la pestaña \"Simular\" para generar la primera." }));
-    return wrap;
-  }
-
-  const stats = window.StatsEngine.computeStats(history, DB);
-
-  wrap.appendChild(el("h3", { class: "group-title", text: "Ranking de concursantes" }));
-  wrap.appendChild(el("p", { class: "muted small", text: "\"Puntos/ep.\" es el promedio de puntos por episodio semanal (WIN/HIGH/SAFE/LOW/BTM/ELIM), igual que en tu Excel. \"Puntos totales\" suma también la colocación final." }));
-  wrap.appendChild(statsTable(stats.contestants));
-
-  wrap.appendChild(el("h3", { class: "group-title", text: "Historial de temporadas" }));
-  const seasonsList = el("div", { class: "grid" });
-  history.forEach((entry, i) => {
-    const card = el("div", { class: "card card--queen" });
-    card.appendChild(el("strong", { text: entry.winner ? `👑 ${entry.winner}` : "Temporada" }));
-    card.appendChild(el("div", { class: "muted small", text: new Date(entry.date).toLocaleString() }));
-    card.appendChild(el("div", { class: "muted small", text: `${Object.keys(entry.finalPlacements || {}).length} concursantes · ${(entry.log || []).length} episodios` }));
-    if (entry.runnerUp) card.appendChild(el("div", { class: "muted small", text: `Runner-up: ${entry.runnerUp}` }));
-    card.appendChild(el("div", { class: "card__actions" }, [
-      el("button", { class: "btn btn--ghost", text: statsSeasonDetail === i ? "Ocultar detalle" : "Ver detalle",
-        onclick: () => { statsSeasonDetail = statsSeasonDetail === i ? null : i; render(); } }),
-    ]));
-    seasonsList.appendChild(card);
-  });
-  wrap.appendChild(seasonsList);
-
-  if (statsSeasonDetail !== null && history[statsSeasonDetail]) {
-    const entry = history[statsSeasonDetail];
-    wrap.appendChild(el("h3", { class: "group-title", text: "Detalle de la temporada" }));
-    wrap.appendChild(renderSimResult({
-      log: entry.log || [],
-      notes: entry.notes || [],
-      finalPlacements: entry.finalPlacements || {},
-      missCongeniality: entry.missCongeniality,
-      relationships: entry.relationships,
-    }, Infinity));
-  }
-
-  return wrap;
-}
-
-function statsTable(contestants) {
-  const sorted = [...contestants].sort((a, b) =>
-    b.wins - a.wins || b.careerPoints - a.careerPoints || a.name.localeCompare(b.name));
-
-  const tableWrap = el("div", { class: "table-wrap" });
-  const table = el("table", { class: "stats-table" });
-  const thead = el("thead");
-  const headRow = el("tr");
-  ["Concursante", "Temp.", "WIN", "HIGH", "SAFE", "LOW", "BTM", "ELIM", "Coronas", "Runner-up", "Miss Simpatía", "Puntos/ep.", "Puntos totales"]
-    .forEach((h) => headRow.appendChild(el("th", { text: h })));
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = el("tbody");
-  sorted.forEach((c) => {
-    const row = el("tr");
-    [
-      c.name, c.seasons,
-      c.statusCounts.WIN || 0, c.statusCounts.HIGH || 0, c.statusCounts.SAFE || 0,
-      c.statusCounts.LOW || 0, c.statusCounts.BTM || 0, c.statusCounts.ELIM || 0,
-      c.wins, c.runnerUps, c.missCongeniality,
-      c.avgWeeklyPoints.toFixed(2), c.careerPoints,
-    ].forEach((v) => row.appendChild(el("td", { text: String(v) })));
-    tbody.appendChild(row);
-  });
-  table.appendChild(tbody);
-  tableWrap.appendChild(table);
-  return tableWrap;
 }
 
 // ---------- ESTADOS ----------
