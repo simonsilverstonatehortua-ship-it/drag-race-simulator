@@ -102,26 +102,10 @@ function renderSimulate() {
   // myrainboww.github.io/Drag-Race-Simulator y esopare.github.io/esoteric-drag-race-simulator)
   // sobre todo el roster cargado (temporadas reales + personalizadas), mezclando de
   // cualquier origen en un mismo reparto. El botón "Al azar" añade una concursante al azar
-  // cada vez que se pulsa (no rellena un cupo fijo de golpe).
+  // cada vez que se pulsa (no rellena un cupo fijo de golpe). No se muestra el roster
+  // completo de fondo: los resultados del buscador solo aparecen mientras se escribe.
   const allPool = [...window.ALL_CONTESTANTS, ...DB.customContestants];
-  wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes (${simSelection.size} seleccionadas)` }));
-  wrap.appendChild(el("p", { class: "muted small", text: "Busca por nombre y haz click en un resultado para añadirla, o pulsa \"Al azar\" para añadir una al azar. Haz click en una chip para quitarla." }));
-
-  const chipsWrap = el("div", { class: "chip-list" });
-  if (!simSelection.size) chipsWrap.appendChild(el("span", { class: "muted small", text: "Ninguna concursante seleccionada todavía." }));
-  [...simSelection].forEach((name) => {
-    const chip = el("span", { class: "name-chip" });
-    const avatar = avatarImg(name, "avatar--chip");
-    if (avatar) chip.appendChild(avatar);
-    chip.appendChild(el("span", { text: name }));
-    chip.appendChild(el("button", { type: "button", class: "name-chip__remove", text: "×", title: "Quitar",
-      onclick: () => { simSelection.delete(name); render(); } }));
-    chipsWrap.appendChild(chip);
-  });
-  wrap.appendChild(chipsWrap);
-
   const addOne = (name) => { simSelection.add(name); render(); };
-
   const addRandomOne = () => {
     const remaining = allPool.filter((c) => !simSelection.has(c.name));
     if (!remaining.length) return;
@@ -129,11 +113,14 @@ function renderSimulate() {
     addOne(pick.name);
   };
 
+  // 1. Buscador
+  wrap.appendChild(el("h3", { class: "group-title", text: "Buscar concursantes" }));
+  wrap.appendChild(el("p", { class: "muted small", text: "Escribe el nombre de una concursante y haz click en el resultado para añadirla, o pulsa \"Al azar\" para añadir una al azar." }));
+
   const searchRow = el("div", { class: "toolbar", style: "justify-content:flex-start;" });
   const searchInput = el("input", { type: "text", class: "name-input", placeholder: "Buscar concursante..." });
   searchRow.appendChild(searchInput);
   searchRow.appendChild(el("button", { class: "btn btn--ghost", text: "🎲 Al azar", onclick: addRandomOne }));
-  searchRow.appendChild(el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); render(); } }));
   wrap.appendChild(searchRow);
 
   const resultsWrap = el("div", { class: "search-results" });
@@ -142,12 +129,11 @@ function renderSimulate() {
   const renderResults = (query) => {
     resultsWrap.innerHTML = "";
     const q = query.trim().toLowerCase();
+    if (!q) return;
     const pool = allPool.filter((c) => !simSelection.has(c.name));
-    const matches = (q ? pool.filter((c) => c.name.toLowerCase().includes(q)) : pool)
-      .sort((a, b) => a.name.localeCompare(b.name));
+    const matches = pool.filter((c) => c.name.toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
     if (!matches.length) {
-      resultsWrap.appendChild(el("span", { class: "muted small",
-        text: q ? "Sin resultados." : "No quedan más concursantes por añadir." }));
+      resultsWrap.appendChild(el("span", { class: "muted small", text: "Sin resultados." }));
       return;
     }
     matches.forEach((c) => {
@@ -165,11 +151,10 @@ function renderSimulate() {
     e.preventDefault();
     const q = searchInput.value.trim().toLowerCase();
     const first = allPool.find((c) => !simSelection.has(c.name) && c.name.toLowerCase().includes(q));
-    if (first) addOne(first.name);
+    if (first) { addOne(first.name); searchInput.value = ""; renderResults(""); }
   });
-  renderResults("");
 
-  // Selección de formatos
+  // 2. Formato
   wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -186,6 +171,30 @@ function renderSimulate() {
   });
   wrap.appendChild(formatGrid);
 
+  // 3. Concursantes elegidas
+  wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes elegidas (${simSelection.size})` }));
+  wrap.appendChild(el("p", { class: "muted small", text: "Haz click en una chip para quitarla." }));
+
+  const chipsWrap = el("div", { class: "chip-list" });
+  if (!simSelection.size) chipsWrap.appendChild(el("span", { class: "muted small", text: "Ninguna concursante seleccionada todavía." }));
+  [...simSelection].forEach((name) => {
+    const chip = el("span", { class: "name-chip" });
+    const avatar = avatarImg(name, "avatar--chip");
+    if (avatar) chip.appendChild(avatar);
+    chip.appendChild(el("span", { text: name }));
+    chip.appendChild(el("button", { type: "button", class: "name-chip__remove", text: "×", title: "Quitar",
+      onclick: () => { simSelection.delete(name); render(); } }));
+    chipsWrap.appendChild(chip);
+  });
+  wrap.appendChild(chipsWrap);
+
+  if (simSelection.size) {
+    wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
+      el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); render(); } }),
+    ]));
+  }
+
+  // 4. Simular
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
     el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: runSimulation }),
   ]));

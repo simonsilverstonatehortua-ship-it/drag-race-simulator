@@ -358,6 +358,7 @@ main {
   border-radius: 8px;
   background: var(--bg-card);
 }
+.search-results:empty { display: none; margin: 0; padding: 0; border: none; }
 .search-result {
   display: inline-flex;
   align-items: center;
