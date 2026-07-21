@@ -168,7 +168,7 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6b/ManilaAS4Promo.png/revision/latest/scale-to-width-down/300?cb=20181109165646",
         stats: { acting: 12, comedy: 11, dance: 7, design: 14, improv: 10, runway: 13, lipsync: 11, makeup: 12, singing: 7, verses: 8, strategy: 12, charisma: 10, uniqueness: 9, nerve: 9, talent: 9 } },
       { name: "Alexis Mateo", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Alexis_Mateo",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e0/AlexisMateoCAvsTW2.jpeg/revision/latest/scale-to-width-down/300?cb=20240626150710",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/AlexisMateoDRMXLR1.jpg/revision/latest/scale-to-width-down/1000?cb=20260626181255",
         stats: { acting: 14, comedy: 12, dance: 9, design: 7, improv: 10, runway: 8, lipsync: 12, makeup: 9, singing: 7, verses: 6, strategy: 9, charisma: 10, uniqueness: 7, nerve: 8, talent: 9 } },
       { name: "Yara Sofia", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Yara_Sofia",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b5/YaraSofiaAS6PromoLook.jpg/revision/latest/scale-to-width-down/300?cb=20210526211709",
