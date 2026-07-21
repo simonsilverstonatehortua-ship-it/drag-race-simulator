@@ -205,7 +205,7 @@ const ALL_SEASONS = [
     franchise: "Estados Unidos",
     contestants: [
       { name: "Sharon Needles", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Sharon_Needles",
-        image: IMG_BASE + "SharonNeedles.webp", stats: deriveStats({ acting: 12, comedy: 12, dance: 8, design: 12, improv: 11, runway: 10, lipsync: 8 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/49/Needles.png/revision/latest/scale-to-width-down/1000?cb=20180202000600", stats: deriveStats({ acting: 12, comedy: 12, dance: 8, design: 12, improv: 11, runway: 10, lipsync: 8 }) },
       { name: "Chad Michaels", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Chad_Michaels",
         image: IMG_BASE + "Chad.webp", stats: deriveStats({ acting: 11, comedy: 10, dance: 8, design: 9, improv: 12, runway: 10, lipsync: 8 }) },
       { name: "Phi Phi O'Hara", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Phi_Phi_O'Hara",
