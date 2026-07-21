@@ -299,6 +299,11 @@ main {
   height: 22px;
   border-width: 1px;
 }
+.avatar--result {
+  width: 84px;
+  height: 84px;
+  border-width: 2px;
+}
 .avatar--podium {
   width: 72px;
   height: 72px;
@@ -347,12 +352,12 @@ main {
   min-width: 220px;
 }
 .search-results {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 0.7rem;
   margin: 0.6rem 0 1rem;
-  padding: 0.6rem;
-  max-height: 260px;
+  padding: 0.7rem;
+  max-height: 380px;
   overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -360,20 +365,23 @@ main {
 }
 .search-results:empty { display: none; margin: 0; padding: 0; border: none; }
 .search-result {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   background: var(--bg-panel);
   border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+  border-radius: 10px;
+  padding: 0.9rem 0.5rem;
   font-family: inherit;
   font-size: 0.85rem;
   color: var(--text);
+  text-align: center;
   cursor: pointer;
   transition: border-color 0.15s, transform 0.15s;
 }
-.search-result:hover { border-color: var(--teal); transform: translateY(-1px); }
+.search-result:hover { border-color: var(--teal); transform: translateY(-2px); }
 
 .stats-grid {
   display: grid;

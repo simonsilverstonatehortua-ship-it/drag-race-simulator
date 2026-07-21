@@ -139,7 +139,7 @@ function renderSimulate() {
     matches.forEach((c) => {
       const item = el("button", { type: "button", class: "search-result",
         onclick: () => { addOne(c.name); searchInput.value = ""; renderResults(""); searchInput.focus(); } });
-      const avatar = avatarImg(c.name, "avatar--chip");
+      const avatar = avatarImg(c.name, "avatar--result");
       if (avatar) item.appendChild(avatar);
       item.appendChild(el("span", { text: c.name }));
       resultsWrap.appendChild(item);
