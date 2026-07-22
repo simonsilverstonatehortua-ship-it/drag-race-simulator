@@ -314,7 +314,7 @@ const ALL_SEASONS = [
       { name: "Pearl", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Pearl",
         image: IMG_BASE + "Pearl.webp", stats: deriveStats({ acting: 7, comedy: 10, dance: 8, design: 9, improv: 10, runway: 9, lipsync: 5 }) },
       { name: "Kennedy Davenport", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Kennedy_Davenport",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f6/KennedyDavenportAS11CastMug.jpg/revision/latest/scale-to-width-down/110?cb=20260425183311", stats: deriveStats({ acting: 9, comedy: 8, dance: 10, design: 8, improv: 11, runway: 10, lipsync: 14 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f6/KennedyDavenportAS11CastMug.jpg/revision/latest/scale-to-width-down/110?cb=20260425183311", stats: deriveStats({ acting: 10, comedy: 9, dance: 11, design: 7, improv: 13, runway: 7, lipsync: 15 }) },
       { name: "Katya", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Katya",
         image: IMG_BASE + "Katya.webp", stats: deriveStats({ acting: 9, comedy: 12, dance: 9, design: 7, improv: 12, runway: 10, lipsync: 10 }) },
       { name: "Trixie Mattel", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Trixie_Mattel",
