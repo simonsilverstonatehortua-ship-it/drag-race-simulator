@@ -42,7 +42,7 @@ function randomScore(scoreScale) {
 // (equipos, Lipsync Assassin, Lipsync For Your Legacy) cuya lógica exige que alguien se
 // vaya esa semana.
 function randomChallenge(challenges, { requireElim = false } = {}) {
-  let maxis = challenges.filter((c) => c.category !== "runway");
+  let maxis = challenges;
   if (requireElim) {
     const withElim = maxis.filter((c) => !c.noElim);
     if (withElim.length) maxis = withElim;
@@ -106,6 +106,14 @@ function lipsyncWinner(nameA, nameB, db, statsByName) {
 function loseLipsyncBattle(names, db, statsByName) {
   const scored = names.map((name) => ({ name, lip: lipsyncScore(name, db, statsByName) }));
   scored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
+  return scored[0].name;
+}
+
+// Lip sync de desempate entre varias concursantes empatadas como mejores de la semana:
+// quien saca mejor puntuación de lip sync, se queda con la victoria del reto.
+function winTiebreakLipsync(names, db, statsByName) {
+  const scored = names.map((name) => ({ name, lip: lipsyncScore(name, db, statsByName) }));
+  scored.sort((a, b) => b.lip - a.lip || Math.random() - 0.5);
   return scored[0].name;
 }
 
@@ -218,13 +226,15 @@ function assignMidTierAndElimination(results, db, statsByName, { noElim = false,
   let lipsyncNote = "";
   if (canEliminate && bottomN > 0) {
     const bottomSlice = pool.slice(n - bottomN);
-    bottomSlice.forEach((r) => (r.status = "BTM"));
     const elimCount = Math.max(1, Math.min(pickElimCount(bottomN), bottomN, maxElim));
     const lipScored = bottomSlice.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
     lipScored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
     eliminatedNames = lipScored.slice(0, elimCount).map((r) => r.name);
-    eliminatedNames.forEach((name) => { bottomSlice.find((r) => r.name === name).status = "ELIM"; });
-    const survivors = bottomSlice.filter((r) => r.status !== "ELIM").map((r) => r.name);
+    const elimSet = new Set(eliminatedNames);
+    const elimStatus = eliminatedNames.length > 1 ? "ELIM_MULTI" : "ELIM";
+    const survivors = bottomSlice.filter((r) => !elimSet.has(r.name)).map((r) => r.name);
+    const survivorStatus = survivors.length > 1 ? "BTM_MULTI" : "BTM";
+    bottomSlice.forEach((r) => { r.status = elimSet.has(r.name) ? elimStatus : survivorStatus; });
     lipsyncNote = eliminatedNames.length > 1
       ? `Lip sync múltiple: se eliminan ${eliminatedNames.join(", ")}. ${survivors.length ? "Se salva " + survivors.join(", ") + "." : ""}`
       : `Lip sync: se salva ${survivors.join(", ")}.`;
@@ -255,11 +265,21 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   const n = scored.length;
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
 
+  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
   const winCount = Math.max(1, Math.min(pickWinCount(), Math.floor(n / 2) || 1));
-  for (let i = 0; i < winCount; i++) results[i].status = "WIN";
+  let tiebreakNote = "";
+  if (winCount === 1) {
+    results[0].status = winStatus;
+  } else {
+    const tied = results.slice(0, winCount);
+    const tiedNames = tied.map((r) => r.name);
+    const trueWinner = winTiebreakLipsync(tiedNames, db, statsByName);
+    tied.forEach((r) => { r.status = r.name === trueWinner ? winStatus : "TIEBREAK_LOSE"; });
+    tiebreakNote = `${tiedNames.join(", ")} empatan como mejores de la semana y hacen lip sync para decidir la única ganadora del reto: gana ${trueWinner}.`;
+  }
 
   const { eliminatedNames, lipsyncNote } = assignMidTierAndElimination(results, db, statsByName, { noElim, maxElim });
-  return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
+  return { challenge: challenge.label, results, eliminatedNames, lipsyncNote: [tiebreakNote, lipsyncNote].filter(Boolean).join(" ") };
 }
 
 // --- Reto sin eliminación con doble reconocimiento (p.ej. Meet the Queens): se juzga
@@ -304,17 +324,25 @@ function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinit
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
+  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
 
   let legacyNote = "";
   if (results.length >= 2) {
     const [first, second] = results;
     const winner = lipsyncWinner(first.name, second.name, db, statsByName);
     const loser = winner === first.name ? second.name : first.name;
-    first.status = first.name === winner ? "WIN" : "TOP2";
-    second.status = second.name === winner ? "WIN" : "TOP2";
-    legacyNote = `${first.name} y ${second.name} empatan como mejores de la semana y hacen Lip Sync For Your Legacy: gana ${winner}. ${loser} se queda como TOP2 (a salvo, sin puntos de victoria).`;
+    const isTie = first.score === second.score;
+    if (isTie) {
+      first.status = "WIN_TIE";
+      second.status = "WIN_TIE";
+      legacyNote = `${first.name} y ${second.name} empatan como mejores de la semana y hacen Lip Sync For Your Legacy: gana ${winner}, quien decide a quién eliminar del fondo. ${loser} también se queda con los 10 puntos de la victoria.`;
+    } else {
+      first.status = first.name === winner ? winStatus : "TOP2";
+      second.status = second.name === winner ? winStatus : "TOP2";
+      legacyNote = `${first.name} y ${second.name} hacen Lip Sync For Your Legacy: gana ${winner}. ${loser} se queda como TOP2 (10 puntos, sin poder de eliminación).`;
+    }
   } else if (results.length === 1) {
-    results[0].status = "WIN";
+    results[0].status = winStatus;
   }
 
   const { eliminatedNames, lipsyncNote } = assignMidTierAndElimination(results, db, statsByName, { maxElim });
@@ -399,6 +427,7 @@ function runLaLaParUza(pool, db, statsByName) {
 // hace lip sync interno para decidir quién se va. ---
 function runTeamsEpisode(activeNames, db, statsByName) {
   const challenge = randomChallenge(db.challenges, { requireElim: true });
+  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
   const shuffled = shuffle(activeNames);
   const teams = [];
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -416,9 +445,11 @@ function runTeamsEpisode(activeNames, db, statsByName) {
   teamScores.forEach((t, i) => {
     const sortedMembers = [...t.members].sort((a, b) => b.score - a.score);
     if (i === 0) {
-      sortedMembers.forEach((m, j) => results.push({ name: m.name, score: m.score, status: j === 0 ? "WIN" : "HIGH" }));
+      sortedMembers.forEach((m, j) => results.push({ name: m.name, score: m.score, status: j === 0 ? winStatus : "HIGH" }));
     } else if (i === teamScores.length - 1 && teamScores.length > 1) {
       sortedMembers.forEach((m) => results.push({ name: m.name, score: m.score, status: "BTM" }));
+    } else if (i === 1 && teamScores.length > 2) {
+      sortedMembers.forEach((m) => results.push({ name: m.name, score: m.score, status: "HIGH_GROUP" }));
     } else {
       sortedMembers.forEach((m) => results.push({ name: m.name, score: m.score, status: "SAFE" }));
     }
@@ -433,8 +464,11 @@ function runTeamsEpisode(activeNames, db, statsByName) {
     const memberNames = worstTeam.members.map((m) => m.name);
     const loserName = loseLipsyncBattle(memberNames, db, statsByName);
     results.find((r) => r.name === loserName).status = "ELIM";
+    const survivorNames = memberNames.filter((n) => n !== loserName);
+    const survivorStatus = survivorNames.length > 1 ? "BTM_MULTI" : "BTM";
+    survivorNames.forEach((n) => { results.find((r) => r.name === n).status = survivorStatus; });
     eliminatedName = loserName;
-    lipsyncNote += ` El equipo peor puntuado hace lip sync entre sí: se salva ${memberNames.filter((n) => n !== loserName).join(", ")}.`;
+    lipsyncNote += ` El equipo peor puntuado hace lip sync entre sí: se salva ${survivorNames.join(", ")}.`;
   } else {
     lipsyncNote += " Reparto demasiado reducido para formar más de un equipo: nadie es eliminada esta semana.";
   }
@@ -450,7 +484,7 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships =
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const n = scored.length;
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
-  results[0].status = "WIN";
+  results[0].status = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
   if (n >= 6) results[1].status = "HIGH";
   if (n >= 6) results[n - 1].status = "LOW";
 

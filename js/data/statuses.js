@@ -3,34 +3,52 @@
 // custom:false = viene de la referencia oficial. Puedes añadir los tuyos desde la UI.
 //
 // "countsForPoints": si el estado entra en el cálculo de PPE (puntos por episodio) que se
-// muestra en la tabla de trackrecord y en la pestaña Estadísticas. Solo los 7 estados
-// semanales "de reto" (WIN/TOP2/HIGH/SAFE/LOW/BTM/ELIM) cuentan; el resto (MVQ, ADV, RTRN,
-// QUIT, DISQ, GUEST) y las colocaciones finales (que ya suman aparte como puntos de
-// carrera) quedan fuera del promedio.
+// muestra en la tabla de trackrecord y en la pestaña Estadísticas. Solo los estados
+// semanales "de reto" cuentan; el resto (MVQ, ADV, RTRN, QUIT, DISQ, GUEST) y las
+// colocaciones finales (que ya suman aparte como puntos de carrera) quedan fuera del
+// promedio.
 
 const DEFAULT_STATUSES = [
   // --- Estados semanales (por reto) ---
-  { id: "WIN", label: "Ganadora del reto", type: "weekly", color: "#D4AF37",
+  { id: "WIN", label: "Ganadora del reto (única)", type: "weekly", color: "#4169e1",
     points: 10, countsForPoints: true, custom: false,
-    description: "Gana el reto principal (maxi challenge) de la semana." },
-  { id: "TOP2", label: "Gana el reto, pierde el lip sync (TOP2)", type: "weekly", color: "#8CA6D4",
+    description: "Es la única ganadora del maxi reto de la semana." },
+  { id: "WIN_TIE", label: "Ganadora empatada (Lipsync For Your Legacy)", type: "weekly", color: "#00008b",
+    points: 10, countsForPoints: true, custom: false,
+    description: "Empata como mejor de la semana en un Lipsync For Your Legacy: ambas ganan el reto y se quedan con 10 puntos, gane o pierda el lip sync por su legado." },
+  { id: "TOP2", label: "Gana el reto, pierde el Lipsync For Your Legacy", type: "weekly", color: "#00bfff",
+    points: 10, countsForPoints: true, custom: false,
+    description: "En un Lipsync For Your Legacy sin empate exacto de puntaje: gana el reto pero pierde el lip sync por su legado (se queda con los 10 puntos, sin poder de eliminación)." },
+  { id: "WIN_RUNWAY", label: "Gana el reto por la pasarela", type: "weekly", color: "#00bfff",
+    points: 10, countsForPoints: true, custom: false,
+    description: "Gana el maxi reto de la semana en una categoría de solo pasarela (Ball, Runway libre, etc.)." },
+  { id: "TIEBREAK_LOSE", label: "Empata el reto pero pierde el lip sync de desempate", type: "weekly", color: "#00bfff",
     points: 9, countsForPoints: true, custom: false,
-    description: "Formato All Stars: gana el reto pero pierde el Lip Sync for Your Legacy." },
-  { id: "HIGH", label: "Destacada (HIGH)", type: "weekly", color: "#4FD1C5",
+    description: "Empata como mejor puntuada de la semana, hace lip sync para decidir la única ganadora del reto y lo pierde: se queda con 9 puntos. No es lo mismo que un Lipsync For Your Legacy: aquí solo hay una ganadora del reto." },
+  { id: "HIGH", label: "Destacada (HIGH)", type: "weekly", color: "#add8e6",
     points: 8, countsForPoints: true, custom: false,
     description: "Entre las mejores de la semana, sin llegar a ganar." },
-  { id: "SAFE", label: "A salvo (SAFE)", type: "weekly", color: "#7C8CA6",
+  { id: "HIGH_GROUP", label: "Grupo destacado (reto en equipos)", type: "weekly", color: "#7fffd4",
+    points: 8, countsForPoints: true, custom: false,
+    description: "En un reto en grupos/equipos: forma parte del grupo destacado de la semana (ni el ganador ni el peor)." },
+  { id: "SAFE", label: "A salvo (SAFE)", type: "weekly", color: "#f9f9ff",
     points: 5, countsForPoints: true, custom: false,
     description: "Ni entre las mejores ni entre las peores." },
-  { id: "LOW", label: "Floja (LOW)", type: "weekly", color: "#E08A3E",
+  { id: "LOW", label: "Floja (LOW)", type: "weekly", color: "#ffb6c1",
     points: 3, countsForPoints: true, custom: false,
     description: "Entre las peores, pero no en el fondo de la clasificación." },
-  { id: "BTM", label: "En el fondo (BOTTOM)", type: "weekly", color: "#C24E4E",
+  { id: "BTM", label: "En el fondo, sobrevive (BOTTOM)", type: "weekly", color: "#ff6347",
     points: 1, countsForPoints: true, custom: false,
-    description: "Entre las dos (o más) peores; se enfrenta al lip sync por su vida." },
-  { id: "ELIM", label: "Eliminada", type: "weekly", color: "#7A1F2B",
+    description: "Es la única en el fondo que sobrevive al lip sync por su vida." },
+  { id: "BTM_MULTI", label: "En el fondo junto a otra(s), nadie es eliminada", type: "weekly", color: "#ff69b4",
+    points: 1, countsForPoints: true, custom: false,
+    description: "Dos o más concursantes están en el fondo de la clasificación pero ninguna es eliminada esta semana." },
+  { id: "ELIM", label: "Eliminada", type: "weekly", color: "#ff0000",
     points: 0, countsForPoints: true, custom: false,
     description: "Pierde el lip sync y es eliminada de la competición." },
+  { id: "ELIM_MULTI", label: "Eliminada (doble o más eliminación)", type: "weekly", color: "#8b0000",
+    points: 0, countsForPoints: true, custom: false,
+    description: "Es eliminada la misma semana que otra(s) concursante(s) (doble o triple eliminación)." },
   { id: "MVQ", label: "Most Valuable Queen (MVQ)", type: "weekly", color: "#B08CC7",
     points: 0, countsForPoints: false, custom: false,
     description: "Está en el fondo pero participa en el reparto de puntos de la 'Reina Más Valiosa'." },

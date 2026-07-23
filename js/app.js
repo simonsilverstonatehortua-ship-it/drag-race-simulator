@@ -236,12 +236,24 @@ function buildTrackRecord(result) {
     const cells = columns.map(({ ep }) => ep.results.find((r) => r.name === name) || null);
     let eliminatedAtCol = null;
     for (let i = cells.length - 1; i >= 0; i--) {
-      if (cells[i]) { eliminatedAtCol = cells[i].status === "ELIM" ? i : null; break; }
+      if (cells[i]) { eliminatedAtCol = (cells[i].status === "ELIM" || cells[i].status === "ELIM_MULTI") ? i : null; break; }
     }
     return { name, cells, eliminatedAtCol };
   });
 
   return { columns, rows, indexed };
+}
+
+// Elige texto blanco o el oscuro por defecto de .trackrecord-cell según el brillo del
+// color de fondo del estado, para que los estados con fondos muy oscuros (p.ej. #00008b,
+// #8b0000) sigan siendo legibles.
+function readableTextColor(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
+  if (!m) return "";
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255, g = (int >> 8) & 255, b = int & 255;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance < 0.5 ? "#ffffff" : "";
 }
 
 function statusCountsForPoints(status) {
@@ -337,8 +349,9 @@ function trackRecordTable(track, shown, result) {
     row.cells.slice(0, shown).forEach((cell) => {
       if (!cell) { tr.appendChild(el("td", { class: "trackrecord-cell", text: "—" })); return; }
       const status = DB.statuses.find((s) => s.id === cell.status);
+      const textColor = status ? readableTextColor(status.color) : "";
       tr.appendChild(el("td", { class: "trackrecord-cell", text: cell.status,
-        style: status ? `background:${status.color};` : "" }));
+        style: status ? `background:${status.color};${textColor ? `color:${textColor};` : ""}` : "" }));
       if (status && statusCountsForPoints(status)) { pointsSum += status.points; pointsCount++; }
     });
 
@@ -442,8 +455,9 @@ function renderStatuses() {
 
 function statusCard(s) {
   const card = el("div", { class: "card", style: `border-left-color:${s.color}` });
+  const chipText = readableTextColor(s.color);
   card.appendChild(el("div", { class: "card__top" }, [
-    el("span", { class: "chip", style: `background:${s.color}`, text: s.id }),
+    el("span", { class: "chip", style: `background:${s.color};${chipText ? `color:${chipText};` : ""}`, text: s.id }),
     s.custom ? el("span", { class: "badge", text: "personalizado" }) : null,
   ]));
   card.appendChild(el("strong", { text: s.label }));
