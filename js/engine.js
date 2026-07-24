@@ -159,19 +159,35 @@ function weightedPick(options) {
   return options[options.length - 1].value;
 }
 
-// Reparte fondo+eliminación sobre quienes en "results" sigan "SAFE" (deja intactas las
-// casillas ya asignadas antes, p.ej. WIN/TOP2 de Lipsync For Your Legacy): las 2 últimas
-// del ranking por puntaje de reto van a lip sync por su vida; la de menor puntaje de lip
-// sync es eliminada, la otra sobrevive (BTM). El resto del grupo se queda SAFE.
+// Reparte HIGH/LOW/fondo+eliminación sobre quienes en "results" sigan "SAFE" (deja
+// intactas las casillas ya asignadas antes, p.ej. WIN/TOP2 de Lipsync For Your Legacy).
+// "pool" ya viene ordenado de mejor a peor puntaje: las 2 últimas siempre van a lip sync
+// por su vida (la de menor puntaje de lip sync es eliminada, la otra sobrevive como BTM);
+// de las que quedan en medio, las 2 mejores quedan HIGH y la peor queda LOW. Con 5 o menos
+// activas no hay sitio para las 3 posiciones de en medio (HIGH/HIGH/LOW) sin pisar el
+// fondo: en ese caso se decide HIGH o LOW comparando el puntaje de cada una con la media
+// del grupo restante.
 // Si solo queda 1 persona en el grupo (p.ej. Lipsync For Your Legacy con apenas 3 activas:
 // las 2 mejores ya se fueron al legacy lip sync), esa única persona no tiene con quién
 // hacer lip sync y queda eliminada directamente, para no estancar la temporada.
 // "maxElim" evita eliminar cuando ya se llegó al tamaño de la final.
 // Devuelve { eliminatedNames, lipsyncNote }.
-function assignBottomTwoAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity } = {}) {
+function assignPlacementsAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity } = {}) {
   const pool = results.filter((r) => r.status === "SAFE");
   const n = pool.length;
   const canEliminate = !noElim && maxElim > 0 && n >= 1;
+
+  if (n >= 2) {
+    const middlePool = pool.slice(0, n - 2);
+    if (middlePool.length >= 3) {
+      middlePool[0].status = "HIGH";
+      middlePool[1].status = "HIGH";
+      middlePool[middlePool.length - 1].status = "LOW";
+    } else if (middlePool.length > 0) {
+      const avg = average(pool.map((r) => r.score));
+      middlePool.forEach((r) => { r.status = r.score >= avg ? "HIGH" : "LOW"; });
+    }
+  }
 
   let eliminatedNames = [];
   let lipsyncNote = "";
@@ -199,8 +215,8 @@ function assignBottomTwoAndElimination(results, db, statsByName, { noElim = fals
 // Simula un único reto entre un grupo de concursantes activas. Se puntúa a cada una
 // (media de las estadísticas relevantes del reto + un bono al azar de 1 a 5) y se ordena
 // de mejor a peor: la primera de la lista gana el reto; las 2 últimas van a lip sync por
-// su vida (mismo método con Lip Sync/Carisma/Originalidad/Nervio/Talento); el resto queda
-// SAFE.
+// su vida (mismo método con Lip Sync/Carisma/Originalidad/Nervio/Talento); de las que
+// quedan en medio, las 2 mejores quedan HIGH y la peor LOW (ver assignPlacementsAndElimination).
 // "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
 // final); por defecto sin límite.
 // Devuelve { results: [{name, score, status}], eliminatedNames, lipsyncNote }
@@ -217,7 +233,7 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
   const results = scored.map((s, i) => ({ ...s, status: i === 0 ? winStatus : "SAFE" }));
 
-  const { eliminatedNames, lipsyncNote } = assignBottomTwoAndElimination(results, db, statsByName, { noElim, maxElim });
+  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { noElim, maxElim });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
 }
 
@@ -287,7 +303,7 @@ function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinit
     results[0].status = winStatus;
   }
 
-  const { eliminatedNames, lipsyncNote } = assignBottomTwoAndElimination(results, db, statsByName, { maxElim });
+  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { maxElim });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote: `${legacyNote} ${lipsyncNote}`.trim() };
 }
 
