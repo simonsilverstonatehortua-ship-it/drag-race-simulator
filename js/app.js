@@ -236,7 +236,7 @@ function buildTrackRecord(result) {
     const cells = columns.map(({ ep }) => ep.results.find((r) => r.name === name) || null);
     let eliminatedAtCol = null;
     for (let i = cells.length - 1; i >= 0; i--) {
-      if (cells[i]) { eliminatedAtCol = (cells[i].status === "ELIM" || cells[i].status === "ELIM_MULTI") ? i : null; break; }
+      if (cells[i]) { eliminatedAtCol = cells[i].status === "ELIM" ? i : null; break; }
     }
     return { name, cells, eliminatedAtCol };
   });
@@ -509,16 +509,6 @@ function renderChallenges() {
   const grid = el("div", { class: "grid" });
   DB.challenges.forEach((c) => grid.appendChild(challengeCard(c)));
   wrap.appendChild(grid);
-
-  wrap.appendChild(el("h3", { class: "group-title", text: "Escala de puntuación por reto" }));
-  const scaleWrap = el("div", { class: "scale" });
-  DB.scoreScale.forEach((s) => {
-    scaleWrap.appendChild(el("div", { class: "scale__item" }, [
-      el("span", { class: "scale__value", text: s.value }),
-      el("span", { class: "scale__label", text: s.label }),
-    ]));
-  });
-  wrap.appendChild(scaleWrap);
 
   return wrap;
 }
