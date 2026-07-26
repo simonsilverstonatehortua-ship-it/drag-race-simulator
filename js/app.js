@@ -322,21 +322,21 @@ function trackRecordTable(track, shown, result) {
 
   const tableWrap = el("div", { class: "table-wrap" });
   const table = el("table", { class: "stats-table trackrecord-table" });
+  // Rank/Concursante/PPE ocupan las 2 filas de encabezado (número de episodio + reto de
+  // la semana), centradas verticalmente en medio, al estilo de las tablas de trackrecord
+  // de la wiki fandom.
   const thead = el("thead");
   const headRow = el("tr");
-  headRow.appendChild(el("th", { text: "Rank" }));
-  headRow.appendChild(el("th", { text: "Concursante" }));
+  headRow.appendChild(el("th", { text: "Rank", rowspan: "2", class: "trackrecord-th--span" }));
+  headRow.appendChild(el("th", { text: "Concursante", rowspan: "2", class: "trackrecord-th--span" }));
   track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", { text: shortEpisodeLabel(ep.label) })));
-  headRow.appendChild(el("th", { text: "PPE" }));
+  headRow.appendChild(el("th", { text: "PPE", rowspan: "2", class: "trackrecord-th--span" }));
   thead.appendChild(headRow);
 
   // Fila con el reto de cada capítulo, justo debajo del número de episodio (al estilo de
   // las tablas de trackrecord de la wiki fandom, del Excel y de otros simuladores).
   const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
-  challengeRow.appendChild(el("th", { text: "" }));
-  challengeRow.appendChild(el("th", { text: "" }));
   track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", { text: ep.challenge || "" })));
-  challengeRow.appendChild(el("th", { text: "" }));
   thead.appendChild(challengeRow);
 
   table.appendChild(thead);

@@ -565,6 +565,9 @@ footer {
   max-width: 140px;
   border-bottom: 1px solid var(--line);
 }
+.trackrecord-th--span {
+  vertical-align: middle;
+}
 .trackrecord-name {
   display: flex;
   align-items: center;
