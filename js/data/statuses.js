@@ -61,7 +61,7 @@ const DEFAULT_STATUSES = [
   { id: "DISQ", label: "Descalificada (DISQ)", type: "weekly", color: "#3A3A3A",
     points: 0, countsForPoints: false, custom: false,
     description: "Descalificada por la producción/RuPaul." },
-  { id: "GUEST", label: "Invitada (ya eliminada)", type: "weekly", color: "#6B6B6B",
+  { id: "GUEST", label: "Invitada (ya eliminada)", type: "weekly", color: "#dcdcdc",
     points: 0, countsForPoints: false, custom: false,
     description: "Aparece como invitada tras haber sido eliminada (reunion, finale, etc.)." },
 
@@ -72,9 +72,9 @@ const DEFAULT_STATUSES = [
   { id: "RUNNER_UP", label: "Finalista (Runner-up)", type: "final", color: "#C0C0C0",
     points: 7, countsForPoints: false, custom: false,
     description: "Segunda posición final." },
-  { id: "MISS_CONGENIALITY", label: "Miss Simpatía", type: "final", color: "#E4136B",
+  { id: "MISS_CONGENIALITY", label: "Miss Simpatía", type: "final", color: "#00ffff",
     points: 5, countsForPoints: false, custom: false,
-    description: "Premio a la concursante más querida por sus compañeras." },
+    description: "Premio a la concursante que mejor se lleva con sus compañeras (solo puede ganarla una eliminada, nunca una finalista)." },
 ];
 
 // Se combina con lo que el usuario guarde en localStorage (ver store.js)

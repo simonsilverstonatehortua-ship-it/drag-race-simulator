@@ -273,6 +273,10 @@ function shortChallengeLabel(label) {
   return TRACKRECORD_CHALLENGE_ABBR[label] || label;
 }
 
+// Texto abreviado de ciertas casillas del trackrecord (el color de cada estado ya las
+// distingue; el nombre completo se mantiene en el resto de la app, p.ej. la pestaña Estados).
+const TRACKRECORD_CELL_TEXT_OVERRIDES = { WIN_TIE: "WIN", MISS_CONGENIALITY: "MISS CON" };
+
 const RELATIONSHIP_STYLE = {
   "le cae muy bien": { symbol: "++", color: "#3FA796" },
   "le cae bien": { symbol: "+", color: "#4FD1C5" },
@@ -376,8 +380,9 @@ function trackRecordTable(track, shown, result) {
       // ELIM siempre en negro, sin importar el brillo del fondo (a pedido: se sacrifica el
       // contraste automático solo para esta casilla).
       const textColor = cell.status === "ELIM" ? "#000000" : (status ? readableTextColor(status.color) : "");
-      // WIN_TIE se muestra como "WIN" a secas en la celda (el color sigue distinguiendo el empate).
-      const cellText = cell.status === "WIN_TIE" ? "WIN" : cell.status;
+      // WIN_TIE se muestra como "WIN" a secas, y Miss Simpatía abreviada como "MISS CON"
+      // (el color de cada una sigue distinguiéndolas del resto).
+      const cellText = TRACKRECORD_CELL_TEXT_OVERRIDES[cell.status] || cell.status;
       tr.appendChild(el("td", { class: "trackrecord-cell", text: cellText,
         style: status ? `background:${status.color};${textColor ? `color:${textColor};` : ""}` : "" }));
       if (status && statusCountsForPoints(status)) { pointsSum += status.points; pointsCount++; }

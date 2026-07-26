@@ -140,18 +140,28 @@ function generateRelationships(names, statsByName) {
   return relationships;
 }
 
-// Miss Simpatía: si hay datos de Carisma, se sesga hacia quien tenga más; si no, al azar.
-function pickMissCongeniality(candidates, statsByName) {
-  const withStats = candidates.filter((n) => statsByName[n] && typeof statsByName[n].charisma === "number");
-  if (!withStats.length) return candidates[Math.floor(Math.random() * candidates.length)];
-  const weights = candidates.map((n) => (statsByName[n] ? statsByName[n].charisma + 1 : 8));
-  const total = weights.reduce((a, b) => a + b, 0);
-  let roll = Math.random() * total;
-  for (let i = 0; i < candidates.length; i++) {
-    roll -= weights[i];
-    if (roll <= 0) return candidates[i];
-  }
-  return candidates[candidates.length - 1];
+// Puntuación numérica de cada nivel de relación, para calcular medias (misma escala que
+// los símbolos ++/+/•/−/−− de la tabla de relaciones en la UI).
+const RELATIONSHIP_SCORE = { "le cae muy bien": 2, "le cae bien": 1, "normal": 0, "le cae mal": -1, "le cae muy mal": -2 };
+
+// Miss Simpatía: de entre las candidatas (solo eliminadas durante la temporada; nunca una
+// finalista), se elige a quien mejor se lleva con el resto según la tabla de relaciones —
+// media de ambos sentidos (cuánto le cae bien a cada compañera y cuánto le cae ella a cada
+// compañera) con todas las demás concursantes de la temporada.
+function pickMissCongeniality(candidates, relationships) {
+  const allNames = Object.keys(relationships);
+  const scoreOf = (name) => {
+    const others = allNames.filter((n) => n !== name);
+    if (!others.length) return 0;
+    const total = others.reduce((sum, other) => {
+      const aToB = RELATIONSHIP_SCORE[relationships[name]?.[other]] ?? 0;
+      const bToA = RELATIONSHIP_SCORE[relationships[other]?.[name]] ?? 0;
+      return sum + (aToB + bToA) / 2;
+    }, 0);
+    return total / others.length;
+  };
+  const ranked = [...candidates].sort((a, b) => scoreOf(b) - scoreOf(a) || Math.random() - 0.5);
+  return ranked[0];
 }
 
 // Elige un valor al azar de una lista de {value, weight}.
@@ -782,11 +792,20 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     finaleLipsyncNote = `${winnerName} gana el lip sync final y se corona.`;
   }
 
+  // Miss Simpatía: solo puede ganarla una eliminada durante la temporada (nunca una
+  // finalista); se elige según quién mejor se lleve con el resto en la tabla de relaciones.
+  const missCongeniality = eliminated.length ? pickMissCongeniality(eliminated, relationships) : null;
+
   const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
-    results: finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
-      status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" })),
+    results: [
+      ...finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
+        status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" })),
+      // El resto de la temporada "vuelve" para la final, al estilo de la wiki/el Excel.
+      ...eliminated.map((name) => ({ name, score: null,
+        status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" })),
+    ],
     eliminatedNames: [],
     lipsyncNote: finaleLipsyncNote,
   };
@@ -813,10 +832,6 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     const entries = restNames.map((name) => ({ name, placement: finalPlacements[name] }));
     finalLogEntry.lipsyncNote += ` ${describeTiedPlacements(entries)}`;
   }
-
-  // Miss Simpatía: se favorece a quien tenga más Carisma (si hay stats), si no, al azar.
-  const missCandidates = contestantNames.filter((n) => n !== winnerName);
-  const missCongeniality = pickMissCongeniality(missCandidates, statsByName);
 
   return { log, winnerName, runnerUpName, finalPlacements, missCongeniality, notes, relationships };
 }
