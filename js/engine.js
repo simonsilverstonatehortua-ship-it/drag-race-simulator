@@ -186,9 +186,12 @@ function weightedPick(options) {
 //
 // Empates de puntaje en el lip sync por su vida (entre las del fondo, sean 2 o más por los
 // empates de arriba): si TODAS empatan exactamente, se decide en bloque en vez de al azar:
-// puntaje alto (>= DOUBLE_LIPSYNC_HIGH_THRESHOLD) = doble shantay, nadie se va a casa;
-// puntaje bajo = doble sashay, se van todas. Si solo empatan varias por el último puesto
-// (pero no todas), se eliminan esas (lo más común, con diferencia, es que sea 1 sola).
+// puntaje alto (>= DOUBLE_LIPSYNC_HIGH_THRESHOLD) = doble shantay, nadie se va a casa (BTM_MULTI
+// para todas); puntaje bajo = doble sashay, se van todas (ELIM_MULTI). Si solo empatan varias
+// por el último puesto (pero no todas), se eliminan esas entre sí (ELIM_MULTI) y quien
+// sobreviva queda BTM — lo más común, con diferencia, es que solo empate/se elimine 1 sola
+// (ELIM normal). BTM_MULTI queda reservado solo para el doble shantay (nadie eliminada);
+// si hay eliminación de por medio, quien sobrevive siempre es BTM, aunque sobrevivan varias.
 //
 // Si solo queda 1 persona en el grupo (p.ej. Lipsync For Your Legacy con apenas 3 activas:
 // las 2 mejores ya se fueron al legacy lip sync), esa única persona no tiene con quién
@@ -244,9 +247,10 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
     }
 
     eliminatedNames = loserNames;
+    const elimStatus = loserNames.length > 1 ? "ELIM_MULTI" : "ELIM";
     const survivors = bottomPool.filter((r) => !loserNames.includes(r.name));
     bottomPool.forEach((r) => {
-      r.status = loserNames.includes(r.name) ? "ELIM" : (survivors.length > 1 ? "BTM_MULTI" : "BTM");
+      r.status = loserNames.includes(r.name) ? elimStatus : (doubleShantay ? "BTM_MULTI" : "BTM");
     });
 
     const groupDesc = bottomPool.map((r) => r.name).join(", ");
@@ -255,7 +259,7 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
     } else if (loserNames.length === bottomPool.length) {
       lipsyncNote = `Lip sync entre ${groupDesc}: empatan tan flojas que RuPaul manda a todas a casa (doble sashay).`;
     } else if (loserNames.length > 1) {
-      lipsyncNote = `Lip sync entre ${groupDesc}: empatan como las peores y se van ${loserNames.join(" y ")}. Se salva${survivors.length > 1 ? "n" : ""} ${survivors.map((r) => r.name).join(", ")}.`;
+      lipsyncNote = `Lip sync entre ${groupDesc}: empatan entre sí como las peores y se van ${loserNames.join(" y ")}. Se salva${survivors.length > 1 ? "n" : ""} ${survivors.map((r) => r.name).join(", ")}.`;
     } else {
       lipsyncNote = `Lip sync entre ${groupDesc}: se salva${survivors.length > 1 ? "n" : ""} ${survivors.map((r) => r.name).join(", ")}.`;
     }
@@ -292,9 +296,11 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
   // Si dos o más empatan exactamente en la puntuación más alta, ganan todas el reto (en
-  // vez de desempatarlas al azar).
-  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
+  // vez de desempatarlas al azar): WIN_TIE si son 2+, WIN si es una sola. (WIN_RUNWAY queda
+  // de momento sin usar: se retomará más adelante.)
   const topScore = scored[0].score;
+  const topScorerCount = scored.filter((s) => s.score === topScore).length;
+  const winStatus = topScorerCount > 1 ? "WIN_TIE" : "WIN";
   const results = scored.map((s) => ({ ...s, status: s.score === topScore ? winStatus : "SAFE" }));
 
   const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { noElim, maxElim });
@@ -346,7 +352,7 @@ function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinit
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
-  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
+  const winStatus = "WIN"; // WIN_RUNWAY queda de momento sin usar: se retomará más adelante.
 
   let legacyNote = "";
   if (results.length >= 2) {
@@ -449,7 +455,7 @@ function runLaLaParUza(pool, db, statsByName) {
 // hace lip sync interno para decidir quién se va. ---
 function runTeamsEpisode(activeNames, db, statsByName) {
   const challenge = randomChallenge(db.challenges, { requireElim: true });
-  const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
+  const winStatus = "WIN"; // WIN_RUNWAY queda de momento sin usar: se retomará más adelante.
   const shuffled = shuffle(activeNames);
   const teams = [];
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -486,9 +492,10 @@ function runTeamsEpisode(activeNames, db, statsByName) {
     const memberNames = worstTeam.members.map((m) => m.name);
     const loserName = loseLipsyncBattle(memberNames, db, statsByName);
     results.find((r) => r.name === loserName).status = "ELIM";
+    // BTM_MULTI queda reservado para el doble shantay (nadie eliminada): aquí sí hubo
+    // eliminación, así que quien sobrevive es BTM aunque sobrevivan varias a la vez.
     const survivorNames = memberNames.filter((n) => n !== loserName);
-    const survivorStatus = survivorNames.length > 1 ? "BTM_MULTI" : "BTM";
-    survivorNames.forEach((n) => { results.find((r) => r.name === n).status = survivorStatus; });
+    survivorNames.forEach((n) => { results.find((r) => r.name === n).status = "BTM"; });
     eliminatedName = loserName;
     lipsyncNote += ` El equipo peor puntuado hace lip sync entre sí: se salva ${survivorNames.join(", ")}.`;
   } else {
@@ -506,7 +513,7 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships =
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const n = scored.length;
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
-  results[0].status = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
+  results[0].status = "WIN"; // WIN_RUNWAY queda de momento sin usar: se retomará más adelante.
   if (n >= 6) results[1].status = "HIGH";
   if (n >= 6) results[n - 1].status = "LOW";
 
