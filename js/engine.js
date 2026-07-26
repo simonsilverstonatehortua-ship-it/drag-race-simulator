@@ -87,6 +87,12 @@ function lipsyncScore(name, db, statsByName) {
   return average(vals) + randomStatBonus();
 }
 
+// Umbral para considerar "alto" un empate exacto en la puntuación de lip sync (escala
+// aprox. 1-20: media de 5 estadísticas 0-15 + bono al azar 1-5). Empate en o por encima:
+// doble shantay (nadie se va a casa). Empate por debajo: doble sashay (se van todas las
+// empatadas). Ver assignPlacementsAndElimination.
+const DOUBLE_LIPSYNC_HIGH_THRESHOLD = 11;
+
 function lipsyncWinner(nameA, nameB, db, statsByName) {
   const scoreA = lipsyncScore(nameA, db, statsByName);
   const scoreB = lipsyncScore(nameB, db, statsByName);
@@ -167,41 +173,94 @@ function weightedPick(options) {
 // activas no hay sitio para las 3 posiciones de en medio (HIGH/HIGH/LOW) sin pisar el
 // fondo: en ese caso se decide HIGH o LOW comparando el puntaje de cada una con la media
 // del grupo restante.
+//
+// Empates de puntaje en el reto (mismo puntaje exacto): comparten posición en vez de
+// desempatarse al azar.
+//  - Empate entre quien sería HIGH y una que sería SAFE: esa SAFE también queda HIGH
+//    (pueden quedar 3+ HIGH).
+//  - Empate entre quien sería LOW y una que sería SAFE: esa SAFE también queda LOW.
+//  - Empate entre quien sería LOW y alguien del fondo: esa LOW se suma también al lip
+//    sync por su vida (lip sync a 3 o más en vez de a 2).
+// (El empate por la victoria del reto se resuelve en runEpisode/runLipsyncLegacyEpisode:
+// todas las que empatan en la puntuación más alta ganan.)
+//
+// Empates de puntaje en el lip sync por su vida (entre las del fondo, sean 2 o más por los
+// empates de arriba): si TODAS empatan exactamente, se decide en bloque en vez de al azar:
+// puntaje alto (>= DOUBLE_LIPSYNC_HIGH_THRESHOLD) = doble shantay, nadie se va a casa;
+// puntaje bajo = doble sashay, se van todas. Si solo empatan varias por el último puesto
+// (pero no todas), se eliminan esas (lo más común, con diferencia, es que sea 1 sola).
+//
 // Si solo queda 1 persona en el grupo (p.ej. Lipsync For Your Legacy con apenas 3 activas:
 // las 2 mejores ya se fueron al legacy lip sync), esa única persona no tiene con quién
 // hacer lip sync y queda eliminada directamente, para no estancar la temporada.
-// "maxElim" evita eliminar cuando ya se llegó al tamaño de la final.
+// "maxElim" evita eliminar cuando ya se llegó al tamaño de la final (si un doble sashay o
+// una eliminación múltiple por empate se pasara de "maxElim", solo se elimina a las peores
+// puntuadas en lip sync hasta llegar al límite).
 // Devuelve { eliminatedNames, lipsyncNote }.
 function assignPlacementsAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity } = {}) {
   const pool = results.filter((r) => r.status === "SAFE");
   const n = pool.length;
   const canEliminate = !noElim && maxElim > 0 && n >= 1;
 
-  if (n >= 2) {
-    const middlePool = pool.slice(0, n - 2);
-    if (middlePool.length >= 3) {
-      middlePool[0].status = "HIGH";
-      middlePool[1].status = "HIGH";
-      middlePool[middlePool.length - 1].status = "LOW";
-    } else if (middlePool.length > 0) {
-      const avg = average(pool.map((r) => r.score));
-      middlePool.forEach((r) => { r.status = r.score >= avg ? "HIGH" : "LOW"; });
+  // Fondo: nominalmente las 2 últimas del pool, ampliable si la que debería ser LOW
+  // empata en puntaje con la peor de esas 2 (y así sucesivamente si el empate sigue).
+  let bottomSize = Math.min(2, n);
+  while (bottomSize < n && pool[n - bottomSize - 1].score === pool[n - bottomSize].score) {
+    bottomSize++;
+  }
+  const bottomPool = pool.slice(n - bottomSize);
+  const middlePool = pool.slice(0, n - bottomSize);
+
+  if (middlePool.length >= 3) {
+    const midLen = middlePool.length;
+    let highCount = 2;
+    while (highCount < midLen - 1 && middlePool[highCount - 1].score === middlePool[highCount].score) {
+      highCount++;
     }
+    let lowCount = 1;
+    while (highCount + lowCount < midLen && middlePool[midLen - lowCount - 1].score === middlePool[midLen - lowCount].score) {
+      lowCount++;
+    }
+    for (let i = 0; i < highCount; i++) middlePool[i].status = "HIGH";
+    for (let i = midLen - lowCount; i < midLen; i++) middlePool[i].status = "LOW";
+  } else if (middlePool.length > 0) {
+    const avg = average(pool.map((r) => r.score));
+    middlePool.forEach((r) => { r.status = r.score >= avg ? "HIGH" : "LOW"; });
   }
 
   let eliminatedNames = [];
   let lipsyncNote = "";
-  if (canEliminate && n >= 2) {
-    const bottomTwo = pool.slice(n - 2);
-    const lipScored = bottomTwo.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
-    lipScored.sort((a, b) => a.lip - b.lip || Math.random() - 0.5);
-    const loserName = lipScored[0].name;
-    eliminatedNames = [loserName];
-    bottomTwo.forEach((r) => { r.status = r.name === loserName ? "ELIM" : "BTM"; });
-    const survivor = bottomTwo.find((r) => r.name !== loserName).name;
-    lipsyncNote = `Lip sync: se salva ${survivor}.`;
-  } else if (canEliminate && n === 1) {
-    const only = pool[0];
+
+  if (canEliminate && bottomPool.length >= 2) {
+    const lipScored = bottomPool.map((r) => ({ name: r.name, lip: lipsyncScore(r.name, db, statsByName) }));
+    const minLip = Math.min(...lipScored.map((r) => r.lip));
+    const tiedAtMin = lipScored.filter((r) => r.lip === minLip);
+    const allTied = tiedAtMin.length === lipScored.length;
+    const doubleShantay = allTied && minLip >= DOUBLE_LIPSYNC_HIGH_THRESHOLD;
+
+    let loserNames = doubleShantay ? [] : tiedAtMin.map((r) => r.name);
+    if (loserNames.length > maxElim) {
+      loserNames = [...tiedAtMin].sort((a, b) => a.lip - b.lip).slice(0, maxElim).map((r) => r.name);
+    }
+
+    eliminatedNames = loserNames;
+    const survivors = bottomPool.filter((r) => !loserNames.includes(r.name));
+    bottomPool.forEach((r) => {
+      r.status = loserNames.includes(r.name) ? "ELIM" : (survivors.length > 1 ? "BTM_MULTI" : "BTM");
+    });
+
+    const groupDesc = bottomPool.map((r) => r.name).join(", ");
+    if (doubleShantay) {
+      lipsyncNote = `Lip sync entre ${groupDesc}: empatan con un número tan bueno que RuPaul decide que nadie se va a casa esta semana (doble shantay).`;
+    } else if (loserNames.length === bottomPool.length) {
+      lipsyncNote = `Lip sync entre ${groupDesc}: empatan tan flojas que RuPaul manda a todas a casa (doble sashay).`;
+    } else if (loserNames.length > 1) {
+      lipsyncNote = `Lip sync entre ${groupDesc}: empatan como las peores y se van ${loserNames.join(" y ")}. Se salva${survivors.length > 1 ? "n" : ""} ${survivors.map((r) => r.name).join(", ")}.`;
+    } else {
+      lipsyncNote = `Lip sync entre ${groupDesc}: se salva${survivors.length > 1 ? "n" : ""} ${survivors.map((r) => r.name).join(", ")}.`;
+    }
+  } else if (canEliminate && bottomPool.length === 1) {
+    const only = bottomPool[0];
     only.status = "ELIM";
     eliminatedNames = [only.name];
     lipsyncNote = `${only.name} es la única fuera del podio esta semana y queda eliminada sin lip sync (no hay con quién emparejarla).`;
@@ -214,9 +273,11 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 
 // Simula un único reto entre un grupo de concursantes activas. Se puntúa a cada una
 // (media de las estadísticas relevantes del reto + un bono al azar de 1 a 5) y se ordena
-// de mejor a peor: la primera de la lista gana el reto; las 2 últimas van a lip sync por
-// su vida (mismo método con Lip Sync/Carisma/Originalidad/Nervio/Talento); de las que
-// quedan en medio, las 2 mejores quedan HIGH y la peor LOW (ver assignPlacementsAndElimination).
+// de mejor a peor: la primera de la lista gana el reto (o todas las que empaten con ella
+// en la puntuación más alta); las 2 últimas van a lip sync por su vida (mismo método con
+// Lip Sync/Carisma/Originalidad/Nervio/Talento); de las que quedan en medio, las 2 mejores
+// quedan HIGH y la peor LOW (ver assignPlacementsAndElimination para el reparto y los
+// empates de puntaje).
 // "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
 // final); por defecto sin límite.
 // Devuelve { results: [{name, score, status}], eliminatedNames, lipsyncNote }
@@ -230,8 +291,11 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
+  // Si dos o más empatan exactamente en la puntuación más alta, ganan todas el reto (en
+  // vez de desempatarlas al azar).
   const winStatus = challenge.category === "runway" ? "WIN_RUNWAY" : "WIN";
-  const results = scored.map((s, i) => ({ ...s, status: i === 0 ? winStatus : "SAFE" }));
+  const topScore = scored[0].score;
+  const results = scored.map((s) => ({ ...s, status: s.score === topScore ? winStatus : "SAFE" }));
 
   const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { noElim, maxElim });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
