@@ -16,7 +16,7 @@
 // que falten se sustituyen por un valor al azar en su misma escala 0-15, para no
 // penalizar ni beneficiar a quien no las tenga definidas.
 
-const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP"];
+const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP", "PREMIERE_MEET_THE_QUEENS"];
 const IMPLEMENTED_RETURN = ["RETURN_NONE", "RETURN_RANDOM", "RETURN_LALAPARUZA"];
 const IMPLEMENTED_SEASON = ["SEASON_REGULAR", "SEASON_TEAMS", "SEASON_LIPSYNC_ASSASSIN", "SEASON_LIPSYNC_LEGACY"];
 const IMPLEMENTED_FINALE = ["FINALE_TOP2", "FINALE_TOP3", "FINALE_TOP4", "FINALE_JURY_VOTE", "FINALE_LIPSYNC_CROWN"];
@@ -33,9 +33,8 @@ const ALL_STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway"
 
 const RELATIONSHIP_LEVELS = ["le cae muy bien", "le cae bien", "normal", "le cae mal", "le cae muy mal"];
 
-// "requireElim": excluye retos marcados "noElim" (p.ej. Meet the Queens) para formatos
-// (equipos, Lipsync Assassin, Lipsync For Your Legacy) cuya lógica exige que alguien se
-// vaya esa semana.
+// "requireElim": excluye retos marcados "noElim" para formatos (equipos, Lipsync Assassin,
+// Lipsync For Your Legacy) cuya lógica exige que alguien se vaya esa semana.
 function randomChallenge(challenges, { requireElim = false } = {}) {
   let maxis = challenges;
   if (requireElim) {
@@ -298,10 +297,6 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}, statsByName = {}) {
   const challenge = randomChallenge(db.challenges);
 
-  if (challenge.noElim && challenge.presentationStats && challenge.lookStats) {
-    return runNoElimSpotlightEpisode(activeNames, db, statsByName, challenge);
-  }
-
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
@@ -317,37 +312,46 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity } = {}
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
 }
 
-// --- Reto sin eliminación con doble reconocimiento (p.ej. Meet the Queens): se juzga
-// quién se presenta mejor y quién luce el mejor look de promo, pero nadie es eliminada. ---
-function runNoElimSpotlightEpisode(activeNames, db, statsByName, challenge) {
-  const results = activeNames.map((name) => ({
-    name,
-    score: challengeScore(name, challenge.stats, db, statsByName),
-    status: "SAFE",
-  }));
+// Estadísticas relevantes para juzgar la presentación inicial de Meet the Queens.
+const MEET_THE_QUEENS_STATS = ["charisma", "nerve", "runway", "design", "makeup"];
 
-  const presentationScored = activeNames
-    .map((name) => ({ name, score: challengeScore(name, challenge.presentationStats, db, statsByName) }))
-    .sort((a, b) => b.score - a.score || Math.random() - 0.5);
-  const bestPresentation = presentationScored[0].name;
+// --- Meet the Queens: no es un reto normal, es un formato especial de ESTRENO (todas las
+// concursantes tienen que estar presentes, así que solo tiene sentido en el capítulo 1).
+// Se puntúa a cada una y se ordena de mejor a peor: las 2 mejores hacen lip sync por el
+// primer puesto (gana WIN, pierde TOP2; si empatan exactas, ambas WIN_TIE); de las que
+// quedan, la mejor mitad queda HIGH y el resto SAFE. Nadie es eliminada esta semana. ---
+function runMeetTheQueensEpisode(activeNames, db, statsByName) {
+  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, MEET_THE_QUEENS_STATS, db, statsByName) }));
+  scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
+  const results = scored.map((s) => ({ ...s, status: "SAFE" }));
 
-  const lookScored = activeNames
-    .map((name) => ({ name, score: challengeScore(name, challenge.lookStats, db, statsByName) }))
-    .sort((a, b) => b.score - a.score || Math.random() - 0.5);
-  const bestLook = lookScored[0].name;
+  let lipsyncNote = "";
+  if (results.length >= 2) {
+    const [first, second] = results;
+    const winner = lipsyncWinner(first.name, second.name, db, statsByName);
+    const isTie = first.score === second.score;
+    if (isTie) {
+      first.status = "WIN_TIE";
+      second.status = "WIN_TIE";
+      lipsyncNote = `${first.name} y ${second.name} empatan como mejores de la presentación y hacen lip sync: gana ${winner}, pero ambas se quedan con la victoria.`;
+    } else {
+      first.status = first.name === winner ? "WIN" : "TOP2";
+      second.status = second.name === winner ? "WIN" : "TOP2";
+      lipsyncNote = `${first.name} y ${second.name} hacen lip sync por el primer puesto: gana ${winner}.`;
+    }
+  } else if (results.length === 1) {
+    results[0].status = "WIN";
+  }
 
-  results.find((r) => r.name === bestPresentation).status = "WIN";
-  results.find((r) => r.name === bestLook).status = "WIN";
-
-  const lipsyncNote = bestPresentation === bestLook
-    ? `${bestPresentation} es quien mejor se presenta y también luce el mejor look de promo esta semana.`
-    : `${bestPresentation} es quien mejor se presenta esta semana. ${bestLook} luce el mejor look de promo.`;
+  const rest = results.slice(2);
+  const highCount = Math.ceil(rest.length / 2);
+  for (let i = 0; i < highCount; i++) rest[i].status = "HIGH";
 
   return {
-    challenge: challenge.label,
+    challenge: "Meet the Queens",
     results,
     eliminatedNames: [],
-    lipsyncNote: `${lipsyncNote} Al ser un capítulo de presentación, no hay reto principal ni eliminación esta semana.`,
+    lipsyncNote: `${lipsyncNote} La mejor mitad del resto queda destacada (HIGH). Al ser la presentación inicial, nadie es eliminada esta semana.`.trim(),
   };
 }
 
@@ -703,8 +707,13 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   const noElimPremiere = formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM";
   const doublePremiere = formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM";
   const porkchopPremiere = formatChoice.premiere === "PREMIERE_PORKCHOP";
+  const meetTheQueensPremiere = formatChoice.premiere === "PREMIERE_MEET_THE_QUEENS";
 
-  if (porkchopPremiere) {
+  if (meetTheQueensPremiere) {
+    const ep = runMeetTheQueensEpisode(active, db, statsByName);
+    log.push({ label: "Episodio 1", ...ep });
+    processElimination(ep);
+  } else if (porkchopPremiere) {
     const maxElim = Math.max(0, active.length - finaleSize);
     const ep = runPorkchopPremiere(active, db, statsByName, maxElim);
     log.push({ label: "Episodio 1 (Porkchop)", ...ep });

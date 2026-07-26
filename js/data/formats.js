@@ -19,6 +19,8 @@ const DEFAULT_FORMATS = [
     description: "Las concursantes llegan por parejas; un mini reto decide quién compite esa semana." },
   { id: "PREMIERE_RATE_A_QUEEN", group: "premiere", label: "Puntuar a una compañera", custom: false,
     description: "Cada concursante puntúa el look de otra antes del reto principal." },
+  { id: "PREMIERE_MEET_THE_QUEENS", group: "premiere", label: "Meet the Queens", custom: false,
+    description: "Presentación inicial sin eliminación: las 2 mejores hacen lip sync por el primer puesto (TOP 2) y la mejor mitad del resto queda destacada (HIGH)." },
 
   // --- Regreso ---
   { id: "RETURN_NONE", group: "return", label: "Sin regreso", custom: false,

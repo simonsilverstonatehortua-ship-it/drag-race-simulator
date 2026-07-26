@@ -4,10 +4,11 @@
 const STORAGE_KEY = "dragRaceSimulator.rulesDB.v1";
 
 // Refresca en `list` las entradas NO personalizadas (custom:false) con los valores por
-// defecto actuales (por si esta versión trae ajustes, p.ej. nuevos puntos), y añade las
+// defecto actuales (por si esta versión trae ajustes, p.ej. nuevos puntos), añade las
 // entradas por defecto nuevas que aún no existan (p.ej. nuevos retos añadidos en una
-// actualización posterior). Lo que el usuario haya editado o creado (custom:true) se
-// respeta tal cual.
+// actualización posterior), y elimina las oficiales que ya no existan en los catálogos
+// por defecto actuales (p.ej. Meet the Queens, que pasó de reto a formato de estreno
+// especial). Lo que el usuario haya editado o creado (custom:true) se respeta tal cual.
 function refreshUntouchedDefaults(list, defaults) {
   if (!Array.isArray(list)) return;
   defaults.forEach((def) => {
@@ -15,6 +16,10 @@ function refreshUntouchedDefaults(list, defaults) {
     if (idx >= 0) list[idx] = structuredClone(def);
     else if (!list.some((x) => x.id === def.id)) list.push(structuredClone(def));
   });
+  const defaultIds = new Set(defaults.map((d) => d.id));
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (list[i].custom === false && !defaultIds.has(list[i].id)) list.splice(i, 1);
+  }
 }
 
 function loadDB() {
