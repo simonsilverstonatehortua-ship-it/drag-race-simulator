@@ -366,8 +366,12 @@ function trackRecordTable(track, shown, result) {
     row.cells.slice(0, shown).forEach((cell) => {
       if (!cell) { tr.appendChild(el("td", { class: "trackrecord-cell", text: "—" })); return; }
       const status = DB.statuses.find((s) => s.id === cell.status);
-      const textColor = status ? readableTextColor(status.color) : "";
-      tr.appendChild(el("td", { class: "trackrecord-cell", text: cell.status,
+      // ELIM siempre en negro, sin importar el brillo del fondo (a pedido: se sacrifica el
+      // contraste automático solo para esta casilla).
+      const textColor = cell.status === "ELIM" ? "#000000" : (status ? readableTextColor(status.color) : "");
+      // WIN_TIE se muestra como "WIN" a secas en la celda (el color sigue distinguiendo el empate).
+      const cellText = cell.status === "WIN_TIE" ? "WIN" : cell.status;
+      tr.appendChild(el("td", { class: "trackrecord-cell", text: cellText,
         style: status ? `background:${status.color};${textColor ? `color:${textColor};` : ""}` : "" }));
       if (status && statusCountsForPoints(status)) { pointsSum += status.points; pointsCount++; }
     });
