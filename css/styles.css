@@ -554,6 +554,17 @@ footer {
 .trackrecord-table th:nth-child(2), .trackrecord-table td:nth-child(2) {
   text-align: left;
 }
+.trackrecord-challenge-row th {
+  font-family: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: normal;
+  max-width: 140px;
+  border-bottom: 1px solid var(--line);
+}
 .trackrecord-name {
   display: flex;
   align-items: center;

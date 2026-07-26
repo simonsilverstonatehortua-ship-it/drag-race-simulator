@@ -329,6 +329,16 @@ function trackRecordTable(track, shown, result) {
   track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", { text: shortEpisodeLabel(ep.label) })));
   headRow.appendChild(el("th", { text: "PPE" }));
   thead.appendChild(headRow);
+
+  // Fila con el reto de cada capítulo, justo debajo del número de episodio (al estilo de
+  // las tablas de trackrecord de la wiki fandom, del Excel y de otros simuladores).
+  const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
+  challengeRow.appendChild(el("th", { text: "" }));
+  challengeRow.appendChild(el("th", { text: "" }));
+  track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", { text: ep.challenge || "" })));
+  challengeRow.appendChild(el("th", { text: "" }));
+  thead.appendChild(challengeRow);
+
   table.appendChild(thead);
 
   const tbody = el("tbody");
@@ -385,16 +395,16 @@ function renderSimResult(result, revealedCount) {
 
   wrap.appendChild(trackRecordTable(track, shown, result));
 
-  // Narrativa (reto + nota de lip sync) de los episodios ya revelados, incluyendo
-  // regresos/LaLaParUza que no forman su propia columna en la tabla.
+  // Regresos/LaLaParUza: no forman su propia columna en la tabla (no reparten estados),
+  // así que se anotan aparte. El reto de cada capítulo normal ya sale en la tabla, debajo
+  // del número de episodio.
   const cutoff = shown <= 0 ? -1 : (track.columns[shown] ? track.columns[shown].idx : track.indexed.length) - 1;
   result.log.slice(0, cutoff + 1).forEach((ep) => {
+    if (ep.results && ep.results.length > 0) return;
+    if (!ep.lipsyncNote) return;
     const epBox = el("div", { class: "episode" });
-    epBox.appendChild(el("div", { class: "episode__head" }, [
-      el("strong", { text: ep.label }),
-      ep.challenge ? el("span", { class: "muted small", text: " · " + ep.challenge }) : null,
-    ]));
-    if (ep.lipsyncNote) epBox.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
+    epBox.appendChild(el("div", { class: "episode__head" }, [el("strong", { text: ep.label })]));
+    epBox.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
     wrap.appendChild(epBox);
   });
 
