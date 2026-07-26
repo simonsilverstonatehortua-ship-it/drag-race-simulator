@@ -553,6 +553,7 @@ footer {
 
 .trackrecord-table th:nth-child(2), .trackrecord-table td:nth-child(2) {
   text-align: left;
+  max-width: 170px;
 }
 .trackrecord-challenge-row th {
   font-family: inherit;
@@ -572,6 +573,16 @@ footer {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  max-width: 170px;
+}
+.trackrecord-name img {
+  flex-shrink: 0;
+}
+.trackrecord-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .trackrecord-cell {
   text-align: center !important;

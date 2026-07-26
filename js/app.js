@@ -266,6 +266,13 @@ function shortEpisodeLabel(label) {
   return m ? "Ep. " + m[1] : label;
 }
 
+// Abreviaturas de nombres de reto solo para la fila de retos del trackrecord (el nombre
+// completo se mantiene en el resto de la app, p.ej. la pestaña Retos).
+const TRACKRECORD_CHALLENGE_ABBR = { "Meet the Queens": "MTQ" };
+function shortChallengeLabel(label) {
+  return TRACKRECORD_CHALLENGE_ABBR[label] || label;
+}
+
 const RELATIONSHIP_STYLE = {
   "le cae muy bien": { symbol: "++", color: "#3FA796" },
   "le cae bien": { symbol: "+", color: "#4FD1C5" },
@@ -336,7 +343,7 @@ function trackRecordTable(track, shown, result) {
   // Fila con el reto de cada capítulo, justo debajo del número de episodio (al estilo de
   // las tablas de trackrecord de la wiki fandom, del Excel y de otros simuladores).
   const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
-  track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", { text: ep.challenge || "" })));
+  track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", { text: shortChallengeLabel(ep.challenge || "") })));
   thead.appendChild(challengeRow);
 
   table.appendChild(thead);
