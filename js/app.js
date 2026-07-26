@@ -336,14 +336,21 @@ function trackRecordTable(track, shown, result) {
   const headRow = el("tr");
   headRow.appendChild(el("th", { text: "Rank", rowspan: "2", class: "trackrecord-th--span" }));
   headRow.appendChild(el("th", { text: "Concursante", rowspan: "2", class: "trackrecord-th--span" }));
-  track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", { text: shortEpisodeLabel(ep.label) })));
+  // El capítulo final también es un número de episodio más (el último), así que en vez de
+  // literalmente "Final" arriba, se muestra su número de capítulo; el nombre del lip sync
+  // final (jurado, rondas, por la corona...) se simplifica a "Final" abajo, en la fila del reto.
+  track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", {
+    text: ep.label === "Final" ? `Ep. ${track.columns.length}` : shortEpisodeLabel(ep.label),
+  })));
   headRow.appendChild(el("th", { text: "PPE", rowspan: "2", class: "trackrecord-th--span" }));
   thead.appendChild(headRow);
 
   // Fila con el reto de cada capítulo, justo debajo del número de episodio (al estilo de
   // las tablas de trackrecord de la wiki fandom, del Excel y de otros simuladores).
   const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
-  track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", { text: shortChallengeLabel(ep.challenge || "") })));
+  track.columns.slice(0, shown).forEach(({ ep }) => challengeRow.appendChild(el("th", {
+    text: ep.label === "Final" ? "Final" : shortChallengeLabel(ep.challenge || ""),
+  })));
   thead.appendChild(challengeRow);
 
   table.appendChild(thead);
