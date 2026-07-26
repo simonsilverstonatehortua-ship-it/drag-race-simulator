@@ -322,14 +322,19 @@ function relationshipsTable(names, relationships) {
   return wrapAll;
 }
 
+// Convierte un puesto final ("WINNER", "RUNNER_UP", "5º lugar"...) en un número para
+// ordenar el trackrecord: siempre 1ª, 2ª, 3ª... de mejor a peor, nunca al azar.
+function placementRank(placement) {
+  if (placement === "WINNER") return 1;
+  if (placement === "RUNNER_UP") return 2;
+  const m = /^(\d+)º lugar$/.exec(placement || "");
+  return m ? parseInt(m[1], 10) : Infinity;
+}
+
 function trackRecordTable(track, shown, result) {
-  const sortedRows = [...track.rows].sort((a, b) => {
-    const aOut = a.eliminatedAtCol !== null && a.eliminatedAtCol <= shown - 1;
-    const bOut = b.eliminatedAtCol !== null && b.eliminatedAtCol <= shown - 1;
-    if (aOut !== bOut) return aOut ? 1 : -1;
-    if (aOut && bOut) return b.eliminatedAtCol - a.eliminatedAtCol;
-    return 0;
-  });
+  const sortedRows = [...track.rows].sort((a, b) =>
+    placementRank(result.finalPlacements[a.name]) - placementRank(result.finalPlacements[b.name])
+  );
 
   const tableWrap = el("div", { class: "table-wrap" });
   const table = el("table", { class: "stats-table trackrecord-table" });
