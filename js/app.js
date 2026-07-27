@@ -1,6 +1,6 @@
 let DB = window.RulesStore.loadDB();
 
-const TABS = ["simulate", "statuses", "challenges", "formats", "roster"];
+const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
 let lastSimResult = null;
@@ -64,7 +64,6 @@ function render() {
   const root = document.getElementById("panel");
   root.innerHTML = "";
   if (currentTab === "simulate") root.appendChild(renderSimulate());
-  if (currentTab === "statuses") root.appendChild(renderStatuses());
   if (currentTab === "challenges") root.appendChild(renderChallenges());
   if (currentTab === "formats") root.appendChild(renderFormats());
   if (currentTab === "roster") root.appendChild(renderRoster());
@@ -73,7 +72,7 @@ function render() {
 function renderTabs() {
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
-  const labels = { simulate: "Simular", statuses: "Estados", challenges: "Retos", formats: "Formatos", roster: "Roster" };
+  const labels = { simulate: "Simular", challenges: "Retos", formats: "Formatos", roster: "Roster" };
   TABS.forEach((tab) => {
     const btn = el("button", {
       class: "tab" + (tab === currentTab ? " tab--active" : ""),
@@ -491,71 +490,6 @@ function placementRank(place) {
   const m2 = /Eliminada #(\d+)/.exec(place);
   if (m2) return 100 - Number(m2[1]);
   return 999;
-}
-
-// ---------- ESTADOS ----------
-function renderStatuses() {
-  const wrap = el("div", { class: "section" });
-  wrap.appendChild(el("div", { class: "section__head" }, [
-    el("h2", { text: "Catálogo de estados" }),
-    el("p", { class: "muted", text: "Resultados semanales y colocaciones finales. Los \"puntos\" son el valor que usará el motor de estadísticas." }),
-    el("button", { class: "btn btn--accent", text: "+ Nuevo estado", onclick: () => openStatusForm() }),
-  ]));
-
-  ["weekly", "final"].forEach((type) => {
-    const groupLabel = type === "weekly" ? "Semanales (por reto)" : "Colocación final";
-    wrap.appendChild(el("h3", { class: "group-title", text: groupLabel }));
-    const grid = el("div", { class: "grid" });
-    DB.statuses.filter((s) => s.type === type).forEach((s) => grid.appendChild(statusCard(s)));
-    wrap.appendChild(grid);
-  });
-
-  return wrap;
-}
-
-function statusCard(s) {
-  const card = el("div", { class: "card", style: `border-left-color:${s.color}` });
-  const chipText = readableTextColor(s.color);
-  card.appendChild(el("div", { class: "card__top" }, [
-    el("span", { class: "chip", style: `background:${s.color};${chipText ? `color:${chipText};` : ""}`, text: s.id }),
-    s.custom ? el("span", { class: "badge", text: "personalizado" }) : null,
-  ]));
-  card.appendChild(el("strong", { text: s.label }));
-  card.appendChild(el("p", { class: "muted small", text: s.description }));
-  card.appendChild(el("div", { class: "card__meta", text: `Puntos: ${s.points}${statusCountsForPoints(s) ? " (cuenta para PPE)" : ""}` }));
-  card.appendChild(el("div", { class: "card__actions" }, [
-    el("button", { class: "btn btn--ghost", text: "Editar", onclick: () => openStatusForm(s) }),
-    el("button", { class: "btn btn--ghost btn--danger", text: "Eliminar", onclick: () => deleteItem("statuses", s.id) }),
-  ]));
-  return card;
-}
-
-function openStatusForm(existing) {
-  const isNew = !existing;
-  const data = existing || { id: "", label: "", type: "weekly", color: "#E4136B", points: 0, countsForPoints: true, description: "", custom: true };
-  const currentCounts = data.countsForPoints !== undefined ? data.countsForPoints : data.type === "weekly";
-  openModal(isNew ? "Nuevo estado" : `Editar ${data.id}`, [
-    field("Código (ID)", "id", data.id, isNew ? "" : "disabled"),
-    field("Nombre", "label", data.label),
-    selectField("Tipo", "type", data.type, [["weekly", "Semanal"], ["final", "Colocación final"]]),
-    field("Color", "color", data.color, "", "color"),
-    field("Puntos", "points", data.points, "", "number"),
-    selectField("Cuenta para el promedio (PPE)", "countsForPoints", String(currentCounts), [["true", "Sí"], ["false", "No"]]),
-    textareaField("Descripción", "description", data.description),
-  ], (values) => {
-    const item = {
-      id: values.id.trim().toUpperCase().replace(/\s+/g, "_"),
-      label: values.label,
-      type: values.type,
-      color: values.color,
-      points: Number(values.points) || 0,
-      countsForPoints: values.countsForPoints === "true",
-      description: values.description,
-      custom: true,
-    };
-    if (!item.id) return alert("El código no puede estar vacío.");
-    upsertItem("statuses", item, isNew);
-  });
 }
 
 // ---------- RETOS ----------
