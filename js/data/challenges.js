@@ -34,6 +34,8 @@ const DEFAULT_CHALLENGES = [
     description: "Grabar un anuncio publicitario paródico." },
   { id: "MUSIC_VIDEO", label: "Videoclip", category: "maxi", custom: false, stats: ["dance", "lipsync", "singing", "verses"],
     description: "Grabar el videoclip de una canción (a menudo de RuPaul)." },
+  { id: "RUMIX", label: "RuMix", category: "maxi", custom: false, stats: ["dance", "lipsync", "singing", "verses"],
+    description: "Interpretar en directo un mashup/remix de varias canciones de RuPaul, con coreografía." },
   { id: "PHOTO_SHOOT", label: "Photoshoot", category: "maxi", custom: false, stats: ["runway", "makeup"],
     description: "Sesión fotográfica editorial con un concepto concreto." },
   { id: "RUNWAY", label: "Runway", category: "runway", custom: false, stats: ["runway", "makeup"],

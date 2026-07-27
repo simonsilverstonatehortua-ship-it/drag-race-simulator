@@ -90,7 +90,13 @@ let formatChoice = {
   return: "RETURN_NONE",
   season: "SEASON_REGULAR",
   finale: "FINALE_TOP2",
+  openingChallenge: "",
 };
+
+// Reto de estreno: opcional, fuerza qué reto abre la temporada (episodio 1) en vez de
+// sortearlo, al estilo de "First Episode" de esopare.github.io. No aplica al estreno
+// Meet the Queens, que tiene su propia mecánica fija sin sortear reto.
+const OPENING_CHALLENGE_IDS = ["TALENT_SHOW", "GIRL_GROUP", "DESIGN", "RUNWAY"];
 
 function renderSimulate() {
   const wrap = el("div", { class: "section" });
@@ -171,6 +177,22 @@ function renderSimulate() {
     formatGrid.appendChild(el("label", { class: "form-row" }, [el("span", { text: label }), select]));
   });
   wrap.appendChild(formatGrid);
+
+  wrap.appendChild(el("p", { class: "muted small", text: "Reto de estreno: con qué reto empieza la temporada (episodio 1), o al azar. No aplica al estreno Meet the Queens." }));
+  const openingSelect = el("select", {
+    onchange: (e) => { formatChoice.openingChallenge = e.target.value; },
+  });
+  const azarOpt = el("option", { value: "", text: "Al azar" });
+  if (!formatChoice.openingChallenge) azarOpt.setAttribute("selected", "selected");
+  openingSelect.appendChild(azarOpt);
+  OPENING_CHALLENGE_IDS.forEach((id) => {
+    const challenge = DB.challenges.find((c) => c.id === id);
+    if (!challenge) return;
+    const opt = el("option", { value: id, text: challenge.label });
+    if (formatChoice.openingChallenge === id) opt.setAttribute("selected", "selected");
+    openingSelect.appendChild(opt);
+  });
+  wrap.appendChild(el("label", { class: "form-row", style: "max-width:260px;" }, [el("span", { text: "Reto de estreno" }), openingSelect]));
 
   // 3. Concursantes elegidas
   wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes elegidas (${simSelection.size})` }));
