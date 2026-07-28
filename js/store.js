@@ -29,9 +29,11 @@ function loadDB() {
       const db = JSON.parse(raw);
       if (!db.customContestants) db.customContestants = [];
       if (!db.contestantOverrides) db.contestantOverrides = {};
+      if (!db.twists) db.twists = structuredClone(window.DEFAULT_TWISTS);
       refreshUntouchedDefaults(db.statuses, window.DEFAULT_STATUSES);
       refreshUntouchedDefaults(db.challenges, window.DEFAULT_CHALLENGES);
       refreshUntouchedDefaults(db.formats, window.DEFAULT_FORMATS);
+      refreshUntouchedDefaults(db.twists, window.DEFAULT_TWISTS);
       return db;
     } catch (e) {
       console.warn("No se pudo leer la base de datos guardada, se reinicia.", e);
@@ -41,6 +43,7 @@ function loadDB() {
     statuses: structuredClone(window.DEFAULT_STATUSES),
     challenges: structuredClone(window.DEFAULT_CHALLENGES),
     formats: structuredClone(window.DEFAULT_FORMATS),
+    twists: structuredClone(window.DEFAULT_TWISTS),
     scoreScale: structuredClone(window.DEFAULT_SCORE_SCALE),
     customContestants: [],
     contestantOverrides: {},

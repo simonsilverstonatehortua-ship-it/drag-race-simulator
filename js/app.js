@@ -90,7 +90,13 @@ let formatChoice = {
   season: "SEASON_REGULAR",
   finale: "FINALE_TOP2",
   openingChallenge: "",
+  twists: [],
 };
+
+// Opciones/twists: a diferencia de Estreno/Regreso/Temporada/Final (una sola opción de
+// cada lista), aquí se pueden activar varias a la vez (checkboxes), al estilo de la
+// pestaña "Twists" de esopare.github.io / myrainboww.github.io.
+let selectedTwists = new Set();
 
 // Reto de estreno: opcional, fuerza qué reto abre la temporada (episodio 1) en vez de
 // sortearlo, al estilo de "First Episode" de esopare.github.io. No aplica al estreno
@@ -192,6 +198,22 @@ function renderSimulate() {
     openingSelect.appendChild(opt);
   });
   wrap.appendChild(el("label", { class: "form-row", style: "max-width:260px;" }, [el("span", { text: "Reto de estreno" }), openingSelect]));
+
+  // 2b. Opciones/twists (multi-selección, a diferencia de los desplegables de arriba)
+  wrap.appendChild(el("h3", { class: "group-title", text: "Opciones" }));
+  wrap.appendChild(el("p", { class: "muted small", text: "Puedes activar varias a la vez." }));
+  const twistsWrap = el("div", { class: "chip-list" });
+  DB.twists.forEach((t) => {
+    const checkbox = el("input", { type: "checkbox" });
+    checkbox.checked = selectedTwists.has(t.id);
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) selectedTwists.add(t.id); else selectedTwists.delete(t.id);
+      formatChoice.twists = [...selectedTwists];
+    });
+    const labelEl = el("label", { class: "form-row form-row--checkbox", title: t.description }, [checkbox, el("span", { text: t.label })]);
+    twistsWrap.appendChild(labelEl);
+  });
+  wrap.appendChild(twistsWrap);
 
   // 3. Concursantes elegidas
   wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes elegidas (${simSelection.size})` }));
@@ -297,6 +319,10 @@ function shortChallengeLabel(label) {
 // Texto abreviado de ciertas casillas del trackrecord (el color de cada estado ya las
 // distingue; el nombre completo se mantiene en el resto de la app, p.ej. la pestaña Estados).
 const TRACKRECORD_CELL_TEXT_OVERRIDES = { WIN_TIE: "WIN", MISS_CONGENIALITY: "MISS CON" };
+
+// Borde de la casilla de trackrecord cuando la concursante lleva inmunidad esa semana
+// (twist de Inmunidad), igual que en la tabla de la Temporada 1 del fandom wiki.
+const IMMUNITY_BORDER_COLOR = "#FE4EDA";
 
 const RELATIONSHIP_STYLE = {
   "le cae muy bien": { symbol: "++", color: "#3FA796" },
@@ -409,8 +435,11 @@ function trackRecordTable(track, shown, result) {
       // WIN_TIE se muestra como "WIN" a secas, y Miss Simpatía abreviada como "MISS CON"
       // (el color de cada una sigue distinguiéndolas del resto).
       const cellText = TRACKRECORD_CELL_TEXT_OVERRIDES[cell.status] || cell.status;
+      // Inmunidad (twist activo): borde rosa característico de la tabla de la Temporada 1
+      // del fandom wiki, encima del color normal del estado.
+      const immuneBorder = cell.immune ? `border:3px solid ${IMMUNITY_BORDER_COLOR};` : "";
       tr.appendChild(el("td", { class: "trackrecord-cell", text: cellText,
-        style: status ? `background:${status.color};${textColor ? `color:${textColor};` : ""}` : "" }));
+        style: status ? `background:${status.color};${textColor ? `color:${textColor};` : ""}${immuneBorder}` : immuneBorder }));
       if (status && statusCountsForPoints(status)) { pointsSum += status.points; pointsCount++; }
     });
 

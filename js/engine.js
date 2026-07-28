@@ -227,20 +227,31 @@ function weightedPick(options) {
 // "maxElim" evita eliminar cuando ya se llegó al tamaño de la final (si un doble sashay o
 // una eliminación múltiple por empate se pasara de "maxElim", solo se elimina a las peores
 // puntuadas en lip sync hasta llegar al límite).
+//
+// "immuneNames": con el twist de Inmunidad activo, quienes ganaron la semana pasada no
+// pueden caer en el fondo esta semana pase lo que pase con su puntaje: se las salta al
+// elegir a las peores, y la siguiente peor no inmune ocupa su sitio en el fondo. Quedan
+// dentro del middlePool (HIGH/SAFE/LOW según su puntaje relativo) en vez de arriesgar el
+// lip sync por su vida.
 // Devuelve { eliminatedNames, lipsyncNote }.
-function assignPlacementsAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity } = {}) {
+function assignPlacementsAndElimination(results, db, statsByName, { noElim = false, maxElim = Infinity, immuneNames = new Set() } = {}) {
   const pool = results.filter((r) => r.status === "SAFE");
-  const n = pool.length;
-  const canEliminate = !noElim && maxElim > 0 && n >= 1;
+  const eligibleForBottom = immuneNames.size ? pool.filter((r) => !immuneNames.has(r.name)) : pool;
+  const canEliminate = !noElim && maxElim > 0 && eligibleForBottom.length >= 1;
 
-  // Fondo: nominalmente las 2 últimas del pool, ampliable si la que debería ser LOW
-  // empata en puntaje con la peor de esas 2 (y así sucesivamente si el empate sigue).
-  let bottomSize = Math.min(2, n);
-  while (bottomSize < n && pool[n - bottomSize - 1].score === pool[n - bottomSize].score) {
+  // Fondo: nominalmente las 2 últimas de las elegibles (no inmunes), ampliable si la que
+  // debería ser LOW empata en puntaje con la peor de esas 2 (y así sucesivamente si el
+  // empate sigue).
+  let bottomSize = Math.min(2, eligibleForBottom.length);
+  while (
+    bottomSize < eligibleForBottom.length &&
+    eligibleForBottom[eligibleForBottom.length - bottomSize - 1].score === eligibleForBottom[eligibleForBottom.length - bottomSize].score
+  ) {
     bottomSize++;
   }
-  const bottomPool = pool.slice(n - bottomSize);
-  const middlePool = pool.slice(0, n - bottomSize);
+  const bottomPool = eligibleForBottom.slice(eligibleForBottom.length - bottomSize);
+  const bottomNameSet = new Set(bottomPool.map((r) => r.name));
+  const middlePool = pool.filter((r) => !bottomNameSet.has(r.name));
 
   if (middlePool.length >= 3) {
     const midLen = middlePool.length;
@@ -296,6 +307,8 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
     only.status = "ELIM";
     eliminatedNames = [only.name];
     lipsyncNote = `${only.name} es la única fuera del podio esta semana y queda eliminada sin lip sync (no hay con quién emparejarla).`;
+  } else if (!noElim && pool.length > 0 && eligibleForBottom.length === 0) {
+    lipsyncNote = "Todas las que podrían estar en el fondo esta semana tienen inmunidad: nadie es eliminada.";
   } else if (!noElim) {
     lipsyncNote = "Grupo demasiado reducido para lip sync esta semana: nadie es eliminada.";
   }
@@ -313,9 +326,12 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 // "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
 // final); por defecto sin límite. "forceChallengeId" fuerza un reto concreto (p.ej. el reto
 // de estreno elegido) en vez de sortearlo; "usedChallengeIds" evita repetir retos "de firma"
-// durante la temporada (ver randomChallenge).
+// durante la temporada (ver randomChallenge). "immuneNames" son quienes traen inmunidad de
+// haber ganado la semana pasada (twist de Inmunidad): no pueden caer en el fondo esta
+// semana (ver assignPlacementsAndElimination) y quedan marcadas "immune:true" para que la
+// UI dibuje el borde rosa característico, ganen o no de nuevo esta semana.
 // Devuelve { results: [{name, score, status}], eliminatedNames, lipsyncNote }
-function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity, forceChallengeId = null, usedChallengeIds = new Set() } = {}, statsByName = {}) {
+function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity, forceChallengeId = null, usedChallengeIds = new Set(), immuneNames = new Set() } = {}, statsByName = {}) {
   const challenge = randomChallenge(db.challenges, { forceId: forceChallengeId, usedChallengeIds });
 
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
@@ -328,8 +344,9 @@ function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity, force
   const topScorerCount = scored.filter((s) => s.score === topScore).length;
   const winStatus = topScorerCount > 1 ? "WIN_TIE" : "WIN";
   const results = scored.map((s) => ({ ...s, status: s.score === topScore ? winStatus : "SAFE" }));
+  if (immuneNames.size) results.forEach((r) => { if (immuneNames.has(r.name)) r.immune = true; });
 
-  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { noElim, maxElim });
+  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { noElim, maxElim, immuneNames });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote };
 }
 
@@ -382,11 +399,12 @@ function runMeetTheQueensEpisode(activeNames, db, statsByName) {
 // se queda con el WIN y la otra queda TOP2 (también 10 puntos, sin poder de eliminación).
 // El resto del grupo sigue el reparto normal de fondo+eliminación (las 2 últimas del
 // ranking van a lip sync por su vida). ---
-function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinity, usedChallengeIds = new Set()) {
+function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinity, usedChallengeIds = new Set(), immuneNames = new Set()) {
   const challenge = randomChallenge(db.challenges, { requireElim: true, usedChallengeIds });
   const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
+  if (immuneNames.size) results.forEach((r) => { if (immuneNames.has(r.name)) r.immune = true; });
   const winStatus = "WIN"; // WIN_RUNWAY queda de momento sin usar: se retomará más adelante.
 
   let legacyNote = "";
@@ -408,13 +426,13 @@ function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinit
     results[0].status = winStatus;
   }
 
-  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { maxElim });
+  const { eliminatedNames, lipsyncNote } = assignPlacementsAndElimination(results, db, statsByName, { maxElim, immuneNames });
   return { challenge: challenge.label, results, eliminatedNames, lipsyncNote: `${legacyNote} ${lipsyncNote}`.trim() };
 }
 
 // --- Estreno Porkchop: llegan por parejas, un mini reto decide quién compite esa
 // semana en el reto principal (el resto queda a salvo sin competir). ---
-function runPorkchopPremiere(activeNames, db, statsByName, maxElim = Infinity, forceChallengeId = null, usedChallengeIds = new Set()) {
+function runPorkchopPremiere(activeNames, db, statsByName, maxElim = Infinity, forceChallengeId = null, usedChallengeIds = new Set(), immuneNames = new Set()) {
   const shuffled = shuffle(activeNames);
   const pairs = [];
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -439,19 +457,21 @@ function runPorkchopPremiere(activeNames, db, statsByName, maxElim = Infinity, f
     miniNotes.push(`${scored[0].name} gana su mini reto Porkchop frente a ${scored[1].name}.`);
   });
 
+  const safeResult = (name) => ({ name, score: null, status: "SAFE", ...(immuneNames.has(name) ? { immune: true } : {}) });
+
   if (competing.length < 2) {
     safeFromMini.push(...competing);
     return {
       challenge: "Mini reto Porkchop",
-      results: safeFromMini.map((name) => ({ name, score: null, status: "SAFE" })),
+      results: safeFromMini.map(safeResult),
       eliminatedNames: [],
       lipsyncNote: `${miniNotes.join(" ")} Reparto demasiado reducido para un reto principal aparte: nadie es eliminada esta semana.`,
     };
   }
 
-  const maxi = runEpisode(competing, db, { maxElim, forceChallengeId, usedChallengeIds }, statsByName);
+  const maxi = runEpisode(competing, db, { maxElim, forceChallengeId, usedChallengeIds, immuneNames }, statsByName);
   const results = [
-    ...safeFromMini.map((name) => ({ name, score: null, status: "SAFE" })),
+    ...safeFromMini.map(safeResult),
     ...maxi.results,
   ];
   return {
@@ -706,6 +726,15 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   // esta misma referencia en todas las llamadas para que no se repitan en toda la temporada.
   const usedChallengeIds = new Set();
 
+  // Twist de Inmunidad: quien gana el reto de la semana no puede caer en el fondo la
+  // semana siguiente (ver assignPlacementsAndElimination). Se recalcula tras cada episodio
+  // a partir de sus ganadoras (WIN/WIN_TIE); empieza vacío porque nadie ha ganado nada aún.
+  const immunityEnabled = Array.isArray(formatChoice.twists) && formatChoice.twists.includes("IMMUNITY");
+  let immuneNames = new Set();
+  function winnersOf(ep) {
+    return (ep.results || []).filter((r) => r.status === "WIN" || r.status === "WIN_TIE").map((r) => r.name);
+  }
+
   // Procesa las eliminadas de un episodio, admitiendo tanto una sola (eliminatedName,
   // usado por Teams/Lipsync Assassin) como varias a la vez (eliminatedNames, para dobles
   // eliminaciones del reto regular).
@@ -739,28 +768,32 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     const ep = runMeetTheQueensEpisode(active, db, statsByName);
     log.push({ label: "Episodio 1", ...ep });
     processElimination(ep);
+    if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
   } else if (porkchopPremiere) {
     const maxElim = Math.max(0, active.length - finaleSize);
-    const ep = runPorkchopPremiere(active, db, statsByName, maxElim, openingChallengeId, usedChallengeIds);
+    const ep = runPorkchopPremiere(active, db, statsByName, maxElim, openingChallengeId, usedChallengeIds, immuneNames);
     log.push({ label: "Episodio 1 (Porkchop)", ...ep });
     processElimination(ep);
+    if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
   } else if (doublePremiere) {
     const shuffled = shuffle(active);
     const groupA = shuffled.slice(0, Math.ceil(shuffled.length / 2));
     const groupB = shuffled.slice(Math.ceil(shuffled.length / 2));
     const maxElimA = Math.max(0, active.length - finaleSize);
-    const epA = runEpisode(groupA, db, { noElim: noElimPremiere, maxElim: maxElimA, forceChallengeId: openingChallengeId, usedChallengeIds }, statsByName);
+    const epA = runEpisode(groupA, db, { noElim: noElimPremiere, maxElim: maxElimA, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
     log.push({ label: "Episodio 1a (grupo A)", ...epA });
     processElimination(epA);
     const maxElimB = Math.max(0, active.length - finaleSize);
-    const epB = runEpisode(groupB, db, { noElim: noElimPremiere, maxElim: maxElimB, forceChallengeId: openingChallengeId, usedChallengeIds }, statsByName);
+    const epB = runEpisode(groupB, db, { noElim: noElimPremiere, maxElim: maxElimB, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
     log.push({ label: "Episodio 1b (grupo B)", ...epB });
     processElimination(epB);
+    if (immunityEnabled) immuneNames = new Set([...winnersOf(epA), ...winnersOf(epB)]);
   } else {
     const maxElim = Math.max(0, active.length - finaleSize);
-    const ep = runEpisode(active, db, { noElim: noElimPremiere, maxElim, forceChallengeId: openingChallengeId, usedChallengeIds }, statsByName);
+    const ep = runEpisode(active, db, { noElim: noElimPremiere, maxElim, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
     log.push({ label: "Episodio 1", ...ep });
     processElimination(ep);
+    if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
   }
 
   // --- Temporada regular hasta llegar al tamaño de la final ---
@@ -772,15 +805,16 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
     if (formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" && active.length >= 3) {
       ep = runLipsyncAssassinEpisode(active, db, statsByName, relationships, usedChallengeIds);
     } else if (formatChoice.season === "SEASON_LIPSYNC_LEGACY" && active.length >= 3) {
-      ep = runLipsyncLegacyEpisode(active, db, statsByName, maxElim, usedChallengeIds);
+      ep = runLipsyncLegacyEpisode(active, db, statsByName, maxElim, usedChallengeIds, immuneNames);
     } else if (formatChoice.season === "SEASON_TEAMS" && !teamsEpisodeDone && active.length >= 4) {
       ep = runTeamsEpisode(active, db, statsByName, usedChallengeIds);
       teamsEpisodeDone = true;
     } else {
-      ep = runEpisode(active, db, { maxElim, usedChallengeIds }, statsByName);
+      ep = runEpisode(active, db, { maxElim, usedChallengeIds, immuneNames }, statsByName);
     }
     log.push({ label: `Episodio ${episodeNum}`, ...ep });
     processElimination(ep);
+    if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
 
     // Regreso al azar: una eliminada vuelve (solo si hay eliminadas disponibles)
     if (formatChoice.return === "RETURN_RANDOM" && eliminated.length > 0 && Math.random() < 0.3) {
