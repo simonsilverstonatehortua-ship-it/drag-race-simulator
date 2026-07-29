@@ -83,6 +83,10 @@ const ALL_SEASONS = [
     id: "US_S1",
     seasonName: "RuPaul's Drag Race — Temporada 1 (US)",
     franchise: "Estados Unidos",
+    // Reglas específicas de esta temporada para el botón "Simular esta temporada" del
+    // Roster: en la Temporada 1 real, ganar el reto daba inmunidad la semana siguiente
+    // (borde rosa en la hoja del fandom wiki, ver js/data/twists.js).
+    preset: { twists: ["IMMUNITY"] },
     contestants: [
       { name: "BeBe Zahara Benet", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/BeBe_Zahara_Benet",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/ea/BeBeAS3Promo.png/revision/latest/scale-to-width-down/300?cb=20181021181328",

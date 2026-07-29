@@ -703,7 +703,13 @@ function renderRoster() {
     });
     details.appendChild(seasonTabs);
 
-    details.appendChild(el("h4", { class: "season-title", text: activeSeason.seasonName }));
+    const seasonHeadRow = el("div", { class: "toolbar", style: "justify-content:space-between; margin-top:0.6rem;" }, [
+      el("h4", { class: "season-title", text: activeSeason.seasonName }),
+      el("button", { class: "btn btn--accent", text: "▶ Simular esta temporada",
+        title: "Precarga a estas concursantes (y las reglas propias de esta temporada, si tiene) en la pestaña Simular.",
+        onclick: () => simulateSeasonPreset(activeSeason) }),
+    ]);
+    details.appendChild(seasonHeadRow);
     const grid = el("div", { class: "grid" });
     const sortedContestants = [...activeSeason.contestants].sort((a, b) => a.name.localeCompare(b.name));
     sortedContestants.forEach((c) => {
@@ -725,6 +731,20 @@ function renderRoster() {
     wrap.appendChild(details);
   });
   return wrap;
+}
+
+// "Simular esta temporada" (Roster): precarga a las concursantes de esa temporada en la
+// pestaña Simular, junto con las reglas propias de la temporada si las tiene (p.ej. la
+// Inmunidad de la Temporada 1), al estilo de "Predefined Casts" de esopare.github.io /
+// myrainboww.github.io. No cambia Estreno/Regreso/Temporada/Final: solo el reparto y las
+// opciones/twists.
+function simulateSeasonPreset(season) {
+  simSelection = new Set(season.contestants.map((c) => c.name));
+  selectedTwists = new Set((season.preset && season.preset.twists) || []);
+  formatChoice.twists = [...selectedTwists];
+  currentTab = "simulate";
+  render();
+  window.scrollTo(0, 0);
 }
 
 function placementLabel(code) {
