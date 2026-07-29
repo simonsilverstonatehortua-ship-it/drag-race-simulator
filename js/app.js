@@ -1,11 +1,12 @@
 let DB = window.RulesStore.loadDB();
 
-const TABS = ["simulate", "challenges", "formats", "roster"];
+const TABS = ["simulate", "challenges", "formats", "roster", "franchises"];
 let currentTab = "simulate";
 let simSelection = new Set();
 let lastSimResult = null;
 let revealedEpisodes = 1;
 let rosterSeasonTab = {};
+let franchiseTab = null;
 
 const GROUP_LABELS = {
   premiere: "Estreno",
@@ -67,12 +68,13 @@ function render() {
   if (currentTab === "challenges") root.appendChild(renderChallenges());
   if (currentTab === "formats") root.appendChild(renderFormats());
   if (currentTab === "roster") root.appendChild(renderRoster());
+  if (currentTab === "franchises") root.appendChild(renderFranchises());
 }
 
 function renderTabs() {
   const nav = document.getElementById("tabs");
   nav.innerHTML = "";
-  const labels = { simulate: "Simular", challenges: "Retos", formats: "Formatos", roster: "Roster" };
+  const labels = { simulate: "Simular", challenges: "Retos", formats: "Formatos", roster: "Roster", franchises: "Franquicias" };
   TABS.forEach((tab) => {
     const btn = el("button", {
       class: "tab" + (tab === currentTab ? " tab--active" : ""),
@@ -747,6 +749,254 @@ function simulateSeasonPreset(season) {
   window.scrollTo(0, 0);
 }
 
+// ---------- FRANQUICIAS (inventadas por el usuario) ----------
+// Buscador + botón "Al azar" + chips de seleccionadas, igual que en Simular, pero
+// autocontenido y parametrizado por callback: cada temporada de una franquicia tiene su
+// propio reparto independiente de simSelection.
+function contestantPicker(currentNames, onChange) {
+  const wrap = el("div", {});
+  const selection = new Set(currentNames);
+  const allPool = [...window.ALL_CONTESTANTS, ...DB.customContestants];
+
+  const addOne = (name) => { selection.add(name); onChange([...selection]); };
+  const removeOne = (name) => { selection.delete(name); onChange([...selection]); };
+  const addRandomOne = () => {
+    const remaining = allPool.filter((c) => !selection.has(c.name));
+    if (!remaining.length) return;
+    addOne(remaining[Math.floor(Math.random() * remaining.length)].name);
+  };
+
+  const searchRow = el("div", { class: "toolbar", style: "justify-content:flex-start;" });
+  const searchInput = el("input", { type: "text", class: "name-input", placeholder: "Buscar concursante..." });
+  searchRow.appendChild(searchInput);
+  searchRow.appendChild(el("button", { class: "btn btn--ghost", type: "button", text: "🎲 Al azar", onclick: addRandomOne }));
+  wrap.appendChild(searchRow);
+
+  const resultsWrap = el("div", { class: "search-results" });
+  wrap.appendChild(resultsWrap);
+
+  const renderResults = (query) => {
+    resultsWrap.innerHTML = "";
+    const q = query.trim().toLowerCase();
+    if (!q) return;
+    const pool = allPool.filter((c) => !selection.has(c.name));
+    const matches = pool.filter((c) => c.name.toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
+    if (!matches.length) { resultsWrap.appendChild(el("span", { class: "muted small", text: "Sin resultados." })); return; }
+    matches.forEach((c) => {
+      const item = el("button", { type: "button", class: "search-result",
+        onclick: () => { addOne(c.name); searchInput.value = ""; renderResults(""); searchInput.focus(); } });
+      const avatar = avatarImg(c.name, "avatar--result");
+      if (avatar) item.appendChild(avatar);
+      item.appendChild(el("span", { text: c.name }));
+      resultsWrap.appendChild(item);
+    });
+  };
+  searchInput.addEventListener("input", () => renderResults(searchInput.value));
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = searchInput.value.trim().toLowerCase();
+    const first = allPool.find((c) => !selection.has(c.name) && c.name.toLowerCase().includes(q));
+    if (first) { addOne(first.name); searchInput.value = ""; renderResults(""); }
+  });
+
+  const chipsWrap = el("div", { class: "chip-list" });
+  if (!selection.size) chipsWrap.appendChild(el("span", { class: "muted small", text: "Ninguna concursante seleccionada todavía." }));
+  [...selection].forEach((name) => {
+    const chip = el("button", { type: "button", class: "name-chip", title: "Quitar", onclick: () => removeOne(name) });
+    const avatar = avatarImg(name, "avatar--result");
+    if (avatar) chip.appendChild(avatar);
+    chip.appendChild(el("span", { text: name }));
+    chip.appendChild(el("span", { class: "name-chip__remove", text: "×" }));
+    chipsWrap.appendChild(chip);
+  });
+  wrap.appendChild(chipsWrap);
+
+  if (selection.size) {
+    wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
+      el("button", { class: "btn btn--ghost", type: "button", text: "Vaciar selección", onclick: () => onChange([]) }),
+    ]));
+  }
+
+  return wrap;
+}
+
+function createFranchise(name) {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  const franchise = { id: uid("FRANCHISE"), name: trimmed, seasons: [] };
+  DB.customFranchises.push(franchise);
+  window.RulesStore.saveDB(DB);
+  franchiseTab = franchise.id;
+  render();
+}
+
+function deleteFranchise(franchiseId) {
+  if (!confirm("¿Eliminar esta franquicia y todas sus temporadas?")) return;
+  DB.customFranchises = DB.customFranchises.filter((f) => f.id !== franchiseId);
+  if (franchiseTab === franchiseId) franchiseTab = null;
+  window.RulesStore.saveDB(DB);
+  render();
+}
+
+function addFranchiseSeason(franchiseId) {
+  const franchise = DB.customFranchises.find((f) => f.id === franchiseId);
+  if (!franchise) return;
+  franchise.seasons.push({
+    id: uid("SEASON"),
+    name: `Temporada ${franchise.seasons.length + 1}`,
+    contestantNames: [],
+    format: { premiere: "PREMIERE_NORMAL", return: "RETURN_NONE", season: "SEASON_REGULAR", finale: "FINALE_TOP2", openingChallenge: "", twists: [] },
+  });
+  window.RulesStore.saveDB(DB);
+  render();
+}
+
+function deleteFranchiseSeason(franchiseId, seasonId) {
+  if (!confirm("¿Eliminar esta temporada?")) return;
+  const franchise = DB.customFranchises.find((f) => f.id === franchiseId);
+  if (!franchise) return;
+  franchise.seasons = franchise.seasons.filter((s) => s.id !== seasonId);
+  window.RulesStore.saveDB(DB);
+  render();
+}
+
+function updateFranchiseSeason(franchiseId, seasonId, patch) {
+  const franchise = DB.customFranchises.find((f) => f.id === franchiseId);
+  if (!franchise) return;
+  const season = franchise.seasons.find((s) => s.id === seasonId);
+  if (!season) return;
+  Object.assign(season, patch);
+  window.RulesStore.saveDB(DB);
+  render();
+}
+
+// Precarga el reparto Y el formato/opciones propios de esta temporada inventada en la
+// pestaña Simular (a diferencia del preset de Roster, aquí también se copia
+// Estreno/Regreso/Temporada/Final, porque cada temporada de una franquicia define los suyos).
+function simulateFranchiseSeason(season) {
+  if (season.contestantNames.length < 3) return alert("Esta temporada necesita al menos 3 concursantes.");
+  simSelection = new Set(season.contestantNames);
+  formatChoice = { ...season.format, twists: [...(season.format.twists || [])] };
+  selectedTwists = new Set(season.format.twists || []);
+  currentTab = "simulate";
+  render();
+  window.scrollTo(0, 0);
+}
+
+function franchiseSeasonCard(franchise, season) {
+  const card = el("div", { class: "card", style: "margin-bottom:1rem; align-items:stretch;" });
+  card.appendChild(el("div", { class: "section__head" }, [
+    el("h4", { class: "season-title", text: season.name }),
+    el("button", { class: "btn btn--ghost btn--danger", type: "button", text: "Eliminar temporada",
+      onclick: () => deleteFranchiseSeason(franchise.id, season.id) }),
+  ]));
+
+  card.appendChild(el("p", { class: "muted small", text: `Concursantes (${season.contestantNames.length})` }));
+  card.appendChild(contestantPicker(season.contestantNames,
+    (newArr) => updateFranchiseSeason(franchise.id, season.id, { contestantNames: newArr })));
+
+  card.appendChild(el("h4", { class: "group-title", text: "Formato" }));
+  const formatGrid = el("div", { class: "grid grid--formats" });
+  Object.entries(GROUP_LABELS).forEach(([group, label]) => {
+    const options = DB.formats.filter((f) => f.group === group);
+    const select = el("select", {
+      onchange: (e) => updateFranchiseSeason(franchise.id, season.id, { format: { ...season.format, [group]: e.target.value } }),
+    });
+    options.forEach((f) => {
+      const opt = el("option", { value: f.id, text: f.label });
+      if (f.id === season.format[group]) opt.setAttribute("selected", "selected");
+      select.appendChild(opt);
+    });
+    formatGrid.appendChild(el("label", { class: "form-row" }, [el("span", { text: label }), select]));
+  });
+  card.appendChild(formatGrid);
+
+  const openingSelect = el("select", {
+    onchange: (e) => updateFranchiseSeason(franchise.id, season.id, { format: { ...season.format, openingChallenge: e.target.value } }),
+  });
+  const azarOpt = el("option", { value: "", text: "Al azar" });
+  if (!season.format.openingChallenge) azarOpt.setAttribute("selected", "selected");
+  openingSelect.appendChild(azarOpt);
+  window.OPENING_CHALLENGE_IDS.forEach((id) => {
+    const challenge = DB.challenges.find((c) => c.id === id);
+    if (!challenge) return;
+    const opt = el("option", { value: id, text: challenge.label });
+    if (season.format.openingChallenge === id) opt.setAttribute("selected", "selected");
+    openingSelect.appendChild(opt);
+  });
+  card.appendChild(el("label", { class: "form-row", style: "max-width:260px;" }, [el("span", { text: "Reto de estreno" }), openingSelect]));
+
+  card.appendChild(el("p", { class: "muted small", text: "Opciones (puedes activar varias):" }));
+  const twistsWrap = el("div", { class: "chip-list" });
+  DB.twists.forEach((t) => {
+    const checkbox = el("input", { type: "checkbox" });
+    checkbox.checked = (season.format.twists || []).includes(t.id);
+    checkbox.addEventListener("change", () => {
+      const current = new Set(season.format.twists || []);
+      if (checkbox.checked) current.add(t.id); else current.delete(t.id);
+      updateFranchiseSeason(franchise.id, season.id, { format: { ...season.format, twists: [...current] } });
+    });
+    twistsWrap.appendChild(el("label", { class: "form-row form-row--checkbox", title: t.description }, [checkbox, el("span", { text: t.label })]));
+  });
+  card.appendChild(twistsWrap);
+
+  card.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
+    el("button", { class: "btn btn--accent", type: "button", text: "▶ Simular esta temporada", onclick: () => simulateFranchiseSeason(season) }),
+  ]));
+
+  return card;
+}
+
+function renderFranchises() {
+  const wrap = el("div", { class: "section" });
+  wrap.appendChild(el("div", { class: "section__head" }, [
+    el("h2", { text: "Franquicias" }),
+    el("p", { class: "muted", text: "Crea tus propias franquicias y temporadas inventadas: elige el reparto y el formato de cada una, y simúlalas como si fueran una temporada más, al estilo de \"Franchise Builder\" de esopare.github.io." }),
+  ]));
+
+  const createRow = el("div", { class: "toolbar", style: "justify-content:flex-start;" });
+  const nameInput = el("input", { type: "text", class: "name-input", placeholder: "Nombre de la franquicia..." });
+  createRow.appendChild(nameInput);
+  createRow.appendChild(el("button", { class: "btn btn--accent", type: "button", text: "+ Crear franquicia",
+    onclick: () => createFranchise(nameInput.value) }));
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); createFranchise(nameInput.value); }
+  });
+  wrap.appendChild(createRow);
+
+  if (!DB.customFranchises.length) {
+    wrap.appendChild(el("p", { class: "muted small", text: "Todavía no has creado ninguna franquicia." }));
+    return wrap;
+  }
+
+  const activeFranchiseId = franchiseTab && DB.customFranchises.some((f) => f.id === franchiseTab)
+    ? franchiseTab : DB.customFranchises[0].id;
+
+  const franchiseTabsWrap = el("div", { class: "season-tabs", style: "margin-top:1rem;" });
+  DB.customFranchises.forEach((f) => {
+    franchiseTabsWrap.appendChild(el("button", { type: "button",
+      class: "tab tab--sm" + (f.id === activeFranchiseId ? " tab--active" : ""),
+      text: f.name, onclick: () => { franchiseTab = f.id; render(); } }));
+  });
+  wrap.appendChild(franchiseTabsWrap);
+
+  const activeFranchise = DB.customFranchises.find((f) => f.id === activeFranchiseId);
+
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:0.6rem;" }, [
+    el("button", { class: "btn btn--ghost", type: "button", text: "+ Añadir temporada", onclick: () => addFranchiseSeason(activeFranchise.id) }),
+    el("button", { class: "btn btn--ghost btn--danger", type: "button", text: "Eliminar franquicia", onclick: () => deleteFranchise(activeFranchise.id) }),
+  ]));
+
+  if (!activeFranchise.seasons.length) {
+    wrap.appendChild(el("p", { class: "muted small", text: "Esta franquicia todavía no tiene temporadas." }));
+  } else {
+    activeFranchise.seasons.forEach((season) => wrap.appendChild(franchiseSeasonCard(activeFranchise, season)));
+  }
+
+  return wrap;
+}
+
 function placementLabel(code) {
   const s = DB.statuses.find((s) => s.id === code);
   return s ? s.label : code;
@@ -1027,6 +1277,7 @@ function importJSON(file) {
       DB = parsed;
       if (!DB.customContestants) DB.customContestants = [];
       if (!DB.contestantOverrides) DB.contestantOverrides = {};
+      if (!DB.customFranchises) DB.customFranchises = [];
       window.RulesStore.saveDB(DB);
       render();
     } catch (e) {
