@@ -10,11 +10,11 @@
 // "(no implementado aún)").
 //
 // Estadísticas: la puntuación de una concursante en un reto es la media de las
-// estadísticas relevantes del reto (js/data/challenges.js) más un bono al azar entre 1 y
+// estadísticas relevantes del reto (js/data/challenges.js) más un bono al azar entre -3 y
 // 5 (ver challengeScore). Para lip syncs se usa la media de Lip Sync/Carisma/
-// Originalidad/Nervio/Talento, también +1-5 al azar (ver lipsyncScore). Las estadísticas
-// que falten se sustituyen por un valor al azar en su misma escala 0-15, para no
-// penalizar ni beneficiar a quien no las tenga definidas.
+// Originalidad/Nervio/Talento, también con ese mismo bono al azar (ver lipsyncScore). Las
+// estadísticas que falten se sustituyen por un valor al azar en su misma escala 0-15, para
+// no penalizar ni beneficiar a quien no las tenga definidas.
 
 const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP", "PREMIERE_MEET_THE_QUEENS"];
 const IMPLEMENTED_RETURN = ["RETURN_NONE", "RETURN_RANDOM", "RETURN_LALAPARUZA"];
@@ -76,10 +76,10 @@ function average(nums) {
   return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
-// Bono al azar (entero entre 1 y 5) que se suma a la media de estadísticas para dar
+// Bono al azar (entero entre -3 y 5) que se suma a la media de estadísticas para dar
 // puntuación final de un reto o un lip sync.
 function randomStatBonus() {
-  return 1 + Math.floor(Math.random() * 5);
+  return -3 + Math.floor(Math.random() * 9);
 }
 
 // Estadísticas que decide un lip sync (no las de Lip Sync a secas: también Carisma,
@@ -88,7 +88,7 @@ const LIPSYNC_SCORE_KEYS = ["lipsync", "charisma", "uniqueness", "nerve", "talen
 
 // Puntuación de una concursante en un reto: media de las estadísticas relevantes del reto
 // (las que no tenga definidas se sustituyen por un valor al azar en su misma escala 0-15,
-// para no penalizarla ni beneficiarla) más un bono al azar entre 1 y 5.
+// para no penalizarla ni beneficiarla) más un bono al azar entre -3 y 5.
 function challengeScore(name, statKeys, db, statsByName) {
   const stats = statsByName[name];
   const keys = statKeys && statKeys.length ? statKeys : ALL_STAT_KEYS;
@@ -98,7 +98,7 @@ function challengeScore(name, statKeys, db, statsByName) {
 
 // Puntuación de una concursante en un lip sync: media de Lip Sync, Carisma, Originalidad,
 // Nervio y Talento (mismo criterio de sustitución al azar que challengeScore) más un bono
-// al azar entre 1 y 5.
+// al azar entre -3 y 5.
 function lipsyncScore(name, db, statsByName) {
   const stats = statsByName[name];
   const vals = LIPSYNC_SCORE_KEYS.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : Math.random() * 15);
@@ -106,7 +106,7 @@ function lipsyncScore(name, db, statsByName) {
 }
 
 // Umbral para considerar "alto" un empate exacto en la puntuación de lip sync (escala
-// aprox. 1-20: media de 5 estadísticas 0-15 + bono al azar 1-5). Empate en o por encima:
+// aprox. -3 a 20: media de 5 estadísticas 0-15 + bono al azar -3 a 5). Empate en o por encima:
 // doble shantay (nadie se va a casa). Empate por debajo: doble sashay (se van todas las
 // empatadas). Ver assignPlacementsAndElimination.
 const DOUBLE_LIPSYNC_HIGH_THRESHOLD = 11;
@@ -317,7 +317,7 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 }
 
 // Simula un único reto entre un grupo de concursantes activas. Se puntúa a cada una
-// (media de las estadísticas relevantes del reto + un bono al azar de 1 a 5) y se ordena
+// (media de las estadísticas relevantes del reto + un bono al azar de -3 a 5) y se ordena
 // de mejor a peor: la primera de la lista gana el reto (o todas las que empaten con ella
 // en la puntuación más alta); las 2 últimas van a lip sync por su vida (mismo método con
 // Lip Sync/Carisma/Originalidad/Nervio/Talento); de las que quedan en medio, las 2 mejores
