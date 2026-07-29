@@ -33,6 +33,16 @@ const ALL_STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway"
 
 const RELATIONSHIP_LEVELS = ["le cae muy bien", "le cae bien", "normal", "le cae mal", "le cae muy mal"];
 
+// Retos que puede forzar el selector de "reto de estreno" en la UI; si se deja en "Al
+// azar" (sin elegir ninguno), el estreno sortea entre estos 4 en vez de entre todo el
+// catálogo de retos.
+const OPENING_CHALLENGE_IDS = ["TALENT_SHOW", "GIRL_GROUP", "DESIGN", "RUNWAY"];
+window.OPENING_CHALLENGE_IDS = OPENING_CHALLENGE_IDS;
+
+// Tipos de reunión, elegidos al azar cada temporada: sin reunión, antes de la final (su
+// propio capítulo), el mismo capítulo que la final, o después de la final.
+const REUNION_TYPES = ["NONE", "BEFORE", "SAME", "AFTER"];
+
 // Retos "de firma" que no se repiten dos veces en la misma temporada (a diferencia de
 // retos genéricos como Actuación o Coreografía, que sí pueden repetirse con otra temática).
 const NO_REPEAT_CHALLENGE_IDS = new Set(["TALENT_SHOW", "RUSICAL", "BALL", "MAKEOVER", "MUSIC_VIDEO", "SNATCH_GAME", "ROAST", "RUMIX"]);
@@ -762,7 +772,10 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   const porkchopPremiere = formatChoice.premiere === "PREMIERE_PORKCHOP";
   const meetTheQueensPremiere = formatChoice.premiere === "PREMIERE_MEET_THE_QUEENS";
 
-  const openingChallengeId = formatChoice.openingChallenge || null;
+  // Si se deja en "Al azar" (sin elegir un reto de estreno concreto), el sorteo es solo
+  // entre los 4 retos de estreno, no entre todo el catálogo.
+  const openingChallengeId = formatChoice.openingChallenge
+    || OPENING_CHALLENGE_IDS[Math.floor(Math.random() * OPENING_CHALLENGE_IDS.length)];
 
   if (meetTheQueensPremiere) {
     const ep = runMeetTheQueensEpisode(active, db, statsByName);
@@ -865,20 +878,34 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
   // finalista); se elige según quién mejor se lleve con el resto en la tabla de relaciones.
   const missCongeniality = eliminated.length ? pickMissCongeniality(eliminated, relationships) : null;
 
+  // Reunión: al azar, puede no haberla, ir antes de la final (como su propio capítulo),
+  // ser el mismo capítulo que la final, o ir después. Es donde el resto de la temporada
+  // "vuelve" (GUEST) y se revela Miss Simpatía, al estilo de la wiki/el Excel.
+  const reunionType = REUNION_TYPES[Math.floor(Math.random() * REUNION_TYPES.length)];
+
+  const finalistsResults = finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
+    status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" }));
+  const guestResults = eliminated.map((name) => ({ name, score: null,
+    status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" }));
+
   const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
-    results: [
-      ...finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
-        status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" })),
-      // El resto de la temporada "vuelve" para la final, al estilo de la wiki/el Excel.
-      ...eliminated.map((name) => ({ name, score: null,
-        status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" })),
-    ],
+    results: reunionType === "SAME" ? [...finalistsResults, ...guestResults] : finalistsResults,
     eliminatedNames: [],
     lipsyncNote: finaleLipsyncNote,
   };
+  const reunionLogEntry = {
+    label: "Reunión",
+    challenge: "Reunión",
+    results: guestResults,
+    eliminatedNames: [],
+    lipsyncNote: `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`,
+  };
+
+  if (reunionType === "BEFORE" && guestResults.length) log.push(reunionLogEntry);
   log.push(finalLogEntry);
+  if (reunionType === "AFTER" && guestResults.length) log.push(reunionLogEntry);
 
   const finalPlacements = { [winnerName]: "WINNER", [runnerUpName]: "RUNNER_UP" };
   restNames.forEach((name, i) => { finalPlacements[name] = `${i + 3}º lugar`; });

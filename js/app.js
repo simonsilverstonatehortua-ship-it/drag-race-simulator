@@ -100,8 +100,9 @@ let selectedTwists = new Set();
 
 // Reto de estreno: opcional, fuerza qué reto abre la temporada (episodio 1) en vez de
 // sortearlo, al estilo de "First Episode" de esopare.github.io. No aplica al estreno
-// Meet the Queens, que tiene su propia mecánica fija sin sortear reto.
-const OPENING_CHALLENGE_IDS = ["TALENT_SHOW", "GIRL_GROUP", "DESIGN", "RUNWAY"];
+// Meet the Queens, que tiene su propia mecánica fija sin sortear reto. Si se deja en "Al
+// azar", js/engine.js sortea entre esos mismos 4 (window.OPENING_CHALLENGE_IDS, definida
+// ahí para no declarar el mismo identificador dos veces en el ámbito global compartido).
 
 function renderSimulate() {
   const wrap = el("div", { class: "section" });
@@ -190,7 +191,7 @@ function renderSimulate() {
   const azarOpt = el("option", { value: "", text: "Al azar" });
   if (!formatChoice.openingChallenge) azarOpt.setAttribute("selected", "selected");
   openingSelect.appendChild(azarOpt);
-  OPENING_CHALLENGE_IDS.forEach((id) => {
+  window.OPENING_CHALLENGE_IDS.forEach((id) => {
     const challenge = DB.challenges.find((c) => c.id === id);
     if (!challenge) return;
     const opt = el("option", { value: id, text: challenge.label });
@@ -392,11 +393,12 @@ function trackRecordTable(track, shown, result) {
   const headRow = el("tr");
   headRow.appendChild(el("th", { text: "Rank", rowspan: "2", class: "trackrecord-th--span" }));
   headRow.appendChild(el("th", { text: "Concursante", rowspan: "2", class: "trackrecord-th--span" }));
-  // El capítulo final también es un número de episodio más (el último), así que en vez de
-  // literalmente "Final" arriba, se muestra su número de capítulo; el nombre del lip sync
-  // final (jurado, rondas, por la corona...) se simplifica a "Final" abajo, en la fila del reto.
-  track.columns.slice(0, shown).forEach(({ ep }) => headRow.appendChild(el("th", {
-    text: ep.label === "Final" ? `Ep. ${track.columns.length}` : shortEpisodeLabel(ep.label),
+  // El capítulo final (y la reunión, si es su propio capítulo) también son un número de
+  // episodio más, así que en vez de literalmente "Final"/"Reunión" arriba, se muestra su
+  // número de capítulo real; el nombre del lip sync final (jurado, rondas, por la
+  // corona...) se simplifica a "Final" abajo, en la fila del reto.
+  track.columns.slice(0, shown).forEach(({ ep }, i) => headRow.appendChild(el("th", {
+    text: (ep.label === "Final" || ep.label === "Reunión") ? `Ep. ${i + 1}` : shortEpisodeLabel(ep.label),
   })));
   headRow.appendChild(el("th", { text: "PPE", rowspan: "2", class: "trackrecord-th--span" }));
   thead.appendChild(headRow);
