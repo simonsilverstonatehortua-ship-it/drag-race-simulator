@@ -885,27 +885,41 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}) {
 
   const finalistsResults = finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
     status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" }));
-  const guestResults = eliminated.map((name) => ({ name, score: null,
+  const eliminatedGuestResults = eliminated.map((name) => ({ name, score: null,
     status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" }));
 
   const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
-    results: reunionType === "SAME" ? [...finalistsResults, ...guestResults] : finalistsResults,
+    results: reunionType === "SAME" ? [...finalistsResults, ...eliminatedGuestResults] : finalistsResults,
     eliminatedNames: [],
     lipsyncNote: finaleLipsyncNote,
   };
+
+  // En la reunión (cuando es su propio capítulo) las finalistas también "aparecen": si es
+  // antes de la final todavía no han hecho el lip sync final, así que quedan como RUN (ya
+  // clasificadas, corriendo por la corona); si es después, ya se coronó todo y quedan como
+  // invitadas más (GUEST), igual que el resto de la temporada.
+  let reunionResults = eliminatedGuestResults;
+  let reunionNote = `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`;
+  if (reunionType === "BEFORE") {
+    reunionResults = [...finalists.map((name) => ({ name, score: null, status: "RUN" })), ...eliminatedGuestResults];
+    reunionNote += " Las finalistas ya están confirmadas pero todavía no han hecho el lip sync final.";
+  } else if (reunionType === "AFTER") {
+    reunionResults = [...finalists.map((name) => ({ name, score: null, status: "GUEST" })), ...eliminatedGuestResults];
+    reunionNote += " Las finalistas también vuelven, ya coronada la temporada.";
+  }
   const reunionLogEntry = {
     label: "Reunión",
     challenge: "Reunión",
-    results: guestResults,
+    results: reunionResults,
     eliminatedNames: [],
-    lipsyncNote: `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`,
+    lipsyncNote: reunionNote,
   };
 
-  if (reunionType === "BEFORE" && guestResults.length) log.push(reunionLogEntry);
+  if (reunionType === "BEFORE") log.push(reunionLogEntry);
   log.push(finalLogEntry);
-  if (reunionType === "AFTER" && guestResults.length) log.push(reunionLogEntry);
+  if (reunionType === "AFTER") log.push(reunionLogEntry);
 
   const finalPlacements = { [winnerName]: "WINNER", [runnerUpName]: "RUNNER_UP" };
   restNames.forEach((name, i) => { finalPlacements[name] = `${i + 3}º lugar`; });

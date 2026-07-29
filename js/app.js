@@ -431,9 +431,9 @@ function trackRecordTable(track, shown, result) {
     row.cells.slice(0, shown).forEach((cell) => {
       if (!cell) { tr.appendChild(el("td", { class: "trackrecord-cell", text: "—" })); return; }
       const status = DB.statuses.find((s) => s.id === cell.status);
-      // ELIM siempre en negro, sin importar el brillo del fondo (a pedido: se sacrifica el
-      // contraste automático solo para esta casilla).
-      const textColor = cell.status === "ELIM" ? "#000000" : (status ? readableTextColor(status.color) : "");
+      // ELIM y RUN siempre en negro, sin importar el brillo del fondo (a pedido: se
+      // sacrifica el contraste automático solo para estas casillas).
+      const textColor = (cell.status === "ELIM" || cell.status === "RUN") ? "#000000" : (status ? readableTextColor(status.color) : "");
       // WIN_TIE se muestra como "WIN" a secas, y Miss Simpatía abreviada como "MISS CON"
       // (el color de cada una sigue distinguiéndolas del resto).
       const cellText = TRACKRECORD_CELL_TEXT_OVERRIDES[cell.status] || cell.status;

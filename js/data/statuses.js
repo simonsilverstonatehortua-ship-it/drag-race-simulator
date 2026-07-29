@@ -63,7 +63,10 @@ const DEFAULT_STATUSES = [
     description: "Descalificada por la producción/RuPaul." },
   { id: "GUEST", label: "Invitada (ya eliminada)", type: "weekly", color: "#dcdcdc",
     points: 0, countsForPoints: false, custom: false,
-    description: "Aparece como invitada tras haber sido eliminada (reunion, finale, etc.)." },
+    description: "Aparece como invitada en la reunión: una eliminada durante la temporada, o una finalista si la reunión es después de la final (ya coronada, vuelve como invitada más)." },
+  { id: "RUN", label: "Sigue en carrera (finalista, sin hacer la final aún)", type: "weekly", color: "#d3ffb5",
+    points: 0, countsForPoints: false, custom: false,
+    description: "Ya está confirmada como finalista pero todavía no ha hecho el lip sync final: sale así en la reunión cuando esta va antes de la final." },
 
   // --- Colocaciones finales (no cuentan para el PPE; suman aparte como puntos de carrera) ---
   { id: "WINNER", label: "Ganadora de la temporada", type: "final", color: "#D4AF37",
