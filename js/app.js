@@ -19,11 +19,14 @@ function uid(prefix) {
   return prefix + "_" + Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
+// Foto por defecto para concursantes personalizadas que no tienen una foto propia puesta.
+const NO_IMAGE_URL = "https://myrainboww.github.io/Drag-Race-Simulator/image/queens/noimage.jpg";
+
 function contestantImage(name) {
   const real = window.ALL_CONTESTANTS.find((c) => c.name === name);
   if (real && real.image) return real.image;
   const custom = DB.customContestants.find((c) => c.name === name);
-  if (custom && custom.image) return custom.image;
+  if (custom) return custom.image || NO_IMAGE_URL;
   return null;
 }
 
