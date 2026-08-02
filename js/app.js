@@ -50,6 +50,18 @@ function contestantStats(name) {
   return null;
 }
 
+// Para buscadores/selectores: una fila por reina real, aunque su nombre aparezca varias
+// veces en window.ALL_CONTESTANTS (una vez por temporada en la que compitió). No se debe
+// poder buscarla y ver "Alexis Mateo" repetida 3 veces solo porque estuvo en 3 temporadas.
+function uniqueRealContestants() {
+  const seen = new Set();
+  return window.ALL_CONTESTANTS.filter((c) => {
+    if (seen.has(c.name)) return false;
+    seen.add(c.name);
+    return true;
+  });
+}
+
 function avatarImg(name, sizeClass) {
   const src = contestantImage(name);
   if (!src) return null;
@@ -131,7 +143,7 @@ function renderSimulate() {
   // cualquier origen en un mismo reparto. El botón "Al azar" añade una concursante al azar
   // cada vez que se pulsa (no rellena un cupo fijo de golpe). No se muestra el roster
   // completo de fondo: los resultados del buscador solo aparecen mientras se escribe.
-  const allPool = [...window.ALL_CONTESTANTS, ...DB.customContestants];
+  const allPool = [...uniqueRealContestants(), ...DB.customContestants];
   const addOne = (name) => { simSelection.add(name); render(); };
   const addRandomOne = () => {
     const remaining = allPool.filter((c) => !simSelection.has(c.name));
@@ -768,7 +780,7 @@ function simulateSeasonPreset(season) {
 function contestantPicker(currentNames, onChange) {
   const wrap = el("div", {});
   const selection = new Set(currentNames);
-  const allPool = [...window.ALL_CONTESTANTS, ...DB.customContestants];
+  const allPool = [...uniqueRealContestants(), ...DB.customContestants];
 
   const addOne = (name) => { selection.add(name); onChange([...selection]); };
   const removeOne = (name) => { selection.delete(name); onChange([...selection]); };
