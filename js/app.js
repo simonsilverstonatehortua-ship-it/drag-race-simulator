@@ -6,6 +6,7 @@ let simSelection = new Set();
 let lastSimResult = null;
 let revealedEpisodes = 1;
 let rosterSeasonTab = {};
+let rosterDrawerOpen = {};
 let franchiseTab = null;
 
 const GROUP_LABELS = {
@@ -704,7 +705,16 @@ function renderRoster() {
   franchises.forEach((franchise) => {
     const totalContestants = franchise.seasons.reduce((sum, s) => sum + s.contestants.length, 0);
     const flag = window.FRANCHISE_FLAGS[franchise.name] || "";
-    const details = el("details", { class: "franchise-drawer", open: "open" });
+    // Si el usuario colapsó manualmente esta franquicia (p.ej. cerró "Estados Unidos" para
+    // no tener que hacer scroll mientras mira "All Stars"), respeta eso en el siguiente
+    // render: antes esto se ignoraba y la franquicia se reabría sola en cada render (al
+    // cambiar de temporada, editar stats, etc.), lo que empujaba todo el contenido de abajo
+    // y daba la sensación de "me manda de vuelta a Estados Unidos".
+    const isOpen = franchise.name in rosterDrawerOpen ? rosterDrawerOpen[franchise.name] : true;
+    const detailsAttrs = { class: "franchise-drawer" };
+    if (isOpen) detailsAttrs.open = "open";
+    const details = el("details", detailsAttrs);
+    details.addEventListener("toggle", () => { rosterDrawerOpen[franchise.name] = details.open; });
     const summary = el("summary", { class: "franchise-drawer__summary" });
     summary.appendChild(el("span", { class: "franchise-drawer__title", text: `${flag} ${franchise.name}`.trim() }));
     summary.appendChild(el("span", { class: "muted small", text: ` ${franchise.seasons.length} temporada(s) · ${totalContestants} concursantes` }));
