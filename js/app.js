@@ -22,20 +22,29 @@ function uid(prefix) {
 // Foto por defecto para concursantes personalizadas que no tienen una foto propia puesta.
 const NO_IMAGE_URL = "https://myrainboww.github.io/Drag-Race-Simulator/image/queens/noimage.jpg";
 
+// Una misma concursante real puede aparecer en varias temporadas (p.ej. Shangela en su
+// temporada numerada y en All Stars): solo UNA de esas entradas en ALL_CONTESTANTS lleva
+// foto/stats/ficha (las demás solo llevan name+finalPlacement), así que buscamos la
+// entrada por nombre que sí tenga el dato en vez de quedarnos con la primera que aparezca.
 function contestantImage(name) {
-  const real = window.ALL_CONTESTANTS.find((c) => c.name === name);
-  if (real && real.image) return real.image;
+  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.image);
+  if (real) return real.image;
   const custom = DB.customContestants.find((c) => c.name === name);
   if (custom) return custom.image || NO_IMAGE_URL;
   return null;
+}
+
+function contestantLink(name) {
+  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.link);
+  return real ? real.link : null;
 }
 
 // Stats de una concursante: si el usuario editó las de una concursante real, esa
 // personalización (guardada en DB.contestantOverrides) gana sobre las de fábrica.
 function contestantStats(name) {
   if (DB.contestantOverrides[name]) return DB.contestantOverrides[name];
-  const real = window.ALL_CONTESTANTS.find((c) => c.name === name);
-  if (real && real.stats) return real.stats;
+  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.stats);
+  if (real) return real.stats;
   const custom = DB.customContestants.find((c) => c.name === name);
   if (custom && custom.stats) return custom.stats;
   return null;
@@ -725,7 +734,7 @@ function renderRoster() {
       card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
       if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
-      card.appendChild(el("a", { class: "link", href: c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+      card.appendChild(el("a", { class: "link", href: contestantLink(c.name) || c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
       card.appendChild(el("div", { class: "card__actions" }, [
         el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
       ]));
@@ -1093,7 +1102,7 @@ function deleteCustomContestant(name) {
 // ---------- EDITAR STATS DE UNA CONCURSANTE REAL ----------
 function openRealStatsForm(contestant) {
   const hasOverride = !!DB.contestantOverrides[contestant.name];
-  const data = DB.contestantOverrides[contestant.name] || contestant.stats || window.randomStats();
+  const data = contestantStats(contestant.name) || window.randomStats();
 
   const overlay = document.getElementById("modal-overlay");
   overlay.innerHTML = "";
