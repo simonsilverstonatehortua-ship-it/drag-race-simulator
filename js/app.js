@@ -753,7 +753,6 @@ function renderRoster() {
       const avatar = avatarImg(c.name, "avatar--card");
       if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
-      card.appendChild(el("div", { class: "muted small", text: placementLabel(c.finalPlacement) }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
       if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
       card.appendChild(el("a", { class: "link", href: contestantLink(c.name) || c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
@@ -1029,11 +1028,6 @@ function renderFranchises() {
   }
 
   return wrap;
-}
-
-function placementLabel(code) {
-  const s = DB.statuses.find((s) => s.id === code);
-  return s ? s.label : code;
 }
 
 function statsSummaryLine(stats) {
