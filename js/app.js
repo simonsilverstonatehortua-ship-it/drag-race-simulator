@@ -728,7 +728,7 @@ function renderRoster() {
 
     const seasonTabs = el("div", { class: "season-tabs" });
     franchise.seasons.forEach((season) => {
-      const num = season.id.replace(/^\D+/, "") || season.seasonName;
+      const num = season.tabLabel || season.id.replace(/^\D+/, "") || season.seasonName;
       seasonTabs.appendChild(el("button", {
         type: "button",
         class: "tab tab--sm" + (season.id === activeSeason.id ? " tab--active" : ""),
