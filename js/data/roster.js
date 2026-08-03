@@ -1528,6 +1528,28 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/9b/LaKahenaCAvsTW2CastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20240626205836", stats: deriveStats({ acting: 5, comedy: 6, dance: 5, design: 3, improv: 5, runway: 6, lipsync: 5 }) },
     ],
   },
+  // Temporada en emisión (estreno 9 de julio de 2026, final el 13 de agosto de 2026): esto
+  // refleja lo confirmado hasta el episodio 4 (a fecha de 3 de agosto de 2026). Las 5 que
+  // siguen compitiendo quedan marcadas así hasta que se sepa la colocación final real —
+  // actualizar cuando termine de emitirse. Todo el reparto ya tiene ficha completa en su
+  // temporada de origen, así que aquí solo colocación/estado.
+  {
+    id: "CAN_AS1",
+    seasonName: "Canada's Drag Race: All Stars — Temporada 1",
+    franchise: "Canadá",
+    tabLabel: "AS 1",
+    contestants: [
+      { name: "Aurora Matrix", finalPlacement: "Sigue compitiendo" },
+      { name: "Jada Shada Hudson", finalPlacement: "Sigue compitiendo" },
+      { name: "Nearah Nuff", finalPlacement: "Sigue compitiendo" },
+      { name: "Sami Landri", finalPlacement: "Sigue compitiendo" },
+      { name: "Tiffany Ann Co.", finalPlacement: "Sigue compitiendo" },
+      { name: "Makayla Couture", finalPlacement: "6th" },
+      { name: "Juice Boxx", finalPlacement: "7th" },
+      { name: "Pythia", finalPlacement: "8th" },
+      { name: "Jackie Cox", finalPlacement: "9th" },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
