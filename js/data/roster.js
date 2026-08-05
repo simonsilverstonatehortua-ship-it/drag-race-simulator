@@ -1718,6 +1718,33 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/07/OliviaDreamsDRDU4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20241009210839", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
     ],
   },
+  // Temporada en emisión (estreno 24 de julio de 2026): esto refleja lo confirmado hasta el
+  // episodio 2 (a fecha de 3 de agosto de 2026); todavía no hay fecha de final anunciada.
+  // Actualizar cuando avancen más episodios. La mayoría del reparto ya tiene ficha completa
+  // en su temporada de origen; aquí solo colocación/estado.
+  {
+    id: "DU_VSTW1",
+    seasonName: "Drag Race Down Under vs the World — Temporada 1",
+    franchise: "Down Under",
+    tabLabel: "vs TW 1",
+    contestants: [
+      { name: "Art Simone", finalPlacement: "Sigue compitiendo" },
+      { name: "Coco Jumbo", finalPlacement: "Sigue compitiendo" },
+      { name: "Estrella Xtravaganza", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Estrella_Xtravaganza",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/EstrellaXtravaganzaDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623203950", stats: deriveStats({ acting: 10, comedy: 7, dance: 7, design: 5, improv: 9, runway: 8, lipsync: 8 }) },
+      { name: "Flor", finalPlacement: "Sigue compitiendo" },
+      { name: "LaLa Ri", finalPlacement: "Sigue compitiendo" },
+      { name: "M1ss Jade So", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/M1ss_Jade_So",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a2/M1ssJadeSoDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623204207", stats: deriveStats({ acting: 7, comedy: 9, dance: 9, design: 9, improv: 8, runway: 9, lipsync: 10 }) },
+      { name: "Michael Marouli", finalPlacement: "Sigue compitiendo" },
+      { name: "Nikita Iman", finalPlacement: "Sigue compitiendo" },
+      { name: "VYBE", finalPlacement: "Sigue compitiendo" },
+      { name: "Nicole Paige Brooks", finalPlacement: "Eliminada (episodio 2)" },
+      // Giro de guion del episodio 2: Raven se reveló como una "topo" infiltrada, no fue una
+      // eliminación normal por reto/lipsync.
+      { name: "Raven", finalPlacement: "Reveló ser una topo (episodio 2)" },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
