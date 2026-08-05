@@ -87,6 +87,7 @@ const FRANCHISE_FLAGS = {
   "Francia": "🇫🇷",
   "Filipinas": "🇵🇭",
   "Bélgica": "🇧🇪",
+  "Suecia": "🇸🇪",
 };
 
 const ALL_SEASONS = [
@@ -2332,6 +2333,34 @@ const ALL_SEASONS = [
       { name: "Madame Yoko", finalPlacement: "8th" },
       { name: "Sarah Logan", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Sarah_Logan",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/SarahLoganDRBE2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116204815", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "SV_S1",
+    seasonName: "Drag Race Sverige — Temporada 1",
+    franchise: "Suecia",
+    contestants: [
+      { name: "Admira Thunderpussy", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Admira_Thunderpussy",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/ef/AdmiraThunderpussyDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140436", stats: deriveStats({ acting: 10, comedy: 10, dance: 10, design: 9, improv: 10, runway: 11, lipsync: 9 }) },
+      // Fontana ya tiene ficha completa en RuPaul's Drag Race UK vs the World — Temporada 3
+      // (UK_VSTW3); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Fontana", finalPlacement: "RUNNER_UP" },
+      { name: "Vanity Vain", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Vanity_Vain",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a2/VanityVainDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140446", stats: deriveStats({ acting: 7, comedy: 7, dance: 9, design: 12, improv: 6, runway: 12, lipsync: 12 }) },
+      { name: "Elecktra", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Elecktra",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/79/ElecktraDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140443", stats: deriveStats({ acting: 9, comedy: 9, dance: 6, design: 7, improv: 9, runway: 10, lipsync: 9 }) },
+      // Antonina Nutshell fue eliminada originalmente en 8º lugar, pero regresó a la
+      // competencia más adelante y terminó colocando 5ª.
+      { name: "Antonina Nutshell", finalPlacement: "5th (regresó a competir)", link: "https://rupaulsdragrace.fandom.com/wiki/Antonina_Nutshell",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7e/AntoninaNutshellDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140442", stats: deriveStats({ acting: 6, comedy: 6, dance: 8, design: 6, improv: 5, runway: 5, lipsync: 6 }) },
+      { name: "Santana Sexmachine", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Santana_Sexmachine",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/70/SantanaSexmachineDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140446", stats: deriveStats({ acting: 6, comedy: 8, dance: 7, design: 9, improv: 8, runway: 10, lipsync: 9 }) },
+      { name: "Imaa Queen", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Imaa_Queen",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/90/ImaaQueenDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140444", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 11, improv: 5, runway: 14, lipsync: 7 }) },
+      { name: "Endigo", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Endigo",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/EndigoDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140444", stats: deriveStats({ acting: 6, comedy: 5, dance: 6, design: 6, improv: 5, runway: 9, lipsync: 8 }) },
+      { name: "Almighty Aphroditey", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Almighty_Aphroditey",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a8/AlmightyAphroditeyDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140443", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 7, lipsync: 5 }) },
     ],
   },
 ];
