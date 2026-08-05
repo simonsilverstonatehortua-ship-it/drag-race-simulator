@@ -2474,7 +2474,7 @@ const ALL_SEASONS = [
       { name: "Hellena Malditta", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hellena_Malditta",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6b/HellenaMaldittaDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816101013", stats: deriveStats({ acting: 9, comedy: 10, dance: 9, design: 10, improv: 10, runway: 10, lipsync: 9 }) },
       { name: "Miranda Lebrão", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Miranda_Lebrão",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/df/MirandaLebr%C3%A3oDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816101132", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b7/MirandaLebr%C3%A3oGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012743", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
       { name: "Shannon Skarllet", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Shannon_Skarllet",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f3/ShannonSkarlletDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816101409", stats: deriveStats({ acting: 10, comedy: 8, dance: 10, design: 7, improv: 7, runway: 10, lipsync: 11 }) },
       { name: "Naza", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Naza",
