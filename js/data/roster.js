@@ -83,6 +83,7 @@ const FRANCHISE_FLAGS = {
   "Holanda": "🇳🇱",
   "Down Under": "🇦🇺🇳🇿",
   "España": "🇪🇸",
+  "Filipinas": "🇵🇭",
 };
 
 const ALL_SEASONS = [
@@ -1923,6 +1924,134 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/68/EvaHarringtonDRES5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250907190759", stats: deriveStats({ acting: 7, comedy: 6, dance: 5, design: 10, improv: 6, runway: 9, lipsync: 6 }) },
       { name: "Nori", finalPlacement: "12th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Nori",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3e/NoriDRES5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250907191153", stats: deriveStats({ acting: 3, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 3 }) },
+    ],
+  },
+  {
+    id: "PH_S1",
+    seasonName: "Drag Race Philippines — Temporada 1",
+    franchise: "Filipinas",
+    contestants: [
+      { name: "Precious Paula Nicole", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Precious_Paula_Nicole",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f4/PreciousPaulaNicoleDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135525", stats: deriveStats({ acting: 8, comedy: 8, dance: 10, design: 7, improv: 9, runway: 9, lipsync: 9 }) },
+      // Marina Summers ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
+      // Temporada 2 (UK_VSTW2); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Marina Summers", finalPlacement: "RUNNER_UP" },
+      { name: "Eva Le Queen", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Eva_Le_Queen",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7f/EvaLeQueenDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135244", stats: deriveStats({ acting: 6, comedy: 10, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
+      { name: "Xilhouete", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Xilhouete",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/63/XilhoueteDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135757", stats: deriveStats({ acting: 6, comedy: 10, dance: 6, design: 8, improv: 11, runway: 10, lipsync: 8 }) },
+      // Minty Fresh ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
+      // Temporada 3 (UK_VSTW3); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Minty Fresh", finalPlacement: "5th" },
+      // Brigiding y Viñas DeLuxe ya tienen ficha completa en Drag Race Philippines: Slaysian
+      // Royale — Temporada 1 (PH_SR1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Brigiding", finalPlacement: "6th" },
+      { name: "Viñas DeLuxe", finalPlacement: "7th" },
+      { name: "Lady Morgana", finalPlacement: "8th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Lady_Morgana",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/02/LadyMorganaDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135343", stats: deriveStats({ acting: 6, comedy: 6, dance: 7, design: 7, improv: 5, runway: 8, lipsync: 11 }) },
+      { name: "Turing", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Turing",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f1/TuringDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135631", stats: deriveStats({ acting: 6, comedy: 6, dance: 9, design: 6, improv: 6, runway: 7, lipsync: 9 }) },
+      { name: "Gigi Era", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Gigi_Era",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cc/GigiEraDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135316", stats: deriveStats({ acting: 5, comedy: 5, dance: 4, design: 5, improv: 5, runway: 6, lipsync: 7 }) },
+      { name: "Corazon", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Corazon",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/48/CorazonDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135215", stats: deriveStats({ acting: 4, comedy: 5, dance: 4, design: 3, improv: 4, runway: 7, lipsync: 5 }) },
+      { name: "Prince", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Prince",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8a/PrinceDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135559", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 7, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "PH_S2",
+    seasonName: "Drag Race Philippines — Temporada 2",
+    franchise: "Filipinas",
+    contestants: [
+      { name: "Captivating Katkat", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Captivating_Katkat",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8e/CaptivatingKatkatDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150147", stats: deriveStats({ acting: 10, comedy: 10, dance: 11, design: 8, improv: 11, runway: 13, lipsync: 10 }) },
+      // Arizona Brandy y Bernie ya tienen ficha completa en Drag Race Philippines: Slaysian
+      // Royale — Temporada 1 (PH_SR1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Arizona Brandy", finalPlacement: "RUNNER_UP" },
+      { name: "Bernie", finalPlacement: "3rd" },
+      // M1ss Jade So ya tiene ficha completa en Drag Race Down Under vs the World — Temporada 1
+      // (DU_VSTW1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "M1ss Jade So", finalPlacement: "4th" },
+      { name: "Hana Beshie", finalPlacement: "5th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Hana_Beshie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/fd/HanaBeshieDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150204", stats: deriveStats({ acting: 9, comedy: 9, dance: 6, design: 9, improv: 9, runway: 10, lipsync: 9 }) },
+      { name: "ØV CÜNT", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/ØV_Cünt",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/80/%C3%98VC%C3%BCntDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150238", stats: deriveStats({ acting: 10, comedy: 10, dance: 8, design: 7, improv: 9, runway: 9, lipsync: 7 }) },
+      { name: "Dee Dee Marié Holliday", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Dee_Dee_Marié_Holliday",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/96/DeeDeeMari%C3%A9HollidayDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150156", stats: deriveStats({ acting: 6, comedy: 6, dance: 10, design: 9, improv: 6, runway: 9, lipsync: 8 }) },
+      { name: "Matilduh", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Matilduh",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/42/MatilduhDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150221", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 9, lipsync: 9 }) },
+      { name: "Veruschka Levels", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Veruschka_Levels",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/97/VeruschkaLevelsDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150255", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 11, improv: 6, runway: 11, lipsync: 7 }) },
+      { name: "Tiny Deluxe", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Tiny_Deluxe",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d3/TinyDeluxeDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150246", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 5, improv: 5, runway: 6, lipsync: 8 }) },
+      { name: "Astrid Mercury", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Astrid_Mercury",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0c/AstridMercuryDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150131", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+      { name: "Nicole Pardaux", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Nicole_Pardaux",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d0/NicolePardauxDRPH2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230818150229", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "PH_S3",
+    seasonName: "Drag Race Philippines — Temporada 3",
+    franchise: "Filipinas",
+    contestants: [
+      { name: "Maxie", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Maxie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/41/MaxieDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053800", stats: deriveStats({ acting: 10, comedy: 9, dance: 12, design: 9, improv: 11, runway: 11, lipsync: 12 }) },
+      // Khianna ya tiene ficha completa en Drag Race Philippines: Slaysian Royale — Temporada 1
+      // (PH_SR1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Khianna", finalPlacement: "RUNNER_UP" },
+      { name: "Angel", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Angel_(drag_queen)",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cf/AngelDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053436", stats: deriveStats({ acting: 8, comedy: 11, dance: 10, design: 6, improv: 9, runway: 9, lipsync: 11 }) },
+      { name: "Tita Baby", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Tita_Baby",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cf/TitaBabyDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053608", stats: deriveStats({ acting: 10, comedy: 11, dance: 9, design: 6, improv: 10, runway: 9, lipsync: 12 }) },
+      { name: "Zymba Ding", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Zymba_Ding",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/fa/ZymbaDingDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053345", stats: deriveStats({ acting: 10, comedy: 6, dance: 10, design: 9, improv: 7, runway: 10, lipsync: 12 }) },
+      { name: "Myx Chanel", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Myx_Chanel",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5b/MyxChanelDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053844", stats: deriveStats({ acting: 9, comedy: 7, dance: 7, design: 10, improv: 7, runway: 10, lipsync: 10 }) },
+      { name: "Popstar Bench", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Popstar_Bench",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f0/PopstarBenchDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053927", stats: deriveStats({ acting: 8, comedy: 7, dance: 9, design: 8, improv: 7, runway: 9, lipsync: 11 }) },
+      { name: "John Fedellaga", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/John_Fedellaga",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/c9/JohnFedellagaDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053715", stats: deriveStats({ acting: 8, comedy: 9, dance: 8, design: 8, improv: 10, runway: 11, lipsync: 8 }) },
+      { name: "J Quinn", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/J_Quinn",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3a/JQuinnDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240824053515", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 8, improv: 5, runway: 10, lipsync: 8 }) },
+      { name: "Yudipota", finalPlacement: "10th (abandonó)", link: "https://rupaulsdragrace.fandom.com/wiki/Yudipota",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d0/YudipotaDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240711100621", stats: deriveStats({ acting: 9, comedy: 7, dance: 6, design: 10, improv: 6, runway: 8, lipsync: 6 }) },
+      { name: "Versex", finalPlacement: "11th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Versex",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3f/VersexDRPH3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240711100600", stats: deriveStats({ acting: 6, comedy: 5, dance: 5, design: 5, improv: 5, runway: 7, lipsync: 6 }) },
+    ],
+  },
+  {
+    id: "PH_SR1",
+    seasonName: "Drag Race Philippines: Slaysian Royale — Temporada 1",
+    franchise: "Filipinas",
+    tabLabel: "Slaysian Royale",
+    contestants: [
+      { name: "Brigiding", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Brigiding",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/BrigidingDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034043", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 11, improv: 7, runway: 11, lipsync: 10 }) },
+      { name: "Viñas DeLuxe", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Viñas_DeLuxe",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7f/Vi%C3%B1asDeluxeDRPHSR1.jpg/revision/latest/scale-to-width-down/105?cb=20250716014835", stats: deriveStats({ acting: 9, comedy: 9, dance: 8, design: 15, improv: 8, runway: 12, lipsync: 8 }) },
+      { name: "Arizona Brandy", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Arizona_Brandy",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/95/ArizonaBrandyDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033524", stats: deriveStats({ acting: 10, comedy: 10, dance: 9, design: 6, improv: 10, runway: 8, lipsync: 11 }) },
+      // Suki Doll ya tiene ficha completa en Canada's Drag Race — Temporada 2 (CAN_S2); aquí
+      // solo su colocación en esta.
+      { name: "Suki Doll", finalPlacement: "4th (Miss Simpatía)" },
+      { name: "Khianna", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Khianna",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/KhiannaDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034310", stats: deriveStats({ acting: 6, comedy: 7, dance: 11, design: 10, improv: 8, runway: 13, lipsync: 13 }) },
+      // Yuhua ya tiene ficha completa en RuPaul's Drag Race — Temporada 10 (US_S10); Siam
+      // Phusri en Drag Race Thailand — Temporada 3 (TH_S3); Sum Ting Wong en RuPaul's Drag
+      // Race UK — Temporada 1 (UK_S1); Ivory Glaze en RuPaul's Drag Race Down Under —
+      // Temporada 3 (DU_S3); aquí solo su colocación en esta.
+      { name: "Yuhua", finalPlacement: "6th" },
+      { name: "Siam Phusri", finalPlacement: "7th" },
+      { name: "Bernie", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Bernie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/48/BernieDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033915", stats: deriveStats({ acting: 8, comedy: 7, dance: 11, design: 9, improv: 10, runway: 13, lipsync: 11 }) },
+      { name: "Kitty Space", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Kitty_Space",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/KittySpaceDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034424", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 11, improv: 7, runway: 13, lipsync: 9 }) },
+      { name: "Ivory Glaze", finalPlacement: "10th" },
+      { name: "Sum Ting Wong", finalPlacement: "11th" },
+      { name: "Madame Yoko", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Madame_Yoko",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/MadameYokoDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034608", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 9, improv: 6, runway: 8, lipsync: 7 }) },
     ],
   },
 ];
