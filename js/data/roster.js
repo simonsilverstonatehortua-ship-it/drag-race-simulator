@@ -2088,7 +2088,7 @@ const ALL_SEASONS = [
       { name: "Aura Eternal Visage", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Aura_Eternal_Visage",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/57/AuraEternalDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230606133146", stats: deriveStats({ acting: 11, comedy: 9, dance: 9, design: 6, improv: 5, runway: 9, lipsync: 8 }) },
       { name: "Nehellenia", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Nehellenia",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/71/NehelleniaDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20221020210341", stats: deriveStats({ acting: 8, comedy: 10, dance: 10, design: 8, improv: 10, runway: 12, lipsync: 9 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6e/NehelleniaGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012759", stats: deriveStats({ acting: 8, comedy: 10, dance: 10, design: 8, improv: 10, runway: 12, lipsync: 9 }) },
       { name: "La Petite Rose Noire", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Petite_Rose_Noire",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b3/LaPetiteNoireDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20221020205943", stats: deriveStats({ acting: 10, comedy: 5, dance: 10, design: 8, improv: 7, runway: 11, lipsync: 11 }) },
       { name: "Skandalove", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Skandalove",
