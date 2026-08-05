@@ -2346,7 +2346,7 @@ const ALL_SEASONS = [
       // (UK_VSTW3); aquí solo su colocación en esta, su temporada de origen.
       { name: "Fontana", finalPlacement: "RUNNER_UP" },
       { name: "Vanity Vain", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Vanity_Vain",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a2/VanityVainDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140446", stats: deriveStats({ acting: 7, comedy: 7, dance: 9, design: 12, improv: 6, runway: 12, lipsync: 12 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/VanityVainGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012840", stats: deriveStats({ acting: 7, comedy: 7, dance: 9, design: 12, improv: 6, runway: 12, lipsync: 12 }) },
       { name: "Elecktra", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Elecktra",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/79/ElecktraDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140443", stats: deriveStats({ acting: 9, comedy: 9, dance: 6, design: 7, improv: 9, runway: 10, lipsync: 9 }) },
       // Antonina Nutshell fue eliminada originalmente en 8º lugar, pero regresó a la
