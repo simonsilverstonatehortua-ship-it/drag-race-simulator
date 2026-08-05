@@ -80,6 +80,7 @@ const FRANCHISE_FLAGS = {
   "Tailandia": "🇹🇭",
   "Reino Unido": "🇬🇧",
   "Canadá": "🇨🇦",
+  "Holanda": "🇳🇱",
 };
 
 const ALL_SEASONS = [
@@ -1305,6 +1306,62 @@ const ALL_SEASONS = [
       { name: "Minty Fresh", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Minty_Fresh",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/MintyFreshUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260124235251", stats: deriveStats({ acting: 6, comedy: 5, dance: 4, design: 12, improv: 4, runway: 11, lipsync: 9 }) },
       { name: "Melinda Verga", finalPlacement: "10th" },
+    ],
+  },
+  {
+    id: "HOL_S1",
+    seasonName: "Drag Race Holland — Temporada 1",
+    franchise: "Holanda",
+    contestants: [
+      { name: "Envy Peru", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Envy_Peru",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/EnvyPeruDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831144623", stats: deriveStats({ acting: 11, comedy: 11, dance: 11, design: 8, improv: 11, runway: 13, lipsync: 11 }) },
+      // Janey Jacké ya tiene ficha completa en UK vs the World — Temporada 1 (UK_VSTW1);
+      // aquí solo su colocación en esta, su temporada de origen.
+      { name: "Janey Jacké", finalPlacement: "RUNNER_UP" },
+      { name: "Ma'Ma Queen", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Ma'Ma_Queen",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/MaMaQueen_DRHS1.jpg/revision/latest/scale-to-width-down/105?cb=20201006001239", stats: deriveStats({ acting: 9, comedy: 6, dance: 5, design: 6, improv: 6, runway: 10, lipsync: 7 }) },
+      { name: "Miss Abby OMG", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Miss_Abby_OMG",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/dc/MissAbbyOMGDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831144958", stats: deriveStats({ acting: 5, comedy: 6, dance: 11, design: 6, improv: 5, runway: 8, lipsync: 10 }) },
+      { name: "Chelsea Boy", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Chelsea_Boy",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/54/ChelseaBoyDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210418214010", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 7, improv: 10, runway: 12, lipsync: 6 }) },
+      { name: "Sederginne", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Sederginne",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7d/SederginneDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831145223", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 7, improv: 5, runway: 13, lipsync: 5 }) },
+      { name: "Madame Madness", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Madame_Madness",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/99/MadameMadnessDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831144754", stats: deriveStats({ acting: 8, comedy: 6, dance: 5, design: 6, improv: 5, runway: 8, lipsync: 7 }) },
+      { name: "Megan Schoonbrood", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Megan_Schoonbrood",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/c9/MeganSchoonbroodDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831144920", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 5, improv: 6, runway: 9, lipsync: 8 }) },
+      { name: "Patty Pam-Pam", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Patty_Pam-Pam",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/99/PattyPamPam_DRHS1.jpg/revision/latest/scale-to-width-down/105?cb=20201006010730", stats: deriveStats({ acting: 5, comedy: 6, dance: 6, design: 6, improv: 5, runway: 9, lipsync: 7 }) },
+      { name: "Roem", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Roem",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b3/RoemDRHL1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210831145137", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 5, improv: 5, runway: 6, lipsync: 5 }) },
+    ],
+  },
+  {
+    id: "HOL_S2",
+    seasonName: "Drag Race Holland — Temporada 2",
+    franchise: "Holanda",
+    contestants: [
+      { name: "Vanessa Van Cartier", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Vanessa_Van_Cartier",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8d/VanessaVanCartierDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903092844", stats: deriveStats({ acting: 7, comedy: 5, dance: 6, design: 8, improv: 5, runway: 12, lipsync: 8 }) },
+      { name: "My Little Puny", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/My_Little_Puny",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/10/MyLittlePunyDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903093154", stats: deriveStats({ acting: 10, comedy: 10, dance: 10, design: 7, improv: 9, runway: 10, lipsync: 10 }) },
+      { name: "Vivaldi", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Vivaldi",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/ba/VivaldiDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903093009", stats: deriveStats({ acting: 8, comedy: 8, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
+      // Keta Minaj ya tiene ficha completa en UK vs the World — Temporada 2 (UK_VSTW2); aquí
+      // solo su colocación en esta, su temporada de origen.
+      { name: "Keta Minaj", finalPlacement: "4th" },
+      { name: "Tabitha", finalPlacement: "5th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Tabitha",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/61/TabithaDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903092807", stats: deriveStats({ acting: 6, comedy: 7, dance: 8, design: 6, improv: 5, runway: 7, lipsync: 8 }) },
+      { name: "The Countess", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/The_Countess",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/72/TheCountessDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210830131642", stats: deriveStats({ acting: 7, comedy: 5, dance: 4, design: 10, improv: 6, runway: 12, lipsync: 5 }) },
+      { name: "Ivy-Elyse", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Ivy-Elyse",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/9c/IvyElyseDRHS2Promo.jpg/revision/latest/scale-to-width-down/105?cb=20210727131037", stats: deriveStats({ acting: 6, comedy: 8, dance: 5, design: 4, improv: 8, runway: 5, lipsync: 10 }) },
+      { name: "Love Masisi", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Love_Masisi",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e4/LoveMasisiDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903093252", stats: deriveStats({ acting: 6, comedy: 5, dance: 6, design: 8, improv: 5, runway: 10, lipsync: 7 }) },
+      { name: "Reggy B", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Reggy_B",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/bc/ReggyBDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903093444", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 5, improv: 6, runway: 8, lipsync: 8 }) },
+      { name: "Juicy Kutoure", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Juicy_Kutoure",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e7/JuicyKutoureDRHL2CastMug.png/revision/latest/scale-to-width-down/105?cb=20210903093603", stats: deriveStats({ acting: 5, comedy: 6, dance: 5, design: 5, improv: 4, runway: 4, lipsync: 5 }) },
     ],
   },
   {
