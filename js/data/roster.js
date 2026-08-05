@@ -85,6 +85,7 @@ const FRANCHISE_FLAGS = {
   "España": "🇪🇸",
   "Filipinas": "🇵🇭",
   "Italia": "🇮🇹",
+  "Francia": "🇫🇷",
 };
 
 const ALL_SEASONS = [
@@ -2136,6 +2137,147 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/00/AmyKraniaDRIT3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230918145338", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 5, improv: 5, runway: 5, lipsync: 5 }) },
       { name: "Adriana Picasso", finalPlacement: "13th", link: "https://rupaulsdragrace.fandom.com/wiki/Adriana_Picasso",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/91/AdrianaPicassoDRIT3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230918145407", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "FR_S1",
+    seasonName: "Drag Race France — Temporada 1",
+    franchise: "Francia",
+    contestants: [
+      { name: "Paloma", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Paloma",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7d/PalomaDRFR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220603151816", stats: deriveStats({ acting: 11, comedy: 11, dance: 6, design: 7, improv: 9, runway: 9, lipsync: 8 }) },
+      // La Grande Dame ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
+      // Temporada 2 (UK_VSTW2); aquí solo su colocación en esta, su temporada de origen.
+      { name: "La Grande Dame", finalPlacement: "RUNNER_UP" },
+      // Soa de Muse, La Big Bertha, Elips y Kam Hugh ya tienen ficha completa en Drag Race
+      // France All Stars — Temporada 1 (FR_AS1); aquí solo su colocación en esta.
+      { name: "Soa de Muse", finalPlacement: "RUNNER_UP" },
+      { name: "Lolita Banana", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Lolita_Banana",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/46/LolitaBananaDRFR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220603144903", stats: deriveStats({ acting: 9, comedy: 7, dance: 13, design: 11, improv: 6, runway: 9, lipsync: 12 }) },
+      { name: "La Big Bertha", finalPlacement: "5th" },
+      { name: "Elips", finalPlacement: "6th (Miss Simpatía)" },
+      { name: "Kam Hugh", finalPlacement: "7th" },
+      { name: "La Briochée", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Briochée",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8e/LaBrioch%C3%A9eDRFR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220603143810", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 5, improv: 6, runway: 8, lipsync: 5 }) },
+      { name: "Lova Ladiva", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Lova_Ladiva",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/73/LovaLadivaDRFR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220603145857", stats: deriveStats({ acting: 5, comedy: 5, dance: 6, design: 4, improv: 6, runway: 6, lipsync: 5 }) },
+      // La Kahena ya tiene ficha completa en Canada's Drag Race: Canada vs the World —
+      // Temporada 2 (CAN_VSTW2); aquí solo su colocación en esta, su temporada de origen.
+      { name: "La Kahena", finalPlacement: "10th" },
+    ],
+  },
+  {
+    id: "FR_S2",
+    seasonName: "Drag Race France — Temporada 2",
+    franchise: "Francia",
+    contestants: [
+      { name: "Keiona", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Keiona",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/45/KeionaDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816113857", stats: deriveStats({ acting: 11, comedy: 10, dance: 15, design: 11, improv: 11, runway: 13, lipsync: 13 }) },
+      { name: "Sara Forever", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Sara_Forever",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/60/SaraForeverDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816114358", stats: deriveStats({ acting: 8, comedy: 7, dance: 11, design: 6, improv: 10, runway: 10, lipsync: 10 }) },
+      // Mami Watta, Punani, Piche y Moon ya tienen ficha completa en Drag Race France All
+      // Stars — Temporada 1 (FR_AS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Mami Watta", finalPlacement: "3rd" },
+      { name: "Punani", finalPlacement: "4th" },
+      { name: "Piche", finalPlacement: "5th" },
+      { name: "Cookie Kunty", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Cookie_Kunty",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/c1/CookieKuntyDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816113751", stats: deriveStats({ acting: 8, comedy: 6, dance: 8, design: 10, improv: 5, runway: 11, lipsync: 10 }) },
+      { name: "Moon", finalPlacement: "7th (Miss Simpatía, abandonó)" },
+      { name: "Ginger Bitch", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Ginger_Bitch",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/27/GingerBitchDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816113827", stats: deriveStats({ acting: 7, comedy: 6, dance: 7, design: 6, improv: 8, runway: 8, lipsync: 9 }) },
+      // Kitty Space ya tiene ficha completa en Drag Race Philippines: Slaysian Royale —
+      // Temporada 1 (PH_SR1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Kitty Space", finalPlacement: "9th" },
+      { name: "Vespi", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Vespi",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/22/VespiDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816114434", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 6, improv: 6, runway: 9, lipsync: 7 }) },
+      { name: "Rose", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Rose_(Drag_Race_France)",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e0/RoseDRFR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816114304", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "FR_S3",
+    seasonName: "Drag Race France — Temporada 3",
+    franchise: "Francia",
+    contestants: [
+      { name: "Le Filip", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Le_Filip",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/99/LeFilipDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135523", stats: deriveStats({ acting: 10, comedy: 10, dance: 8, design: 9, improv: 7, runway: 11, lipsync: 9 }) },
+      { name: "Ruby On The Nail", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Ruby_On_The_Nail",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d5/RubyOnTheNailDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135524", stats: deriveStats({ acting: 9, comedy: 12, dance: 9, design: 6, improv: 10, runway: 11, lipsync: 11 }) },
+      { name: "Leona Winter", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Leona_Winter",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1b/LeonaWinterDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135523", stats: deriveStats({ acting: 10, comedy: 7, dance: 10, design: 10, improv: 8, runway: 10, lipsync: 10 }) },
+      { name: "Lula Strega", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Lula_Strega",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/c7/LulaStregaDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135522", stats: deriveStats({ acting: 9, comedy: 11, dance: 7, design: 10, improv: 9, runway: 12, lipsync: 7 }) },
+      // Misty Phoenix y Magnetica ya tienen ficha completa en Drag Race France All Stars —
+      // Temporada 1 (FR_AS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Misty Phoenix", finalPlacement: "5th" },
+      { name: "Perseo", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Perseo",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/35/PerseoDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135523", stats: deriveStats({ acting: 9, comedy: 8, dance: 9, design: 7, improv: 7, runway: 11, lipsync: 10 }) },
+      { name: "Norma Bell", finalPlacement: "7th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Norma_Bell",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8d/NormaBellDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135523", stats: deriveStats({ acting: 9, comedy: 6, dance: 10, design: 8, improv: 7, runway: 10, lipsync: 8 }) },
+      { name: "Edeha Noire", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Edeha_Noire",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/61/EdehaNoireDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135523", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 6, improv: 6, runway: 8, lipsync: 9 }) },
+      { name: "Magnetica", finalPlacement: "9th" },
+      { name: "Afrodite Amour", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Afrodite_Amour",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f3/AfroditeAmourDRFR3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240424135521", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "FR_AS1",
+    seasonName: "Drag Race France All Stars — Temporada 1",
+    franchise: "Francia",
+    tabLabel: "AS 1",
+    contestants: [
+      { name: "Mami Watta", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Mami_Watta",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/86/MamiWattaDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611182223", stats: deriveStats({ acting: 9, comedy: 7, dance: 9, design: 9, improv: 8, runway: 10, lipsync: 9 }) },
+      { name: "Elips", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Elips",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/85/ElipsDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611203354", stats: deriveStats({ acting: 7, comedy: 9, dance: 8, design: 8, improv: 8, runway: 8, lipsync: 7 }) },
+      { name: "Misty Phoenix", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Misty_Phoenix",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/37/MistyPhoenixDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611203504", stats: deriveStats({ acting: 9, comedy: 8, dance: 10, design: 9, improv: 9, runway: 10, lipsync: 11 }) },
+      { name: "Piche", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Piche",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/aa/PicheDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611194441", stats: deriveStats({ acting: 7, comedy: 6, dance: 11, design: 7, improv: 8, runway: 9, lipsync: 11 }) },
+      { name: "Moon", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Moon",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/ee/MoonDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611123214", stats: deriveStats({ acting: 9, comedy: 9, dance: 9, design: 6, improv: 8, runway: 10, lipsync: 9 }) },
+      { name: "Kam Hugh", finalPlacement: "6th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Kam_Hugh",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/28/KamHughDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611203426", stats: deriveStats({ acting: 7, comedy: 5, dance: 6, design: 9, improv: 4, runway: 13, lipsync: 7 }) },
+      { name: "La Big Bertha", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Big_Bertha",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/10/LaBigBerthaDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611123143", stats: deriveStats({ acting: 7, comedy: 6, dance: 7, design: 6, improv: 6, runway: 8, lipsync: 9 }) },
+      { name: "Punani", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Punani",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e6/PunaniDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611182054", stats: deriveStats({ acting: 8, comedy: 10, dance: 8, design: 9, improv: 10, runway: 10, lipsync: 9 }) },
+      { name: "Soa de Muse", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Soa_de_Muse",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8b/SoadeMuseDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611182119", stats: deriveStats({ acting: 9, comedy: 10, dance: 10, design: 8, improv: 8, runway: 9, lipsync: 10 }) },
+      { name: "Magnetica", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Magnetica",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0c/MagneticaDRFRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250611123152", stats: deriveStats({ acting: 6, comedy: 6, dance: 9, design: 6, improv: 6, runway: 10, lipsync: 9 }) },
+    ],
+  },
+  // Temporada en emisión (estreno 8 de julio de 2026): esto refleja lo confirmado hasta el
+  // episodio 4 (a fecha de 3 de agosto de 2026); todavía no hay fecha de final anunciada.
+  // Actualizar cuando avancen más episodios. Reparto totalmente nuevo, sin apariciones
+  // previas en el roster, así que todas llevan ficha completa desde ya.
+  {
+    id: "FR_S4",
+    seasonName: "Drag Race France — Temporada 4",
+    franchise: "Francia",
+    contestants: [
+      { name: "Azemylia", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Azemylia",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e4/AzemyliaDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173038", stats: deriveStats({ acting: 8, comedy: 7, dance: 7, design: 8, improv: 7, runway: 8, lipsync: 6 }) },
+      { name: "Daisy Superbitch", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Daisy_Superbitch",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/02/DaisySuperbitchDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173115", stats: deriveStats({ acting: 8, comedy: 9, dance: 9, design: 8, improv: 8, runway: 9, lipsync: 8 }) },
+      { name: "Fluffy Bidule", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Fluffy_Bidule",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/96/FluffyBiduleDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173137", stats: deriveStats({ acting: 7, comedy: 8, dance: 6, design: 7, improv: 7, runway: 7, lipsync: 6 }) },
+      { name: "La Harpie", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/La_Harpie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/35/LaHarpieDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173240", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 7, improv: 6, runway: 7, lipsync: 6 }) },
+      { name: "Lana Cotta", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Lana_Cotta",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d9/LanaCottaDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260731002209", stats: deriveStats({ acting: 6, comedy: 6, dance: 7, design: 7, improv: 6, runway: 8, lipsync: 7 }) },
+      { name: "Sublyme", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Sublyme",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/18/SublymeDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173355", stats: deriveStats({ acting: 6, comedy: 7, dance: 6, design: 6, improv: 6, runway: 7, lipsync: 5 }) },
+      { name: "Holly White", finalPlacement: "Eliminada (episodio 4)", link: "https://rupaulsdragrace.fandom.com/wiki/Holly_White",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/69/HollyWhiteDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173213", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 6, improv: 5, runway: 6, lipsync: 6 }) },
+      { name: "Margarette", finalPlacement: "Eliminada (episodio 3)", link: "https://rupaulsdragrace.fandom.com/wiki/Margarette",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/15/MargaretteDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173337", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 6, improv: 5, runway: 6, lipsync: 5 }) },
+      { name: "Malawitte", finalPlacement: "Eliminada (episodio 2)", link: "https://rupaulsdragrace.fandom.com/wiki/Malawitte",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7e/MalawitteDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173317", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 5, improv: 5, runway: 5, lipsync: 5 }) },
+      { name: "Creatine Price", finalPlacement: "Eliminada (episodio 1)", link: "https://rupaulsdragrace.fandom.com/wiki/Creatine_Price",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/97/CreatinePriceDRFR4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260615173059", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 5, lipsync: 4 }) },
     ],
   },
 ];
