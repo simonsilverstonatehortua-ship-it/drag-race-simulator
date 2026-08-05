@@ -1937,7 +1937,7 @@ const ALL_SEASONS = [
       // Temporada 2 (UK_VSTW2); aquí solo su colocación en esta, su temporada de origen.
       { name: "Marina Summers", finalPlacement: "RUNNER_UP" },
       { name: "Eva Le Queen", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Eva_Le_Queen",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7f/EvaLeQueenDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135244", stats: deriveStats({ acting: 6, comedy: 10, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/55/EvaLeQueenGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012635", stats: deriveStats({ acting: 6, comedy: 10, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
       { name: "Xilhouete", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Xilhouete",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/63/XilhoueteDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135757", stats: deriveStats({ acting: 6, comedy: 10, dance: 6, design: 8, improv: 11, runway: 10, lipsync: 8 }) },
       // Minty Fresh ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
@@ -2030,7 +2030,7 @@ const ALL_SEASONS = [
       { name: "Brigiding", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Brigiding",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/BrigidingDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034043", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 11, improv: 7, runway: 11, lipsync: 10 }) },
       { name: "Viñas DeLuxe", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Viñas_DeLuxe",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7f/Vi%C3%B1asDeluxeDRPHSR1.jpg/revision/latest/scale-to-width-down/105?cb=20250716014835", stats: deriveStats({ acting: 9, comedy: 9, dance: 8, design: 15, improv: 8, runway: 12, lipsync: 8 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/64/Vi%C3%B1asDeLuxeDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716035043", stats: deriveStats({ acting: 9, comedy: 9, dance: 8, design: 15, improv: 8, runway: 12, lipsync: 8 }) },
       { name: "Arizona Brandy", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Arizona_Brandy",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/95/ArizonaBrandyDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033524", stats: deriveStats({ acting: 10, comedy: 10, dance: 9, design: 6, improv: 10, runway: 8, lipsync: 11 }) },
       // Suki Doll ya tiene ficha completa en Canada's Drag Race — Temporada 2 (CAN_S2); aquí
