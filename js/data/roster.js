@@ -88,6 +88,7 @@ const FRANCHISE_FLAGS = {
   "Filipinas": "🇵🇭",
   "Bélgica": "🇧🇪",
   "Suecia": "🇸🇪",
+  "México": "🇲🇽",
 };
 
 const ALL_SEASONS = [
@@ -2361,6 +2362,103 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/EndigoDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140444", stats: deriveStats({ acting: 6, comedy: 5, dance: 6, design: 6, improv: 5, runway: 9, lipsync: 8 }) },
       { name: "Almighty Aphroditey", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Almighty_Aphroditey",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a8/AlmightyAphroditeyDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140443", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 7, lipsync: 5 }) },
+    ],
+  },
+  {
+    id: "MX_S1",
+    seasonName: "Drag Race México — Temporada 1",
+    franchise: "México",
+    contestants: [
+      { name: "Cristian Peralta", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Cristian_Peralta",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/38/CristianPeraltaDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808152413", stats: deriveStats({ acting: 9, comedy: 13, dance: 11, design: 12, improv: 11, runway: 12, lipsync: 11 }) },
+      { name: "Gala Varo", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Gala_Varo",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/db/GalaVaroDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808155148", stats: deriveStats({ acting: 9, comedy: 5, dance: 10, design: 9, improv: 6, runway: 11, lipsync: 13 }) },
+      // Matraka y Regina Voce vuelven en Drag Race México: Latina Royale (MX_LR1), pero como
+      // esa temporada sigue en emisión sin colocación final, conservan su ficha completa aquí.
+      { name: "Matraka", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Matraka",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d1/MatrakaDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230809042921", stats: deriveStats({ acting: 10, comedy: 8, dance: 10, design: 10, improv: 9, runway: 12, lipsync: 11 }) },
+      { name: "Regina Voce", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Regina_Voce",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a7/ReginaVoceDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230809045939", stats: deriveStats({ acting: 11, comedy: 10, dance: 9, design: 9, improv: 8, runway: 8, lipsync: 10 }) },
+      { name: "Lady Kero", finalPlacement: "5th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Lady_Kero",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/11/LadyKeroDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808172448", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 9, improv: 9, runway: 10, lipsync: 11 }) },
+      { name: "Margaret Y Ya", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Margaret_Y_Ya",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/81/MargaretYYaDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808173405", stats: deriveStats({ acting: 5, comedy: 6, dance: 9, design: 9, improv: 6, runway: 9, lipsync: 9 }) },
+      { name: "Argennis", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Argennis",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1b/ArgennisDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808142758", stats: deriveStats({ acting: 9, comedy: 7, dance: 5, design: 10, improv: 6, runway: 9, lipsync: 12 }) },
+      // Serena Morena ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
+      // Temporada 3 (UK_VSTW3); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Serena Morena", finalPlacement: "8th" },
+      { name: "Pixie Pixie", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Pixie_Pixie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e8/PixiePixieDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230809044243", stats: deriveStats({ acting: 8, comedy: 8, dance: 6, design: 8, improv: 6, runway: 10, lipsync: 8 }) },
+      { name: "Vermelha Noir", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Vermelha_Noir",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0d/VermelhaNoirDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230809051254", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 5, improv: 4, runway: 7, lipsync: 5 }) },
+      { name: "Miss Vallarta", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Miss_Vallarta",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/66/MissVallartaDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808193907", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "MX_S2",
+    seasonName: "Drag Race México — Temporada 2",
+    franchise: "México",
+    contestants: [
+      { name: "Leexa Fox", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Leexa_Fox",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/82/LeexaFoxDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240526011935", stats: deriveStats({ acting: 9, comedy: 10, dance: 12, design: 10, improv: 9, runway: 13, lipsync: 13 }) },
+      { name: "Eva Blunt", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Eva_Blunt",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/ed/EvaBluntDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524041009", stats: deriveStats({ acting: 9, comedy: 9, dance: 9, design: 10, improv: 9, runway: 12, lipsync: 10 }) },
+      { name: "Horacio Potasio", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Horacio_Potasio",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/31/HoracioPotasioDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524042138", stats: deriveStats({ acting: 7, comedy: 9, dance: 13, design: 9, improv: 6, runway: 12, lipsync: 15 }) },
+      { name: "Jenary Bloom", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Jenary_Bloom",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f4/JenaryBloomDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524043146", stats: deriveStats({ acting: 10, comedy: 8, dance: 10, design: 7, improv: 10, runway: 9, lipsync: 12 }) },
+      { name: "Elektra Vandergeld", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Elektra_Vandergeld",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/18/ElektraVandergeldDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524035155", stats: deriveStats({ acting: 7, comedy: 8, dance: 10, design: 12, improv: 8, runway: 14, lipsync: 11 }) },
+      { name: "Unique", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Unique",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/15/UniqueDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524054733", stats: deriveStats({ acting: 9, comedy: 10, dance: 6, design: 7, improv: 11, runway: 7, lipsync: 12 }) },
+      { name: "Luna Lansman", finalPlacement: "7th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Luna_Lansman",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8e/LunaLansmanDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524044019", stats: deriveStats({ acting: 9, comedy: 11, dance: 7, design: 10, improv: 10, runway: 9, lipsync: 9 }) },
+      { name: "Suculenta", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Suculenta",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/52/SuculentaDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524054419", stats: deriveStats({ acting: 7, comedy: 8, dance: 7, design: 6, improv: 7, runway: 6, lipsync: 7 }) },
+      { name: "Ava Pocket", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Ava_Pocket",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/34/AvaPocketDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524033547", stats: deriveStats({ acting: 7, comedy: 6, dance: 10, design: 8, improv: 6, runway: 9, lipsync: 10 }) },
+      { name: "Garçonne", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Garçonne",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/Gar%C3%A7onneDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524041707", stats: deriveStats({ acting: 7, comedy: 7, dance: 6, design: 10, improv: 7, runway: 11, lipsync: 7 }) },
+      { name: "María Bonita", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/María_Bonita",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/84/Mar%C3%ADaBonitaDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524045617", stats: deriveStats({ acting: 6, comedy: 6, dance: 7, design: 9, improv: 6, runway: 10, lipsync: 8 }) },
+      { name: "Nina De La Fuente", finalPlacement: "12th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Nina_de_la_Fuente",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/fd/NinaDeLaFuenteDRMX2.jpg/revision/latest/scale-to-width-down/105?cb=20240523190555", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 6, improv: 5, runway: 8, lipsync: 7 }) },
+      { name: "Ignus Ars", finalPlacement: "13th", link: "https://rupaulsdragrace.fandom.com/wiki/Ignus_Ars",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1b/IgnusArsDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524042558", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  // Temporada en emisión (estreno 30 de julio de 2026): esto refleja lo confirmado hasta el
+  // episodio 2 (a fecha de 6 de agosto de 2026); todavía no ha habido ninguna eliminación (el
+  // episodio 1 terminó con "nadie se va a casa"), así que todas quedan como "Sigue
+  // compitiendo". La mayoría del reparto ya tiene ficha completa en su temporada de origen;
+  // aquí solo colocación/estado. Actualizar cuando haya eliminaciones reales.
+  {
+    id: "MX_LR1",
+    seasonName: "Drag Race México: Latina Royale — Temporada 1",
+    franchise: "México",
+    tabLabel: "Latina Royale",
+    contestants: [
+      // Alexis Mateo ya tiene ficha completa en All Stars — Temporada 5 (AS_S5); Matraka y
+      // Regina Voce en Drag Race México — Temporada 1 (MX_S1); Elektra Vandergeld, Eva Blunt
+      // y Horacio Potasio en Drag Race México — Temporada 2 (MX_S2); Mariana Stars en Drag
+      // Race España — Temporada 4 (ES_S4); Miss Abby OMG en Drag Race Holland — Temporada 1
+      // (HOL_S1); Xunami Muse en RuPaul's Drag Race — Temporada 15 (US_S15); aquí solo su
+      // colocación/estado en esta.
+      { name: "Alexis Mateo", finalPlacement: "Sigue compitiendo" },
+      { name: "Barbie Q", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Barbie_Q",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/16/BarbieQDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200418", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 9, lipsync: 4 }) },
+      { name: "DesiRée Beck", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/DesiRée_Beck",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/4f/Desir%C3%A9eBeckDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200515", stats: deriveStats({ acting: 6, comedy: 10, dance: 5, design: 6, improv: 10, runway: 8, lipsync: 7 }) },
+      { name: "Elektra Vandergeld", finalPlacement: "Sigue compitiendo" },
+      { name: "Eva Blunt", finalPlacement: "Sigue compitiendo" },
+      { name: "Horacio Potasio", finalPlacement: "Sigue compitiendo" },
+      { name: "Mariana Stars", finalPlacement: "Sigue compitiendo" },
+      { name: "Matraka", finalPlacement: "Sigue compitiendo" },
+      { name: "Miss Abby OMG", finalPlacement: "Sigue compitiendo" },
+      { name: "Regina Voce", finalPlacement: "Sigue compitiendo" },
+      { name: "Xunami Muse", finalPlacement: "Sigue compitiendo" },
     ],
   },
 ];
