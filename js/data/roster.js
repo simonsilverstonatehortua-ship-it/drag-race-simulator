@@ -2542,7 +2542,7 @@ const ALL_SEASONS = [
       { name: "Nikita Vegaz", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Nikita_Vegaz",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/NikitaVegazDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093823", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 8, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Tessa Testicle", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Tessa_Testicle",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b9/TessaTesticleDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093954", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 8, lipsync: 12 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/TessaTesticleGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012830", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 8, lipsync: 12 }) },
       { name: "LéLé Cocoon", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/LéLé_Cocoon",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/L%C3%A9L%C3%A9CocoonDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093645", stats: deriveStats({ acting: 6, comedy: 6, dance: 8, design: 8, improv: 6, runway: 10, lipsync: 7 }) },
       // The Only Naomy ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
