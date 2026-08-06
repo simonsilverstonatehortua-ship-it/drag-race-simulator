@@ -90,6 +90,7 @@ const FRANCHISE_FLAGS = {
   "Suecia": "🇸🇪",
   "México": "🇲🇽",
   "Brasil": "🇧🇷",
+  "Alemania": "🇩🇪",
 };
 
 const ALL_SEASONS = [
@@ -2519,6 +2520,36 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1f/PaolaHoffmannVanCartierDRBR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250605055003", stats: deriveStats({ acting: 5, comedy: 4, dance: 5, design: 7, improv: 4, runway: 7, lipsync: 4 }) },
       { name: "Chanel", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Chanel_(Drag_Race_Brasil)",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/fa/ChanelDRBR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250605055143", stats: deriveStats({ acting: 4, comedy: 4, dance: 8, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
+    ],
+  },
+  {
+    id: "DE_S1",
+    seasonName: "Drag Race Germany — Temporada 1",
+    franchise: "Alemania",
+    contestants: [
+      { name: "Pandora Nox", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Pandora_Nox",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8f/PandoraNoxDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093920", stats: deriveStats({ acting: 9, comedy: 9, dance: 9, design: 11, improv: 9, runway: 14, lipsync: 12 }) },
+      { name: "Metamorkid", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Metamorkid",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/06/MetamorkidDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093748", stats: deriveStats({ acting: 10, comedy: 9, dance: 10, design: 9, improv: 9, runway: 10, lipsync: 9 }) },
+      { name: "Yvonne Nightstand", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Yvonne_Nightstand",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5d/YvonneNightstandDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816094420", stats: deriveStats({ acting: 10, comedy: 10, dance: 7, design: 7, improv: 9, runway: 11, lipsync: 9 }) },
+      { name: "Kelly Heelton", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Kelly_Heelton",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/31/KellyHeeltonDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093510", stats: deriveStats({ acting: 8, comedy: 10, dance: 9, design: 9, improv: 10, runway: 12, lipsync: 9 }) },
+      { name: "Loreley Rivers", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Loreley_Rivers",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/ce/LoreleyRiversDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093720", stats: deriveStats({ acting: 7, comedy: 5, dance: 8, design: 9, improv: 9, runway: 11, lipsync: 12 }) },
+      { name: "Victoria Shakespears", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Victoria_Shakespears",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3b/VictoriaShakespearsDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816094353", stats: deriveStats({ acting: 8, comedy: 7, dance: 9, design: 5, improv: 8, runway: 9, lipsync: 12 }) },
+      { name: "Nikita Vegaz", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Nikita_Vegaz",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/NikitaVegazDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093823", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 8, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Tessa Testicle", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Tessa_Testicle",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b9/TessaTesticleDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093954", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 8, lipsync: 12 }) },
+      { name: "LéLé Cocoon", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/LéLé_Cocoon",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/L%C3%A9L%C3%A9CocoonDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093645", stats: deriveStats({ acting: 6, comedy: 6, dance: 8, design: 8, improv: 6, runway: 10, lipsync: 7 }) },
+      // The Only Naomy ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
+      // Temporada 3 (UK_VSTW3); Barbie Q en Drag Race México: Latina Royale — Temporada 1
+      // (MX_LR1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "The Only Naomy", finalPlacement: "10th" },
+      { name: "Barbie Q", finalPlacement: "11th" },
     ],
   },
 ];
