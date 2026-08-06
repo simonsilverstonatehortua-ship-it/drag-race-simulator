@@ -91,6 +91,7 @@ const FRANCHISE_FLAGS = {
   "México": "🇲🇽",
   "Brasil": "🇧🇷",
   "Alemania": "🇩🇪",
+  "Global All Stars": "🌎",
 };
 
 const ALL_SEASONS = [
@@ -646,8 +647,9 @@ const ALL_SEASONS = [
       { name: "Katya", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Katya",
         image: IMG_BASE + "Katya.webp", stats: deriveStats({ acting: 9, comedy: 12, dance: 9, design: 7, improv: 12, runway: 10, lipsync: 10 }) },
       { name: "Roxxxy Andrews", finalPlacement: "4th" },
-      { name: "Alyssa Edwards", finalPlacement: "5th (orig. 6th)", link: "https://rupaulsdragrace.fandom.com/wiki/Alyssa_Edwards",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1d/AlyssaEdwardsGAS1.jpg/revision/latest/scale-to-width-down/1000?cb=20240717185754", stats: deriveStats({ acting: 5, comedy: 6, dance: 15, design: 8, improv: 10, runway: 10, lipsync: 13 }) },
+      // Alyssa Edwards ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Alyssa Edwards", finalPlacement: "5th (orig. 6th)" },
       { name: "Tatianna", finalPlacement: "6th (orig. 8th)", link: "https://rupaulsdragrace.fandom.com/wiki/Tatianna",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f8/Rpdr-as-s2-t-w.jpg/revision/latest/scale-to-width-down/300?cb=20200126212216",
         stats: { acting: 8, comedy: 11, dance: 8, design: 8, improv: 10, runway: 8, lipsync: 10, makeup: 8, singing: 9, verses: 7, strategy: 8, charisma: 9, uniqueness: 8, nerve: 8, talent: 11 } },
@@ -1105,8 +1107,9 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/aa/KrystalVersaceDRUK3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210830163320", stats: deriveStats({ acting: 10, comedy: 10, dance: 9, design: 12, improv: 10, runway: 13, lipsync: 10 }) },
       { name: "Ella Vaday", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Ella_Vaday",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b2/EllaVadayDRUK3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210830163033", stats: deriveStats({ acting: 11, comedy: 9, dance: 7, design: 12, improv: 9, runway: 12, lipsync: 9 }) },
-      { name: "Kitty Scott-Claus", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Kitty_Scott-Claus",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/KittyScott-ClausGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012719", stats: deriveStats({ acting: 9, comedy: 11, dance: 6, design: 10, improv: 10, runway: 9, lipsync: 8 }) },
+      // Kitty Scott-Claus ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Kitty Scott-Claus", finalPlacement: "RUNNER_UP" },
       { name: "Vanity Milan", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Vanity_Milan",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/bf/VanityMilanCAvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20221017182610", stats: deriveStats({ acting: 7, comedy: 6, dance: 9, design: 9, improv: 6, runway: 9, lipsync: 8 }) },
       { name: "Scarlett Harlett", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Scarlett_Harlett",
@@ -1256,8 +1259,8 @@ const ALL_SEASONS = [
   {
     id: "UK_VSTW1",
     seasonName: "RuPaul's Drag Race UK vs the World — Temporada 1",
-    franchise: "Reino Unido",
-    tabLabel: "vs TW 1",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 1",
     contestants: [
       { name: "Blu Hydrangea", finalPlacement: "WINNER" },
       { name: "Mo Heart", finalPlacement: "RUNNER_UP" },
@@ -1275,8 +1278,8 @@ const ALL_SEASONS = [
   {
     id: "UK_VSTW2",
     seasonName: "RuPaul's Drag Race UK vs the World — Temporada 2",
-    franchise: "Reino Unido",
-    tabLabel: "vs TW 2",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 2",
     contestants: [
       { name: "Tia Kofi", finalPlacement: "WINNER" },
       { name: "Hannah Conda", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hannah_Conda",
@@ -1299,8 +1302,8 @@ const ALL_SEASONS = [
   {
     id: "UK_VSTW3",
     seasonName: "RuPaul's Drag Race UK vs the World — Temporada 3",
-    franchise: "Reino Unido",
-    tabLabel: "vs TW 3",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 3",
     contestants: [
       { name: "Gawdland", finalPlacement: "WINNER" },
       { name: "Kate Butch", finalPlacement: "RUNNER_UP" },
@@ -1359,8 +1362,9 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/16/IcesisCoutureCAvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20221017182231", stats: deriveStats({ acting: 8, comedy: 11, dance: 9, design: 12, improv: 10, runway: 14, lipsync: 12 }) },
       { name: "Kendall Gender", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Kendall_Gender",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/59/KendallGenderCAvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20221017182308", stats: deriveStats({ acting: 7, comedy: 9, dance: 8, design: 6, improv: 7, runway: 8, lipsync: 10 }) },
-      { name: "Pythia", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Pythia",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/32/PythiaCDRAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260611214916", stats: deriveStats({ acting: 8, comedy: 7, dance: 8, design: 12, improv: 9, runway: 12, lipsync: 7 }) },
+      // Pythia ya tiene ficha completa en RuPaul's Drag Race Global All Stars — Temporada 1
+      // (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Pythia", finalPlacement: "RUNNER_UP" },
       { name: "Gia Metric", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Gia_Metric",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/79/GiaMetricCDR2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210914205604", stats: deriveStats({ acting: 9, comedy: 6, dance: 10, design: 6, improv: 6, runway: 9, lipsync: 10 }) },
       { name: "Adriana", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Adriana",
@@ -1506,8 +1510,8 @@ const ALL_SEASONS = [
   {
     id: "CAN_VSTW1",
     seasonName: "Canada's Drag Race: Canada vs the World — Temporada 1",
-    franchise: "Canadá",
-    tabLabel: "vs TW 1",
+    franchise: "Global All Stars",
+    tabLabel: "CA vs TW 1",
     contestants: [
       { name: "Ra'Jah O'Hara", finalPlacement: "WINNER" },
       { name: "Silky Nutmeg Ganache", finalPlacement: "RUNNER_UP" },
@@ -1524,8 +1528,8 @@ const ALL_SEASONS = [
   {
     id: "CAN_VSTW2",
     seasonName: "Canada's Drag Race: Canada vs the World — Temporada 2",
-    franchise: "Canadá",
-    tabLabel: "vs TW 2",
+    franchise: "Global All Stars",
+    tabLabel: "CA vs TW 2",
     contestants: [
       { name: "Lemon", finalPlacement: "WINNER" },
       { name: "Alexis Mateo", finalPlacement: "RUNNER_UP" },
@@ -1655,8 +1659,9 @@ const ALL_SEASONS = [
       // Hannah Conda ya tiene ficha completa en UK vs the World — Temporada 2 (UK_VSTW2);
       // aquí solo su colocación en esta, su temporada de origen.
       { name: "Hannah Conda", finalPlacement: "RUNNER_UP" },
-      { name: "Kween Kong", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Kween_Kong",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e2/KweenKongGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012731", stats: deriveStats({ acting: 5, comedy: 10, dance: 10, design: 5, improv: 8, runway: 10, lipsync: 13 }) },
+      // Kween Kong ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Kween Kong", finalPlacement: "RUNNER_UP" },
       { name: "Molly Poppinz", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Molly_Poppinz",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/19/MollyPoppinzDRDU2CastMug.png/revision/latest/scale-to-width-down/105?cb=20220706213636", stats: deriveStats({ acting: 8, comedy: 7, dance: 6, design: 9, improv: 7, runway: 10, lipsync: 9 }) },
       { name: "Beverly Kills", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Beverly_Kills",
@@ -1734,8 +1739,8 @@ const ALL_SEASONS = [
   {
     id: "DU_VSTW1",
     seasonName: "Drag Race Down Under vs the World — Temporada 1",
-    franchise: "Down Under",
-    tabLabel: "vs TW 1",
+    franchise: "Global All Stars",
+    tabLabel: "DU vs TW 1",
     contestants: [
       { name: "Art Simone", finalPlacement: "Sigue compitiendo" },
       { name: "Coco Jumbo", finalPlacement: "Sigue compitiendo" },
@@ -1965,8 +1970,9 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/dd/LaDiamondDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230606133057", stats: deriveStats({ acting: 10, comedy: 12, dance: 8, design: 12, improv: 11, runway: 13, lipsync: 9 }) },
       { name: "Aura Eternal Visage", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Aura_Eternal_Visage",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/57/AuraEternalDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230606133146", stats: deriveStats({ acting: 11, comedy: 9, dance: 9, design: 6, improv: 5, runway: 9, lipsync: 8 }) },
-      { name: "Nehellenia", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Nehellenia",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6e/NehelleniaGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012759", stats: deriveStats({ acting: 8, comedy: 10, dance: 10, design: 8, improv: 10, runway: 12, lipsync: 9 }) },
+      // Nehellenia ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Nehellenia", finalPlacement: "RUNNER_UP" },
       { name: "La Petite Rose Noire", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Petite_Rose_Noire",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b3/LaPetiteNoireDRIT2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20221020205943", stats: deriveStats({ acting: 10, comedy: 5, dance: 10, design: 8, improv: 7, runway: 11, lipsync: 11 }) },
       { name: "Skandalove", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Skandalove",
@@ -2167,8 +2173,9 @@ const ALL_SEASONS = [
       // Marina Summers ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
       // Temporada 2 (UK_VSTW2); aquí solo su colocación en esta, su temporada de origen.
       { name: "Marina Summers", finalPlacement: "RUNNER_UP" },
-      { name: "Eva Le Queen", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Eva_Le_Queen",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/55/EvaLeQueenGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012635", stats: deriveStats({ acting: 6, comedy: 10, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
+      // Eva Le Queen ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Eva Le Queen", finalPlacement: "3rd" },
       { name: "Xilhouete", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Xilhouete",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/63/XilhoueteDRP1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220727135757", stats: deriveStats({ acting: 6, comedy: 10, dance: 6, design: 8, improv: 11, runway: 10, lipsync: 8 }) },
       // Minty Fresh ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
@@ -2255,7 +2262,7 @@ const ALL_SEASONS = [
   {
     id: "PH_SR1",
     seasonName: "Drag Race Philippines: Slaysian Royale — Temporada 1",
-    franchise: "Filipinas",
+    franchise: "Global All Stars",
     tabLabel: "Slaysian Royale",
     contestants: [
       { name: "Brigiding", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Brigiding",
@@ -2292,8 +2299,9 @@ const ALL_SEASONS = [
     contestants: [
       { name: "Drag Couenne", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Drag_Couenne",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/4e/DragCouenneDRBE1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230127151407", stats: deriveStats({ acting: 12, comedy: 11, dance: 7, design: 9, improv: 8, runway: 13, lipsync: 9 }) },
-      { name: "Athena Likis", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Athena_Likis",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/AthenaLikisGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012623", stats: deriveStats({ acting: 9, comedy: 6, dance: 7, design: 6, improv: 8, runway: 13, lipsync: 9 }) },
+      // Athena Likis ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Athena Likis", finalPlacement: "RUNNER_UP" },
       { name: "Susan", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Susan",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e5/SusanDRBE1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230127150410", stats: deriveStats({ acting: 5, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 9 }) },
       { name: "Mademoiselle Boop", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Mademoiselle_Boop",
@@ -2348,8 +2356,9 @@ const ALL_SEASONS = [
       // Fontana ya tiene ficha completa en RuPaul's Drag Race UK vs the World — Temporada 3
       // (UK_VSTW3); aquí solo su colocación en esta, su temporada de origen.
       { name: "Fontana", finalPlacement: "RUNNER_UP" },
-      { name: "Vanity Vain", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Vanity_Vain",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/VanityVainGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012840", stats: deriveStats({ acting: 7, comedy: 7, dance: 9, design: 12, improv: 6, runway: 12, lipsync: 12 }) },
+      // Vanity Vain ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Vanity Vain", finalPlacement: "3rd" },
       { name: "Elecktra", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Elecktra",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/79/ElecktraDRSV1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230206140443", stats: deriveStats({ acting: 9, comedy: 9, dance: 6, design: 7, improv: 9, runway: 10, lipsync: 9 }) },
       // Antonina Nutshell fue eliminada originalmente en 8º lugar, pero regresó a la
@@ -2373,8 +2382,9 @@ const ALL_SEASONS = [
     contestants: [
       { name: "Cristian Peralta", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Cristian_Peralta",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/38/CristianPeraltaDRMX1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230808152413", stats: deriveStats({ acting: 9, comedy: 13, dance: 11, design: 12, improv: 11, runway: 12, lipsync: 11 }) },
-      { name: "Gala Varo", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Gala_Varo",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d1/GalaVaroGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012702", stats: deriveStats({ acting: 9, comedy: 5, dance: 10, design: 9, improv: 6, runway: 11, lipsync: 13 }) },
+      // Gala Varo ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Gala Varo", finalPlacement: "RUNNER_UP" },
       // Matraka y Regina Voce vuelven en Drag Race México: Latina Royale (MX_LR1), pero como
       // esa temporada sigue en emisión sin colocación final, conservan su ficha completa aquí.
       { name: "Matraka", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Matraka",
@@ -2439,7 +2449,7 @@ const ALL_SEASONS = [
   {
     id: "MX_LR1",
     seasonName: "Drag Race México: Latina Royale — Temporada 1",
-    franchise: "México",
+    franchise: "Global All Stars",
     tabLabel: "Latina Royale",
     contestants: [
       // Alexis Mateo ya tiene ficha completa en All Stars — Temporada 5 (AS_S5); Matraka y
@@ -2474,8 +2484,9 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/BetinaPolaroidDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816100807", stats: deriveStats({ acting: 7, comedy: 10, dance: 6, design: 9, improv: 7, runway: 10, lipsync: 7 }) },
       { name: "Hellena Malditta", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hellena_Malditta",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6b/HellenaMaldittaDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816101013", stats: deriveStats({ acting: 9, comedy: 10, dance: 9, design: 10, improv: 10, runway: 10, lipsync: 9 }) },
-      { name: "Miranda Lebrão", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Miranda_Lebrão",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b7/MirandaLebr%C3%A3oGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012743", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
+      // Miranda Lebrão ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Miranda Lebrão", finalPlacement: "RUNNER_UP" },
       { name: "Shannon Skarllet", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Shannon_Skarllet",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f3/ShannonSkarlletDRBR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816101409", stats: deriveStats({ acting: 10, comedy: 8, dance: 10, design: 7, improv: 7, runway: 10, lipsync: 11 }) },
       { name: "Naza", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Naza",
@@ -2541,8 +2552,9 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3b/VictoriaShakespearsDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816094353", stats: deriveStats({ acting: 8, comedy: 7, dance: 9, design: 5, improv: 8, runway: 9, lipsync: 12 }) },
       { name: "Nikita Vegaz", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Nikita_Vegaz",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/NikitaVegazDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093823", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 8, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Tessa Testicle", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Tessa_Testicle",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/TessaTesticleGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012830", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 8, lipsync: 12 }) },
+      // Tessa Testicle ya tiene ficha completa en RuPaul's Drag Race Global All Stars —
+      // Temporada 1 (GAS1); aquí solo su colocación en esta, su temporada de origen.
+      { name: "Tessa Testicle", finalPlacement: "8th" },
       { name: "LéLé Cocoon", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/LéLé_Cocoon",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/75/L%C3%A9L%C3%A9CocoonDRGR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20230816093645", stats: deriveStats({ acting: 6, comedy: 6, dance: 8, design: 8, improv: 6, runway: 10, lipsync: 7 }) },
       // The Only Naomy ya tiene ficha completa en RuPaul's Drag Race UK vs the World —
@@ -2550,6 +2562,41 @@ const ALL_SEASONS = [
       // (MX_LR1); aquí solo su colocación en esta, su temporada de origen.
       { name: "The Only Naomy", finalPlacement: "10th" },
       { name: "Barbie Q", finalPlacement: "11th" },
+    ],
+  },
+  {
+    id: "GAS1",
+    seasonName: "RuPaul's Drag Race Global All Stars — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "Global AS 1",
+    contestants: [
+      { name: "Alyssa Edwards", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Alyssa_Edwards",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1d/AlyssaEdwardsGAS1.jpg/revision/latest/scale-to-width-down/1000?cb=20240717185754", stats: deriveStats({ acting: 5, comedy: 6, dance: 15, design: 8, improv: 10, runway: 10, lipsync: 13 }) },
+      { name: "Kitty Scott-Claus", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Kitty_Scott-Claus",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/KittyScott-ClausGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012719", stats: deriveStats({ acting: 9, comedy: 11, dance: 6, design: 10, improv: 10, runway: 9, lipsync: 8 }) },
+      { name: "Kween Kong", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Kween_Kong",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e2/KweenKongGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012731", stats: deriveStats({ acting: 5, comedy: 10, dance: 10, design: 5, improv: 8, runway: 10, lipsync: 13 }) },
+      { name: "Nehellenia", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Nehellenia",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6e/NehelleniaGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012759", stats: deriveStats({ acting: 8, comedy: 10, dance: 10, design: 8, improv: 10, runway: 12, lipsync: 9 }) },
+      { name: "Tessa Testicle", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Tessa_Testicle",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/TessaTesticleGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012830", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 9, improv: 6, runway: 8, lipsync: 12 }) },
+      { name: "Vanity Vain", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Vanity_Vain",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/VanityVainGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012840", stats: deriveStats({ acting: 7, comedy: 7, dance: 9, design: 12, improv: 6, runway: 12, lipsync: 12 }) },
+      { name: "Pythia", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Pythia",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1d/PythiaGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012806", stats: deriveStats({ acting: 8, comedy: 7, dance: 8, design: 12, improv: 9, runway: 12, lipsync: 7 }) },
+      { name: "Gala Varo", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Gala_Varo",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d1/GalaVaroGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012702", stats: deriveStats({ acting: 9, comedy: 5, dance: 10, design: 9, improv: 6, runway: 11, lipsync: 13 }) },
+      // Soa de Muse ya tiene ficha completa en Drag Race France All Stars — Temporada 1
+      // (FR_AS1, 2025), su aparición más reciente; aquí solo su colocación en esta. Fue
+      // eliminada en el episodio 6 pero luego ganó el LaLaPaRuZa final, con lo cual se llevó
+      // el título de "Global Lip Sync Assassin" y "Miss Global Peacemaker".
+      { name: "Soa de Muse", finalPlacement: "9th (Global Lip Sync Assassin)" },
+      { name: "Eva Le Queen", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Eva_Le_Queen",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/55/EvaLeQueenGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012635", stats: deriveStats({ acting: 6, comedy: 10, dance: 8, design: 7, improv: 8, runway: 12, lipsync: 8 }) },
+      { name: "Miranda Lebrão", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Miranda_Lebrão",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b7/MirandaLebr%C3%A3oGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012743", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
+      { name: "Athena Likis", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Athena_Likis",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/AthenaLikisGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012623", stats: deriveStats({ acting: 9, comedy: 6, dance: 7, design: 6, improv: 8, runway: 13, lipsync: 9 }) },
     ],
   },
 ];
