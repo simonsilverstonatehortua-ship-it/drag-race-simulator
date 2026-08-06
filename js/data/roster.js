@@ -92,6 +92,7 @@ const FRANCHISE_FLAGS = {
   "Brasil": "🇧🇷",
   "Alemania": "🇩🇪",
   "Global All Stars": "🌎",
+  "Indonesia": "🇮🇩",
 };
 
 const ALL_SEASONS = [
@@ -2597,6 +2598,40 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b7/MirandaLebr%C3%A3oGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012743", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
       { name: "Athena Likis", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Athena_Likis",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/AthenaLikisGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012623", stats: deriveStats({ acting: 9, comedy: 6, dance: 7, design: 6, improv: 8, runway: 13, lipsync: 9 }) },
+    ],
+  },
+  // Franquicia ficticia (no es un show real de Drag Race): reparto en orden alfabético, sin
+  // colocación final definida por el usuario, así que todas quedan como "Por determinar" con
+  // stats neutras y una imagen de marcador de posición compartida.
+  {
+    id: "IND_S1",
+    seasonName: "Drag Race Indonesia — Temporada 1",
+    franchise: "Indonesia",
+    contestants: [
+      { name: "Celksi", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Crimson Ruby", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dheem Inim", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dream Of The Night", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fobru Kubqi", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Intan McWayan", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Iruwy", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Jeprik", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Kaa Bo", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Oxamami #8", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Soviet Ehhhhh", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ty Lapar", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
