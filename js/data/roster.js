@@ -1256,75 +1256,6 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/bf/PastyDRUK7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250824044205", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
     ],
   },
-  // La mayoría del reparto de "UK vs the World" ya tiene ficha completa en su temporada de
-  // origen (UK, US, All Stars, Tailandia...); aquí solo se anota su colocación en este
-  // spin-off. Solo las concursantes que no vienen de ningún reparto ya cargado (de otras
-  // franquicias como España, Holanda, Filipinas...) tienen ficha completa aquí.
-  {
-    id: "UK_VSTW1",
-    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 1",
-    franchise: "Global All Stars",
-    tabLabel: "UK vs TW 1",
-    contestants: [
-      { name: "Blu Hydrangea", finalPlacement: "WINNER" },
-      { name: "Mo Heart", finalPlacement: "RUNNER_UP" },
-      { name: "Baga Chipz", finalPlacement: "3rd" },
-      { name: "Jujubee", finalPlacement: "4th" },
-      { name: "Janey Jacké", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Janey_Jacké",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5c/JaneyJackéUKvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20220117181100", stats: deriveStats({ acting: 7, comedy: 6, dance: 13, design: 11, improv: 6, runway: 11, lipsync: 12 }) },
-      { name: "Pangina Heals", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Pangina_Heals",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/12/PanginaHealsUKvsTW1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230514121456", stats: deriveStats({ acting: 9, comedy: 7, dance: 14, design: 11, improv: 8, runway: 13, lipsync: 14 }) },
-      { name: "Jimbo", finalPlacement: "7th" },
-      { name: "Cheryl", finalPlacement: "8th" },
-      { name: "Lemon", finalPlacement: "9th" },
-    ],
-  },
-  {
-    id: "UK_VSTW2",
-    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 2",
-    franchise: "Global All Stars",
-    tabLabel: "UK vs TW 2",
-    contestants: [
-      { name: "Tia Kofi", finalPlacement: "WINNER" },
-      { name: "Hannah Conda", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hannah_Conda",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/HannahCondaUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160814", stats: deriveStats({ acting: 11, comedy: 12, dance: 11, design: 8, improv: 11, runway: 10, lipsync: 10 }) },
-      { name: "La Grande Dame", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/La_Grande_Dame",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/14/LaGrandeDameUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160909", stats: deriveStats({ acting: 10, comedy: 9, dance: 9, design: 13, improv: 8, runway: 14, lipsync: 9 }) },
-      { name: "Marina Summers", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Marina_Summers",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/MarinaSummersUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240122151755", stats: deriveStats({ acting: 8, comedy: 9, dance: 14, design: 10, improv: 10, runway: 15, lipsync: 13 }) },
-      { name: "Scarlet Envy", finalPlacement: "5th" },
-      { name: "Choriza May", finalPlacement: "6th" },
-      { name: "Gothy Kendoll", finalPlacement: "7th" },
-      { name: "Keta Minaj", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Keta_Minaj",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0f/KetaMinajUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160834", stats: deriveStats({ acting: 8, comedy: 10, dance: 9, design: 10, improv: 12, runway: 13, lipsync: 9 }) },
-      { name: "Jonbers Blonde", finalPlacement: "9th" },
-      { name: "Arantxa Castilla La Mancha", finalPlacement: "10th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Arantxa_Castilla_La_Mancha",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/46/ArantxaCastilla-LaManchaUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160740", stats: deriveStats({ acting: 6, comedy: 8, dance: 6, design: 7, improv: 8, runway: 9, lipsync: 7 }) },
-      { name: "Mayhem Miller", finalPlacement: "11th" },
-    ],
-  },
-  {
-    id: "UK_VSTW3",
-    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 3",
-    franchise: "Global All Stars",
-    tabLabel: "UK vs TW 3",
-    contestants: [
-      { name: "Gawdland", finalPlacement: "WINNER" },
-      { name: "Kate Butch", finalPlacement: "RUNNER_UP" },
-      { name: "Fontana", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Fontana",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/19/FontanaUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004309", stats: deriveStats({ acting: 6, comedy: 6, dance: 11, design: 9, improv: 5, runway: 14, lipsync: 12 }) },
-      { name: "Mariah Balenciaga", finalPlacement: "4th" },
-      { name: "The Only Naomy", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/The_Only_Naomy",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/14/TheOnlyNaomyUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004430", stats: deriveStats({ acting: 9, comedy: 9, dance: 9, design: 8, improv: 10, runway: 12, lipsync: 8 }) },
-      { name: "Zahirah Zapanta", finalPlacement: "6th" },
-      { name: "Serena Morena", finalPlacement: "7th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Serena_Morena",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/78/SerenaMorenaUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004411", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 8, improv: 5, runway: 9, lipsync: 9 }) },
-      { name: "Sminty Drop", finalPlacement: "8th" },
-      { name: "Minty Fresh", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Minty_Fresh",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/MintyFreshUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260124235251", stats: deriveStats({ acting: 6, comedy: 5, dance: 4, design: 12, improv: 4, runway: 11, lipsync: 9 }) },
-      { name: "Melinda Verga", finalPlacement: "10th" },
-    ],
-  },
   {
     id: "CAN_S1",
     seasonName: "Canada's Drag Race — Temporada 1",
@@ -1507,44 +1438,6 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1a/StarDollCDR6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20251023183759", stats: deriveStats({ acting: 5, comedy: 5, dance: 8, design: 8, improv: 5, runway: 6, lipsync: 8 }) },
       { name: "Paolo Perfección", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Paolo_Perfección",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6b/PaoloPerfecci%C3%B3nCDR6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20251023183646", stats: deriveStats({ acting: 4, comedy: 5, dance: 3, design: 4, improv: 4, runway: 5, lipsync: 5 }) },
-    ],
-  },
-  // Igual que con "UK vs the World": la mayoría de este reparto ya tiene ficha completa en
-  // su temporada de origen; aquí solo se anota su colocación en este spin-off.
-  {
-    id: "CAN_VSTW1",
-    seasonName: "Canada's Drag Race: Canada vs the World — Temporada 1",
-    franchise: "Global All Stars",
-    tabLabel: "CA vs TW 1",
-    contestants: [
-      { name: "Ra'Jah O'Hara", finalPlacement: "WINNER" },
-      { name: "Silky Nutmeg Ganache", finalPlacement: "RUNNER_UP" },
-      { name: "Victoria Scone", finalPlacement: "3rd" },
-      { name: "Rita Baga", finalPlacement: "4th" },
-      { name: "Vanity Milan", finalPlacement: "5th" },
-      { name: "Anita Wigl'it", finalPlacement: "6th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Anita_Wigl'it",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/AnitaWigl%27itCAvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20221017182152", stats: deriveStats({ acting: 6, comedy: 9, dance: 8, design: 6, improv: 10, runway: 8, lipsync: 5 }) },
-      { name: "Icesis Couture", finalPlacement: "7th (abandonó)" },
-      { name: "Stephanie Prince", finalPlacement: "8th" },
-      { name: "Kendall Gender", finalPlacement: "9th" },
-    ],
-  },
-  {
-    id: "CAN_VSTW2",
-    seasonName: "Canada's Drag Race: Canada vs the World — Temporada 2",
-    franchise: "Global All Stars",
-    tabLabel: "CA vs TW 2",
-    contestants: [
-      { name: "Lemon", finalPlacement: "WINNER" },
-      { name: "Alexis Mateo", finalPlacement: "RUNNER_UP" },
-      { name: "Cheryl", finalPlacement: "3rd" },
-      { name: "Kennedy Davenport", finalPlacement: "4th" },
-      { name: "Miss Fiercalicious", finalPlacement: "5th" },
-      { name: "Eureka!", finalPlacement: "6th (Miss Simpatía)" },
-      { name: "Tynomi Banks", finalPlacement: "7th" },
-      { name: "Le Fil", finalPlacement: "8th" },
-      { name: "La Kahena", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Kahena",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/9b/LaKahenaCAvsTW2CastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20240626205836", stats: deriveStats({ acting: 5, comedy: 6, dance: 5, design: 3, improv: 5, runway: 6, lipsync: 5 }) },
     ],
   },
   // Temporada en emisión (estreno 9 de julio de 2026, final el 13 de agosto de 2026): esto
@@ -1735,33 +1628,6 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/KarnaFordDRDU4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20241009205048", stats: deriveStats({ acting: 4, comedy: 4, dance: 8, design: 4, improv: 4, runway: 4, lipsync: 8 }) },
       { name: "Olivia Dreams", finalPlacement: "10th", link: "https://rupaulsdragrace.fandom.com/wiki/Olivia_Dreams",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/07/OliviaDreamsDRDU4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20241009210839", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
-    ],
-  },
-  // Temporada en emisión (estreno 24 de julio de 2026): esto refleja lo confirmado hasta el
-  // episodio 2 (a fecha de 3 de agosto de 2026); todavía no hay fecha de final anunciada.
-  // Actualizar cuando avancen más episodios. La mayoría del reparto ya tiene ficha completa
-  // en su temporada de origen; aquí solo colocación/estado.
-  {
-    id: "DU_VSTW1",
-    seasonName: "Drag Race Down Under vs the World — Temporada 1",
-    franchise: "Global All Stars",
-    tabLabel: "DU vs TW 1",
-    contestants: [
-      { name: "Art Simone", finalPlacement: "Sigue compitiendo" },
-      { name: "Coco Jumbo", finalPlacement: "Sigue compitiendo" },
-      { name: "Estrella Xtravaganza", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Estrella_Xtravaganza",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/EstrellaXtravaganzaDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623203950", stats: deriveStats({ acting: 10, comedy: 7, dance: 7, design: 5, improv: 9, runway: 8, lipsync: 8 }) },
-      { name: "Flor", finalPlacement: "Sigue compitiendo" },
-      { name: "LaLa Ri", finalPlacement: "Sigue compitiendo" },
-      { name: "M1ss Jade So", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/M1ss_Jade_So",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a2/M1ssJadeSoDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623204207", stats: deriveStats({ acting: 7, comedy: 9, dance: 9, design: 9, improv: 8, runway: 9, lipsync: 10 }) },
-      { name: "Michael Marouli", finalPlacement: "Sigue compitiendo" },
-      { name: "Nikita Iman", finalPlacement: "Sigue compitiendo" },
-      { name: "VYBE", finalPlacement: "Sigue compitiendo" },
-      { name: "Nicole Paige Brooks", finalPlacement: "Eliminada (episodio 2)" },
-      // Giro de guion del episodio 2: Raven se reveló como una "topo" infiltrada, no fue una
-      // eliminación normal por reto/lipsync.
-      { name: "Raven", finalPlacement: "Reveló ser una topo (episodio 2)" },
     ],
   },
   {
@@ -2265,39 +2131,6 @@ const ALL_SEASONS = [
     ],
   },
   {
-    id: "PH_SR1",
-    seasonName: "Drag Race Philippines: Slaysian Royale — Temporada 1",
-    franchise: "Global All Stars",
-    tabLabel: "Slaysian Royale",
-    contestants: [
-      { name: "Brigiding", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Brigiding",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/BrigidingDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034043", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 11, improv: 7, runway: 11, lipsync: 10 }) },
-      { name: "Viñas DeLuxe", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Viñas_DeLuxe",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/64/Vi%C3%B1asDeLuxeDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716035043", stats: deriveStats({ acting: 9, comedy: 9, dance: 8, design: 15, improv: 8, runway: 12, lipsync: 8 }) },
-      { name: "Arizona Brandy", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Arizona_Brandy",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/95/ArizonaBrandyDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033524", stats: deriveStats({ acting: 10, comedy: 10, dance: 9, design: 6, improv: 10, runway: 8, lipsync: 11 }) },
-      // Suki Doll ya tiene ficha completa en Canada's Drag Race — Temporada 2 (CAN_S2); aquí
-      // solo su colocación en esta.
-      { name: "Suki Doll", finalPlacement: "4th (Miss Simpatía)" },
-      { name: "Khianna", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Khianna",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/KhiannaDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034310", stats: deriveStats({ acting: 6, comedy: 7, dance: 11, design: 10, improv: 8, runway: 13, lipsync: 13 }) },
-      // Yuhua ya tiene ficha completa en RuPaul's Drag Race — Temporada 10 (US_S10); Siam
-      // Phusri en Drag Race Thailand — Temporada 3 (TH_S3); Sum Ting Wong en RuPaul's Drag
-      // Race UK — Temporada 1 (UK_S1); Ivory Glaze en RuPaul's Drag Race Down Under —
-      // Temporada 3 (DU_S3); aquí solo su colocación en esta.
-      { name: "Yuhua", finalPlacement: "6th" },
-      { name: "Siam Phusri", finalPlacement: "7th" },
-      { name: "Bernie", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Bernie",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/48/BernieDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033915", stats: deriveStats({ acting: 8, comedy: 7, dance: 11, design: 9, improv: 10, runway: 13, lipsync: 11 }) },
-      { name: "Kitty Space", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Kitty_Space",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/KittySpaceDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034424", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 11, improv: 7, runway: 13, lipsync: 9 }) },
-      { name: "Ivory Glaze", finalPlacement: "10th" },
-      { name: "Sum Ting Wong", finalPlacement: "11th" },
-      { name: "Madame Yoko", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Madame_Yoko",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/MadameYokoDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034608", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 9, improv: 6, runway: 8, lipsync: 7 }) },
-    ],
-  },
-  {
     id: "BE_S1",
     seasonName: "Drag Race Belgique — Temporada 1",
     franchise: "Bélgica",
@@ -2446,38 +2279,6 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1b/IgnusArsDRMX2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240524042558", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 4, lipsync: 4 }) },
     ],
   },
-  // Temporada en emisión (estreno 30 de julio de 2026): esto refleja lo confirmado hasta el
-  // episodio 2 (a fecha de 6 de agosto de 2026); todavía no ha habido ninguna eliminación (el
-  // episodio 1 terminó con "nadie se va a casa"), así que todas quedan como "Sigue
-  // compitiendo". La mayoría del reparto ya tiene ficha completa en su temporada de origen;
-  // aquí solo colocación/estado. Actualizar cuando haya eliminaciones reales.
-  {
-    id: "MX_LR1",
-    seasonName: "Drag Race México: Latina Royale — Temporada 1",
-    franchise: "Global All Stars",
-    tabLabel: "Latina Royale",
-    contestants: [
-      // Alexis Mateo ya tiene ficha completa en All Stars — Temporada 5 (AS_S5); Matraka y
-      // Regina Voce en Drag Race México — Temporada 1 (MX_S1); Elektra Vandergeld, Eva Blunt
-      // y Horacio Potasio en Drag Race México — Temporada 2 (MX_S2); Mariana Stars en Drag
-      // Race España — Temporada 4 (ES_S4); Miss Abby OMG en Drag Race Holland — Temporada 1
-      // (HOL_S1); Xunami Muse en RuPaul's Drag Race — Temporada 15 (US_S15); aquí solo su
-      // colocación/estado en esta.
-      { name: "Alexis Mateo", finalPlacement: "Sigue compitiendo" },
-      { name: "Barbie Q", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Barbie_Q",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/16/BarbieQDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200418", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 9, lipsync: 4 }) },
-      { name: "DesiRée Beck", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/DesiRée_Beck",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/4f/Desir%C3%A9eBeckDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200515", stats: deriveStats({ acting: 6, comedy: 10, dance: 5, design: 6, improv: 10, runway: 8, lipsync: 7 }) },
-      { name: "Elektra Vandergeld", finalPlacement: "Sigue compitiendo" },
-      { name: "Eva Blunt", finalPlacement: "Sigue compitiendo" },
-      { name: "Horacio Potasio", finalPlacement: "Sigue compitiendo" },
-      { name: "Mariana Stars", finalPlacement: "Sigue compitiendo" },
-      { name: "Matraka", finalPlacement: "Sigue compitiendo" },
-      { name: "Miss Abby OMG", finalPlacement: "Sigue compitiendo" },
-      { name: "Regina Voce", finalPlacement: "Sigue compitiendo" },
-      { name: "Xunami Muse", finalPlacement: "Sigue compitiendo" },
-    ],
-  },
   {
     id: "BR_S1",
     seasonName: "Drag Race Brasil — Temporada 1",
@@ -2569,6 +2370,205 @@ const ALL_SEASONS = [
       { name: "Barbie Q", finalPlacement: "11th" },
     ],
   },
+  // La mayoría del reparto de "UK vs the World" ya tiene ficha completa en su temporada de
+  // origen (UK, US, All Stars, Tailandia...); aquí solo se anota su colocación en este
+  // spin-off. Solo las concursantes que no vienen de ningún reparto ya cargado (de otras
+  // franquicias como España, Holanda, Filipinas...) tienen ficha completa aquí.
+  {
+    id: "UK_VSTW1",
+    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 1",
+    contestants: [
+      { name: "Blu Hydrangea", finalPlacement: "WINNER" },
+      { name: "Mo Heart", finalPlacement: "RUNNER_UP" },
+      { name: "Baga Chipz", finalPlacement: "3rd" },
+      { name: "Jujubee", finalPlacement: "4th" },
+      { name: "Janey Jacké", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Janey_Jacké",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5c/JaneyJackéUKvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20220117181100", stats: deriveStats({ acting: 7, comedy: 6, dance: 13, design: 11, improv: 6, runway: 11, lipsync: 12 }) },
+      { name: "Pangina Heals", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Pangina_Heals",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/12/PanginaHealsUKvsTW1CastMug.png/revision/latest/scale-to-width-down/105?cb=20230514121456", stats: deriveStats({ acting: 9, comedy: 7, dance: 14, design: 11, improv: 8, runway: 13, lipsync: 14 }) },
+      { name: "Jimbo", finalPlacement: "7th" },
+      { name: "Cheryl", finalPlacement: "8th" },
+      { name: "Lemon", finalPlacement: "9th" },
+    ],
+  },
+  {
+    id: "UK_VSTW2",
+    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 2",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 2",
+    contestants: [
+      { name: "Tia Kofi", finalPlacement: "WINNER" },
+      { name: "Hannah Conda", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hannah_Conda",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/HannahCondaUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160814", stats: deriveStats({ acting: 11, comedy: 12, dance: 11, design: 8, improv: 11, runway: 10, lipsync: 10 }) },
+      { name: "La Grande Dame", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/La_Grande_Dame",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/14/LaGrandeDameUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160909", stats: deriveStats({ acting: 10, comedy: 9, dance: 9, design: 13, improv: 8, runway: 14, lipsync: 9 }) },
+      { name: "Marina Summers", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Marina_Summers",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/MarinaSummersUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240122151755", stats: deriveStats({ acting: 8, comedy: 9, dance: 14, design: 10, improv: 10, runway: 15, lipsync: 13 }) },
+      { name: "Scarlet Envy", finalPlacement: "5th" },
+      { name: "Choriza May", finalPlacement: "6th" },
+      { name: "Gothy Kendoll", finalPlacement: "7th" },
+      { name: "Keta Minaj", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Keta_Minaj",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0f/KetaMinajUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160834", stats: deriveStats({ acting: 8, comedy: 10, dance: 9, design: 10, improv: 12, runway: 13, lipsync: 9 }) },
+      { name: "Jonbers Blonde", finalPlacement: "9th" },
+      { name: "Arantxa Castilla La Mancha", finalPlacement: "10th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Arantxa_Castilla_La_Mancha",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/46/ArantxaCastilla-LaManchaUKvsTW2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240116160740", stats: deriveStats({ acting: 6, comedy: 8, dance: 6, design: 7, improv: 8, runway: 9, lipsync: 7 }) },
+      { name: "Mayhem Miller", finalPlacement: "11th" },
+    ],
+  },
+  {
+    id: "UK_VSTW3",
+    seasonName: "RuPaul's Drag Race UK vs the World — Temporada 3",
+    franchise: "Global All Stars",
+    tabLabel: "UK vs TW 3",
+    contestants: [
+      { name: "Gawdland", finalPlacement: "WINNER" },
+      { name: "Kate Butch", finalPlacement: "RUNNER_UP" },
+      { name: "Fontana", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Fontana",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/19/FontanaUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004309", stats: deriveStats({ acting: 6, comedy: 6, dance: 11, design: 9, improv: 5, runway: 14, lipsync: 12 }) },
+      { name: "Mariah Balenciaga", finalPlacement: "4th" },
+      { name: "The Only Naomy", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/The_Only_Naomy",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/14/TheOnlyNaomyUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004430", stats: deriveStats({ acting: 9, comedy: 9, dance: 9, design: 8, improv: 10, runway: 12, lipsync: 8 }) },
+      { name: "Zahirah Zapanta", finalPlacement: "6th" },
+      { name: "Serena Morena", finalPlacement: "7th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Serena_Morena",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/78/SerenaMorenaUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260110004411", stats: deriveStats({ acting: 5, comedy: 5, dance: 5, design: 8, improv: 5, runway: 9, lipsync: 9 }) },
+      { name: "Sminty Drop", finalPlacement: "8th" },
+      { name: "Minty Fresh", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Minty_Fresh",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cd/MintyFreshUKvsTW3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260124235251", stats: deriveStats({ acting: 6, comedy: 5, dance: 4, design: 12, improv: 4, runway: 11, lipsync: 9 }) },
+      { name: "Melinda Verga", finalPlacement: "10th" },
+    ],
+  },
+  // Igual que con "UK vs the World": la mayoría de este reparto ya tiene ficha completa en
+  // su temporada de origen; aquí solo se anota su colocación en este spin-off.
+  {
+    id: "CAN_VSTW1",
+    seasonName: "Canada's Drag Race: Canada vs the World — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "CA vs TW 1",
+    contestants: [
+      { name: "Ra'Jah O'Hara", finalPlacement: "WINNER" },
+      { name: "Silky Nutmeg Ganache", finalPlacement: "RUNNER_UP" },
+      { name: "Victoria Scone", finalPlacement: "3rd" },
+      { name: "Rita Baga", finalPlacement: "4th" },
+      { name: "Vanity Milan", finalPlacement: "5th" },
+      { name: "Anita Wigl'it", finalPlacement: "6th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/Anita_Wigl'it",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/AnitaWigl%27itCAvsTWCastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20221017182152", stats: deriveStats({ acting: 6, comedy: 9, dance: 8, design: 6, improv: 10, runway: 8, lipsync: 5 }) },
+      { name: "Icesis Couture", finalPlacement: "7th (abandonó)" },
+      { name: "Stephanie Prince", finalPlacement: "8th" },
+      { name: "Kendall Gender", finalPlacement: "9th" },
+    ],
+  },
+  {
+    id: "CAN_VSTW2",
+    seasonName: "Canada's Drag Race: Canada vs the World — Temporada 2",
+    franchise: "Global All Stars",
+    tabLabel: "CA vs TW 2",
+    contestants: [
+      { name: "Lemon", finalPlacement: "WINNER" },
+      { name: "Alexis Mateo", finalPlacement: "RUNNER_UP" },
+      { name: "Cheryl", finalPlacement: "3rd" },
+      { name: "Kennedy Davenport", finalPlacement: "4th" },
+      { name: "Miss Fiercalicious", finalPlacement: "5th" },
+      { name: "Eureka!", finalPlacement: "6th (Miss Simpatía)" },
+      { name: "Tynomi Banks", finalPlacement: "7th" },
+      { name: "Le Fil", finalPlacement: "8th" },
+      { name: "La Kahena", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/La_Kahena",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/9b/LaKahenaCAvsTW2CastMug.jpeg/revision/latest/scale-to-width-down/105?cb=20240626205836", stats: deriveStats({ acting: 5, comedy: 6, dance: 5, design: 3, improv: 5, runway: 6, lipsync: 5 }) },
+    ],
+  },
+  // Temporada en emisión (estreno 24 de julio de 2026): esto refleja lo confirmado hasta el
+  // episodio 2 (a fecha de 3 de agosto de 2026); todavía no hay fecha de final anunciada.
+  // Actualizar cuando avancen más episodios. La mayoría del reparto ya tiene ficha completa
+  // en su temporada de origen; aquí solo colocación/estado.
+  {
+    id: "DU_VSTW1",
+    seasonName: "Drag Race Down Under vs the World — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "DU vs TW 1",
+    contestants: [
+      { name: "Art Simone", finalPlacement: "Sigue compitiendo" },
+      { name: "Coco Jumbo", finalPlacement: "Sigue compitiendo" },
+      { name: "Estrella Xtravaganza", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Estrella_Xtravaganza",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/EstrellaXtravaganzaDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623203950", stats: deriveStats({ acting: 10, comedy: 7, dance: 7, design: 5, improv: 9, runway: 8, lipsync: 8 }) },
+      { name: "Flor", finalPlacement: "Sigue compitiendo" },
+      { name: "LaLa Ri", finalPlacement: "Sigue compitiendo" },
+      { name: "M1ss Jade So", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/M1ss_Jade_So",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a2/M1ssJadeSoDUvsTW1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260623204207", stats: deriveStats({ acting: 7, comedy: 9, dance: 9, design: 9, improv: 8, runway: 9, lipsync: 10 }) },
+      { name: "Michael Marouli", finalPlacement: "Sigue compitiendo" },
+      { name: "Nikita Iman", finalPlacement: "Sigue compitiendo" },
+      { name: "VYBE", finalPlacement: "Sigue compitiendo" },
+      { name: "Nicole Paige Brooks", finalPlacement: "Eliminada (episodio 2)" },
+      // Giro de guion del episodio 2: Raven se reveló como una "topo" infiltrada, no fue una
+      // eliminación normal por reto/lipsync.
+      { name: "Raven", finalPlacement: "Reveló ser una topo (episodio 2)" },
+    ],
+  },
+  {
+    id: "PH_SR1",
+    seasonName: "Drag Race Philippines: Slaysian Royale — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "Slaysian Royale",
+    contestants: [
+      { name: "Brigiding", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Brigiding",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/BrigidingDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034043", stats: deriveStats({ acting: 10, comedy: 9, dance: 8, design: 11, improv: 7, runway: 11, lipsync: 10 }) },
+      { name: "Viñas DeLuxe", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Viñas_DeLuxe",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/64/Vi%C3%B1asDeLuxeDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716035043", stats: deriveStats({ acting: 9, comedy: 9, dance: 8, design: 15, improv: 8, runway: 12, lipsync: 8 }) },
+      { name: "Arizona Brandy", finalPlacement: "3rd", link: "https://rupaulsdragrace.fandom.com/wiki/Arizona_Brandy",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/95/ArizonaBrandyDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033524", stats: deriveStats({ acting: 10, comedy: 10, dance: 9, design: 6, improv: 10, runway: 8, lipsync: 11 }) },
+      // Suki Doll ya tiene ficha completa en Canada's Drag Race — Temporada 2 (CAN_S2); aquí
+      // solo su colocación en esta.
+      { name: "Suki Doll", finalPlacement: "4th (Miss Simpatía)" },
+      { name: "Khianna", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Khianna",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/KhiannaDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034310", stats: deriveStats({ acting: 6, comedy: 7, dance: 11, design: 10, improv: 8, runway: 13, lipsync: 13 }) },
+      // Yuhua ya tiene ficha completa en RuPaul's Drag Race — Temporada 10 (US_S10); Siam
+      // Phusri en Drag Race Thailand — Temporada 3 (TH_S3); Sum Ting Wong en RuPaul's Drag
+      // Race UK — Temporada 1 (UK_S1); Ivory Glaze en RuPaul's Drag Race Down Under —
+      // Temporada 3 (DU_S3); aquí solo su colocación en esta.
+      { name: "Yuhua", finalPlacement: "6th" },
+      { name: "Siam Phusri", finalPlacement: "7th" },
+      { name: "Bernie", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Bernie",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/48/BernieDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716033915", stats: deriveStats({ acting: 8, comedy: 7, dance: 11, design: 9, improv: 10, runway: 13, lipsync: 11 }) },
+      { name: "Kitty Space", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Kitty_Space",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/7b/KittySpaceDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034424", stats: deriveStats({ acting: 6, comedy: 6, dance: 6, design: 11, improv: 7, runway: 13, lipsync: 9 }) },
+      { name: "Ivory Glaze", finalPlacement: "10th" },
+      { name: "Sum Ting Wong", finalPlacement: "11th" },
+      { name: "Madame Yoko", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Madame_Yoko",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/MadameYokoDRPHSR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250716034608", stats: deriveStats({ acting: 6, comedy: 6, dance: 5, design: 9, improv: 6, runway: 8, lipsync: 7 }) },
+    ],
+  },
+  // Temporada en emisión (estreno 30 de julio de 2026): esto refleja lo confirmado hasta el
+  // episodio 2 (a fecha de 6 de agosto de 2026); todavía no ha habido ninguna eliminación (el
+  // episodio 1 terminó con "nadie se va a casa"), así que todas quedan como "Sigue
+  // compitiendo". La mayoría del reparto ya tiene ficha completa en su temporada de origen;
+  // aquí solo colocación/estado. Actualizar cuando haya eliminaciones reales.
+  {
+    id: "MX_LR1",
+    seasonName: "Drag Race México: Latina Royale — Temporada 1",
+    franchise: "Global All Stars",
+    tabLabel: "Latina Royale",
+    contestants: [
+      // Alexis Mateo ya tiene ficha completa en All Stars — Temporada 5 (AS_S5); Matraka y
+      // Regina Voce en Drag Race México — Temporada 1 (MX_S1); Elektra Vandergeld, Eva Blunt
+      // y Horacio Potasio en Drag Race México — Temporada 2 (MX_S2); Mariana Stars en Drag
+      // Race España — Temporada 4 (ES_S4); Miss Abby OMG en Drag Race Holland — Temporada 1
+      // (HOL_S1); Xunami Muse en RuPaul's Drag Race — Temporada 15 (US_S15); aquí solo su
+      // colocación/estado en esta.
+      { name: "Alexis Mateo", finalPlacement: "Sigue compitiendo" },
+      { name: "Barbie Q", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/Barbie_Q",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/16/BarbieQDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200418", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 4, improv: 4, runway: 9, lipsync: 4 }) },
+      { name: "DesiRée Beck", finalPlacement: "Sigue compitiendo", link: "https://rupaulsdragrace.fandom.com/wiki/DesiRée_Beck",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/4f/Desir%C3%A9eBeckDRMXLR1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260626200515", stats: deriveStats({ acting: 6, comedy: 10, dance: 5, design: 6, improv: 10, runway: 8, lipsync: 7 }) },
+      { name: "Elektra Vandergeld", finalPlacement: "Sigue compitiendo" },
+      { name: "Eva Blunt", finalPlacement: "Sigue compitiendo" },
+      { name: "Horacio Potasio", finalPlacement: "Sigue compitiendo" },
+      { name: "Mariana Stars", finalPlacement: "Sigue compitiendo" },
+      { name: "Matraka", finalPlacement: "Sigue compitiendo" },
+      { name: "Miss Abby OMG", finalPlacement: "Sigue compitiendo" },
+      { name: "Regina Voce", finalPlacement: "Sigue compitiendo" },
+      { name: "Xunami Muse", finalPlacement: "Sigue compitiendo" },
+    ],
+  },
   {
     id: "GAS1",
     seasonName: "RuPaul's Drag Race Global All Stars — Temporada 1",
@@ -2602,40 +2602,6 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b7/MirandaLebr%C3%A3oGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012743", stats: deriveStats({ acting: 9, comedy: 10, dance: 7, design: 10, improv: 9, runway: 9, lipsync: 8 }) },
       { name: "Athena Likis", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Athena_Likis",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/AthenaLikisGAS1CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240716012623", stats: deriveStats({ acting: 9, comedy: 6, dance: 7, design: 6, improv: 8, runway: 13, lipsync: 9 }) },
-    ],
-  },
-  // Franquicia ficticia (no es un show real de Drag Race): reparto en orden alfabético, sin
-  // colocación final definida por el usuario, así que todas quedan como "Por determinar" con
-  // stats neutras y una imagen de marcador de posición compartida.
-  {
-    id: "IND_S1",
-    seasonName: "Drag Race Indonesia — Temporada 1",
-    franchise: "Indonesia",
-    contestants: [
-      { name: "Celksi", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Crimson Ruby", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Dheem Inim", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Dream Of The Night", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Fobru Kubqi", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Intan McWayan", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Iruwy", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Jeprik", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Kaa Bo", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Oxamami #8", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Soviet Ehhhhh", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
-      { name: "Ty Lapar", finalPlacement: "Por determinar", link: "#",
-        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
   {
@@ -3135,6 +3101,40 @@ const ALL_SEASONS = [
       { name: "Raga Diamante", finalPlacement: "Eliminada" },
       { name: "Deseos Fab", finalPlacement: "Eliminada" },
       { name: "Mista Boo", finalPlacement: "Eliminada" },
+    ],
+  },
+  // Franquicia ficticia (no es un show real de Drag Race): reparto en orden alfabético, sin
+  // colocación final definida por el usuario, así que todas quedan como "Por determinar" con
+  // stats neutras y una imagen de marcador de posición compartida.
+  {
+    id: "IND_S1",
+    seasonName: "Drag Race Indonesia — Temporada 1",
+    franchise: "Indonesia",
+    contestants: [
+      { name: "Celksi", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Crimson Ruby", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dheem Inim", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dream Of The Night", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fobru Kubqi", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Intan McWayan", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Iruwy", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Jeprik", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Kaa Bo", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Oxamami #8", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Soviet Ehhhhh", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ty Lapar", finalPlacement: "Por determinar", link: "#",
+        image: "img/indonesia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
