@@ -30,7 +30,6 @@ function loadDB() {
       if (!db.customContestants) db.customContestants = [];
       if (!db.contestantOverrides) db.contestantOverrides = {};
       if (!db.twists) db.twists = structuredClone(window.DEFAULT_TWISTS);
-      if (!db.customFranchises) db.customFranchises = [];
       refreshUntouchedDefaults(db.statuses, window.DEFAULT_STATUSES);
       refreshUntouchedDefaults(db.challenges, window.DEFAULT_CHALLENGES);
       refreshUntouchedDefaults(db.formats, window.DEFAULT_FORMATS);
@@ -48,7 +47,6 @@ function loadDB() {
     scoreScale: structuredClone(window.DEFAULT_SCORE_SCALE),
     customContestants: [],
     contestantOverrides: {},
-    customFranchises: [],
   };
 }
 
