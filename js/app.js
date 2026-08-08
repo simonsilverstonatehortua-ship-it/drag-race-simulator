@@ -22,24 +22,33 @@ const NO_IMAGE_URL = "https://myrainboww.github.io/Drag-Race-Simulator/image/que
 // temporada numerada y en All Stars): solo UNA de esas entradas en ALL_CONTESTANTS lleva
 // foto/stats/ficha (las demás solo llevan name+finalPlacement), así que buscamos la
 // entrada por nombre que sí tenga el dato en vez de quedarnos con la primera que aparezca.
-function contestantImage(name) {
-  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.image);
+//
+// Muy rara vez dos personas reales distintas comparten nombre de drag (p.ej. "Moon" en
+// Drag Race France y en La Más Draga): en ese caso hay MÁS de una entrada con foto/stats
+// propias para el mismo nombre. Si se conoce la temporada de origen (seasonId), se prioriza
+// la entrada de esa temporada exacta; si no, se cae a la primera que se encuentre (mismo
+// comportamiento de siempre para el 99% de los casos sin colisión de nombre).
+function contestantImage(name, seasonId) {
+  const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.image);
+  const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   if (real) return real.image;
   const custom = DB.customContestants.find((c) => c.name === name);
   if (custom) return custom.image || NO_IMAGE_URL;
   return null;
 }
 
-function contestantLink(name) {
-  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.link);
+function contestantLink(name, seasonId) {
+  const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.link);
+  const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   return real ? real.link : null;
 }
 
 // Stats de una concursante: si el usuario editó las de una concursante real, esa
 // personalización (guardada en DB.contestantOverrides) gana sobre las de fábrica.
-function contestantStats(name) {
+function contestantStats(name, seasonId) {
   if (DB.contestantOverrides[name]) return DB.contestantOverrides[name];
-  const real = window.ALL_CONTESTANTS.find((c) => c.name === name && c.stats);
+  const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.stats);
+  const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   if (real) return real.stats;
   const custom = DB.customContestants.find((c) => c.name === name);
   if (custom && custom.stats) return custom.stats;
@@ -49,17 +58,35 @@ function contestantStats(name) {
 // Para buscadores/selectores: una fila por reina real, aunque su nombre aparezca varias
 // veces en window.ALL_CONTESTANTS (una vez por temporada en la que compitió). No se debe
 // poder buscarla y ver "Alexis Mateo" repetida 3 veces solo porque estuvo en 3 temporadas.
+// Excepción: cuando el mismo nombre tiene MÁS de una ficha completa (foto/stats propias),
+// es una colisión real entre dos personas distintas (p.ej. las dos "Moon"), así que se
+// mantiene una fila por cada una, con su temporada de origen en pickerLabel para
+// distinguirlas en el buscador.
 function uniqueRealContestants() {
-  const seen = new Set();
-  return window.ALL_CONTESTANTS.filter((c) => {
-    if (seen.has(c.name)) return false;
-    seen.add(c.name);
-    return true;
+  const fullRecordsByName = {};
+  window.ALL_CONTESTANTS.forEach((c) => {
+    if (!c.image) return;
+    (fullRecordsByName[c.name] = fullRecordsByName[c.name] || []).push(c);
   });
+
+  const seen = new Set();
+  const result = [];
+  window.ALL_CONTESTANTS.forEach((c) => {
+    const collisions = fullRecordsByName[c.name];
+    if (collisions && collisions.length > 1) {
+      if (!c.image) return; // stub de una concursante con nombre colisionado: se ignora, ya se listan sus fichas completas
+      result.push({ ...c, pickerLabel: `${c.name} (${c.season})` });
+      return;
+    }
+    if (seen.has(c.name)) return;
+    seen.add(c.name);
+    result.push(c);
+  });
+  return result;
 }
 
-function avatarImg(name, sizeClass) {
-  const src = contestantImage(name);
+function avatarImg(name, sizeClass, seasonId) {
+  const src = contestantImage(name, seasonId);
   if (!src) return null;
   const img = el("img", { src, alt: name, class: "avatar" + (sizeClass ? " " + sizeClass : "") });
   img.addEventListener("error", () => { img.remove(); });
@@ -173,9 +200,9 @@ function renderSimulate() {
     matches.forEach((c) => {
       const item = el("button", { type: "button", class: "search-result",
         onclick: () => { addOne(c.name); searchInput.value = ""; renderResults(""); searchInput.focus(); } });
-      const avatar = avatarImg(c.name, "avatar--result");
+      const avatar = avatarImg(c.name, "avatar--result", c.seasonId);
       if (avatar) item.appendChild(avatar);
-      item.appendChild(el("span", { text: c.name }));
+      item.appendChild(el("span", { text: c.pickerLabel || c.name }));
       resultsWrap.appendChild(item);
     });
   };
@@ -744,14 +771,14 @@ function renderRoster() {
     const sortedContestants = [...activeSeason.contestants].sort((a, b) => a.name.localeCompare(b.name));
     sortedContestants.forEach((c) => {
       const card = el("div", { class: "card card--queen" });
-      const avatar = avatarImg(c.name, "avatar--card");
+      const avatar = avatarImg(c.name, "avatar--card", activeSeason.id);
       if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
-      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name)) }));
+      card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name, activeSeason.id)) }));
       if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
-      card.appendChild(el("a", { class: "link", href: contestantLink(c.name) || c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
+      card.appendChild(el("a", { class: "link", href: contestantLink(c.name, activeSeason.id) || c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
       card.appendChild(el("div", { class: "card__actions" }, [
-        el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c) }),
+        el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c, activeSeason.id) }),
       ]));
       grid.appendChild(card);
     });
@@ -934,9 +961,9 @@ function deleteCustomContestant(name) {
 }
 
 // ---------- EDITAR STATS DE UNA CONCURSANTE REAL ----------
-function openRealStatsForm(contestant) {
+function openRealStatsForm(contestant, seasonId) {
   const hasOverride = !!DB.contestantOverrides[contestant.name];
-  const data = contestantStats(contestant.name) || window.randomStats();
+  const data = contestantStats(contestant.name, seasonId) || window.randomStats();
 
   const overlay = document.getElementById("modal-overlay");
   overlay.innerHTML = "";
