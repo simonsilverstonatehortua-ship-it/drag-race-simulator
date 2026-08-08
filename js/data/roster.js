@@ -2846,7 +2846,7 @@ const ALL_SEASONS = [
       { name: "Deborah La Grande", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Deborah_La_Grande",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/05/DeborahLaGrandeLMD1CastMug.png/revision/latest/scale-to-width-down/105?cb=20240407205745", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Bárbara Durango", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Bárbara_Durango",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/23/B%C3%A1rbaraDurango.jpg/revision/latest/scale-to-width-down/105?cb=20210125093338", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0a/B%C3%A1rbaraDurangoLMD1CastMug.png/revision/latest/scale-to-width-down/105?cb=20240407222806", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       // Eva Blunt ya tiene ficha completa en Drag Race México — Temporada 2 (MX_S2); Margaret
       // Y Ya en Drag Race México — Temporada 1 (MX_S1); aquí solo su colocación en esta, su
       // temporada de origen.
@@ -2872,7 +2872,7 @@ const ALL_SEASONS = [
       // aquí solo su colocación en esta, su temporada de origen.
       { name: "Gvajardo", finalPlacement: "RUNNER_UP" },
       { name: "Sophia Jiménez", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Sophia_Jiménez",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/b2/SophiaJim%C3%A9nezLMD2MugPromo.jpg/revision/latest/scale-to-width-down/105?cb=20240209014100", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d0/SophiaJim%C3%A9nezLMD2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906110654", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Job Star", finalPlacement: "4th", link: "https://rupaulsdragrace.fandom.com/wiki/Job_Star",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/81/JobStarLMD2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906110209", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Soro Nasty", finalPlacement: "5th" },
@@ -2897,14 +2897,14 @@ const ALL_SEASONS = [
       // solo su colocación en esta, su temporada de origen.
       { name: "Madison Basrey", finalPlacement: "RUNNER_UP" },
       { name: "Raga Diamante", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Raga_Diamante",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5d/RagaDiamanteLMD3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906140706", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/26/RagaDiamanteSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521192539", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Rudy Reyes", finalPlacement: "RUNNER_UP" },
       { name: "Memo Reyri", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Memo_Reyri",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/7/79/MemoReyriLMD3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906140604", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Mista Boo", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Mista_Boo",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/24/MistaBooLMD3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906140637", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/8e/MistaBooSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521193335", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Regina Bronx", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Regina_Bronx",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/44/ReginaBronxLMD3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906140828", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/43/ReginaBronxSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521192808", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Iviza Lioza", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Iviza_Lioza",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0e/IvizaLiozaLMD3CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210906140425", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Luna Lansman", finalPlacement: "9th" },
@@ -2924,7 +2924,7 @@ const ALL_SEASONS = [
     franchise: "La Más Draga",
     contestants: [
       { name: "Rebel Mörk", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Rebel_Mörk",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/96/RebelM%C3%B6rkLMD4MugPromo.jpg/revision/latest/scale-to-width-down/105?cb=20211002114846", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cc/RebelM%C3%B6rkLMD4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210922201247", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       // C-Pher, Georgiana y Sirena ya tienen ficha completa en La Más Draga: Solo Las Más —
       // Temporada 1 (LMDSLM1); Elektra Vandergeld y Leexa Fox en Drag Race México —
       // Temporada 2 (MX_S2); Paper Cut en La Más Draga — Temporada 5 (LMD5); aquí solo su
@@ -2937,7 +2937,7 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/ae/LaMorraLisaLMD4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210922205001", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Leexa Fox", finalPlacement: "6th" },
       { name: "Lupita Kush", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Lupita_Kush",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e1/LupitaKushLMD4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210922201213", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/84/LupitaKushSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521192434", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Georgiana", finalPlacement: "8th" },
       { name: "Vera Cruz", finalPlacement: "9th", link: "https://rupaulsdragrace.fandom.com/wiki/Vera_Cruz",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/9d/VeraCruzLMD4CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20210922201340", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
@@ -2959,19 +2959,19 @@ const ALL_SEASONS = [
       { name: "Fifí Estah", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Fifí_Estah",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a1/FifiEstahLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927050304", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Hidden Mistake", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Hidden_Mistake",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a4/HiddenMistakeLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927043727", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/47/HiddenMistakeSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521193634", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Liza Zan Zuzzi", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Liza_Zan_Zuzzi",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cc/LizaZanZuzziLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927053739", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Paper Cut", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Paper_Cut",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/23/PaperCutLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220930060003", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Santa Lucía", finalPlacement: "5th (abandonó)", link: "https://rupaulsdragrace.fandom.com/wiki/Santa_Lucía",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/2f/SantaLuc%C3%ADaMugPromo1.jpg/revision/latest/scale-to-width-down/105?cb=20220929223440", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/ff/SantaLuc%C3%ADaLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927050955", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Gretha White", finalPlacement: "6th", link: "https://rupaulsdragrace.fandom.com/wiki/Gretha_White",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/c/cf/GrethaWhiteLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927055424", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       // Peke Balderas y Deseos Fab ya tienen ficha completa aquí (siguen compitiendo en La Más
       // Draga: Solo Las Más — Temporada 2, LMDSLM2, sin colocación final todavía).
       { name: "Peke Balderas", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Peke_Balderas",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/98/PekeBalderasLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927051405", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/3c/PekeBalderasSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521192230", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Aisha Dollkills", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Aisha_Dollkills",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/bc/AishaDollkillsLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927052836", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Light King", finalPlacement: "9th (abandonó)", link: "https://rupaulsdragrace.fandom.com/wiki/Light_King",
@@ -2981,7 +2981,7 @@ const ALL_SEASONS = [
       { name: "Isabella y Catalina", finalPlacement: "11th", link: "https://rupaulsdragrace.fandom.com/wiki/Isabella_y_Catalina",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/IsabellayCatalinaLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20221002063647", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Deseos Fab", finalPlacement: "12th", link: "https://rupaulsdragrace.fandom.com/wiki/Deseos_Fab",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/0b/DeseosFabLMD5CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20220927050635", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/06/DeseosFabSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521191522", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
   {
@@ -2998,11 +2998,11 @@ const ALL_SEASONS = [
       // Juana Guadalupe y La Kyliezz ya tienen ficha completa aquí (siguen compitiendo en La
       // Más Draga: Solo Las Más — Temporada 2, LMDSLM2, sin colocación final todavía).
       { name: "Juana Guadalupe", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Juana_Guadalupe",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/19/JuanaGuadalupeLMD6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240406062612", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/90/JuanaGuadalupeSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521191804", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Kelly", finalPlacement: "5th", link: "https://rupaulsdragrace.fandom.com/wiki/Kelly_(La_Más_Draga)",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/96/KellyLMD6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240406072847", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "La Kyliezz", finalPlacement: "6th (Miss Simpatía)", link: "https://rupaulsdragrace.fandom.com/wiki/La_Kyliezz",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/fd/LaKyliezzLMD6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240406073443", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a1/LaKyliezzSLM2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20260521191921", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Dimittra", finalPlacement: "7th", link: "https://rupaulsdragrace.fandom.com/wiki/Dimittra",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/8/84/DimittraLMD6CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20240406055442", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Shantelle", finalPlacement: "8th", link: "https://rupaulsdragrace.fandom.com/wiki/Shantelle",
@@ -3053,10 +3053,8 @@ const ALL_SEASONS = [
       { name: "Nayla Downs", finalPlacement: "WINNER", link: "https://rupaulsdragrace.fandom.com/wiki/Nayla_Downs",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/1d/NaylaDownsLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071845", stats: deriveStats({ acting: 10, comedy: 6, dance: 7, design: 10, improv: 8, runway: 15, lipsync: 6 }) },
       { name: "Deetox Alanís", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Deetox_Alanís",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/16/DeetoxAlanisQDMug.jpg/revision/latest/scale-to-width-down/105?cb=20231229144949", stats: deriveStats({ acting: 10, comedy: 8, dance: 9, design: 7, improv: 8, runway: 10, lipsync: 10 }) },
-      // Esta Moon es colombiana, de La Más Draga; no es la misma persona que la Moon
-      // francesa de Drag Race France (con ficha completa en FR_AS1).
-      { name: "Moon (Colombia)", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Moon_(Colombia)",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/13/DeetoxLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071845", stats: deriveStats({ acting: 10, comedy: 8, dance: 9, design: 7, improv: 8, runway: 10, lipsync: 10 }) },
+      { name: "Moon", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Moon",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/b/bd/MoonLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071845", stats: deriveStats({ acting: 8, comedy: 9, dance: 10, design: 13, improv: 9, runway: 14, lipsync: 9 }) },
       { name: "Tulsa", finalPlacement: "RUNNER_UP", link: "https://rupaulsdragrace.fandom.com/wiki/Tulsa",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e3/TulsaLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071846", stats: deriveStats({ acting: 8, comedy: 5, dance: 10, design: 10, improv: 5, runway: 12, lipsync: 9 }) },
@@ -3079,7 +3077,7 @@ const ALL_SEASONS = [
       { name: "Oslo", finalPlacement: "13th", link: "https://rupaulsdragrace.fandom.com/wiki/Oslo",
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/6/6c/OsloLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071844", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 9, improv: 4, runway: 7, lipsync: 5 }) },
       { name: "Paty Piñata", finalPlacement: "14th", link: "https://rupaulsdragrace.fandom.com/wiki/Paty_Piñata",
-        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/2/2a/PatyPinataRdDMug.jpg/revision/latest/scale-to-width-down/105?cb=20240405093007", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 5, improv: 4, runway: 5, lipsync: 4 }) },
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/a/a7/PatyPi%C3%B1ataLMD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250914071846", stats: deriveStats({ acting: 4, comedy: 4, dance: 4, design: 5, improv: 4, runway: 5, lipsync: 4 }) },
     ],
   },
   // Temporada en emisión (final el 15 de agosto de 2026, todavía no ocurrida a fecha de 7 de
