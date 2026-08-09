@@ -60,8 +60,7 @@ function contestantStats(name, seasonId) {
 // poder buscarla y ver "Alexis Mateo" repetida 3 veces solo porque estuvo en 3 temporadas.
 // Excepción: cuando el mismo nombre tiene MÁS de una ficha completa (foto/stats propias),
 // es una colisión real entre dos personas distintas (p.ej. las dos "Moon"), así que se
-// mantiene una fila por cada una, con su temporada de origen en pickerLabel para
-// distinguirlas en el buscador.
+// mantiene una fila por cada una (mismo nombre, pero cada una con su propia foto y stats).
 function uniqueRealContestants() {
   const fullRecordsByName = {};
   window.ALL_CONTESTANTS.forEach((c) => {
@@ -75,7 +74,7 @@ function uniqueRealContestants() {
     const collisions = fullRecordsByName[c.name];
     if (collisions && collisions.length > 1) {
       if (!c.image) return; // stub de una concursante con nombre colisionado: se ignora, ya se listan sus fichas completas
-      result.push({ ...c, pickerLabel: `${c.name} (${c.season})` });
+      result.push(c);
       return;
     }
     if (seen.has(c.name)) return;
@@ -202,7 +201,7 @@ function renderSimulate() {
         onclick: () => { addOne(c.name); searchInput.value = ""; renderResults(""); searchInput.focus(); } });
       const avatar = avatarImg(c.name, "avatar--result", c.seasonId);
       if (avatar) item.appendChild(avatar);
-      item.appendChild(el("span", { text: c.pickerLabel || c.name }));
+      item.appendChild(el("span", { text: c.name }));
       resultsWrap.appendChild(item);
     });
   };
