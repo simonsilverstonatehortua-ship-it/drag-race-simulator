@@ -3403,6 +3403,33 @@ const ALL_SEASONS = [
         image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "PK_S4",
+    seasonName: "Drag Race Pakistán — Temporada 4",
+    franchise: "Pakistán",
+    contestants: [
+      { name: "Anjum Pari", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Chameli Jaan", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dilruba Begum", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Gul Bahaar", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mehfil Mirza", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mehrunissa Badshah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Nargis Bachah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sitara Noor", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sohni Heer", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sultana Shalimar", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
