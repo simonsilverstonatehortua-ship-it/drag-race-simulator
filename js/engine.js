@@ -9,12 +9,14 @@
 // el comportamiento "regular" (se anota en el log de la temporada con una nota
 // "(no implementado aún)").
 //
-// Estadísticas: la puntuación de una concursante en un reto es la media de las
+// Estadísticas: la puntuación de una concursante en un reto es 80% la media de las
 // estadísticas relevantes del reto (js/data/challenges.js) más un bono al azar entre -3 y
-// 5 (ver challengeScore). Para lip syncs se usa la media de Lip Sync/Carisma/
-// Originalidad/Nervio/Talento, también con ese mismo bono al azar (ver lipsyncScore). Las
-// estadísticas que falten se sustituyen por un valor al azar en su misma escala 0-15, para
-// no penalizar ni beneficiar a quien no las tenga definidas.
+// 5, y 20% su Runway más su propio bono al azar entre -3 y 5 (ver challengeScore); los
+// retos de Design y Coreografía y looks de coreo quedan exentos de ese 20% de Runway, ya
+// que el propio reto construye el look. Para lip syncs se usa la media de Lip Sync/
+// Carisma/Originalidad/Nervio/Talento, con ese mismo bono al azar (ver lipsyncScore). Una
+// estadística que falte cuenta como 0: nunca se sustituye al azar, así que una concursante
+// con stats planas se puntúa tal cual, sin ningún añadido aleatorio de por medio.
 
 const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP", "PREMIERE_MEET_THE_QUEENS"];
 const IMPLEMENTED_RETURN = ["RETURN_NONE", "RETURN_RANDOM", "RETURN_LALAPARUZA"];
@@ -96,22 +98,38 @@ function randomStatBonus() {
 // Originalidad, Nervio y Talento).
 const LIPSYNC_SCORE_KEYS = ["lipsync", "charisma", "uniqueness", "nerve", "talent"];
 
-// Puntuación de una concursante en un reto: media de las estadísticas relevantes del reto
-// (las que no tenga definidas se sustituyen por un valor al azar en su misma escala 0-15,
-// para no penalizarla ni beneficiarla) más un bono al azar entre -3 y 5.
-function challengeScore(name, statKeys, db, statsByName) {
+// Retos que ya construyen la pasarela/el look como parte del propio reto: sumarles encima
+// el 20% de Runway de challengeScore puntuaría lo mismo dos veces, así que se puntúan
+// 100% con la media de sus propias estadísticas.
+const RUNWAY_WEIGHT_EXEMPT_CHALLENGES = new Set(["DESIGN", "CHOREO_LOOKS"]);
+
+// Puntuación de una concursante en un reto: 80% la media de las estadísticas relevantes del
+// reto más un bono al azar entre -3 y 5, y 20% su estadística de Runway más su propio bono
+// al azar entre -3 y 5 (dos tiradas independientes). Una estadística que no tenga definida
+// cuenta como 0, nunca se sustituye al azar: una concursante con stats planas (p.ej. todo
+// en 7 porque todavía no hay datos reales) se puntúa tal cual, sin ningún añadido aleatorio
+// de por medio. "challengeId" determina si el reto está en RUNWAY_WEIGHT_EXEMPT_CHALLENGES
+// (Design, Coreografía y looks de coreo): en ese caso se puntúa 100% con la media de sus
+// estadísticas, sin el 20% de Runway aparte.
+function challengeScore(name, statKeys, db, statsByName, challengeId) {
   const stats = statsByName[name];
   const keys = statKeys && statKeys.length ? statKeys : ALL_STAT_KEYS;
-  const vals = keys.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : Math.random() * 15);
-  return average(vals) + randomStatBonus();
+  const vals = keys.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : 0);
+  const relevantScore = average(vals) + randomStatBonus();
+
+  if (challengeId && RUNWAY_WEIGHT_EXEMPT_CHALLENGES.has(challengeId)) return relevantScore;
+
+  const runwayVal = (stats && typeof stats.runway === "number") ? stats.runway : 0;
+  const runwayScore = runwayVal + randomStatBonus();
+  return relevantScore * 0.8 + runwayScore * 0.2;
 }
 
 // Puntuación de una concursante en un lip sync: media de Lip Sync, Carisma, Originalidad,
-// Nervio y Talento (mismo criterio de sustitución al azar que challengeScore) más un bono
-// al azar entre -3 y 5.
+// Nervio y Talento (una stat que falte cuenta como 0, nunca al azar) más un bono al azar
+// entre -3 y 5.
 function lipsyncScore(name, db, statsByName) {
   const stats = statsByName[name];
-  const vals = LIPSYNC_SCORE_KEYS.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : Math.random() * 15);
+  const vals = LIPSYNC_SCORE_KEYS.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : 0);
   return average(vals) + randomStatBonus();
 }
 
@@ -344,7 +362,7 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 function runEpisode(activeNames, db, { noElim = false, maxElim = Infinity, forceChallengeId = null, usedChallengeIds = new Set(), immuneNames = new Set() } = {}, statsByName = {}) {
   const challenge = randomChallenge(db.challenges, { forceId: forceChallengeId, usedChallengeIds });
 
-  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
+  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName, challenge.id) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
 
   // Si dos o más empatan exactamente en la puntuación más alta, ganan todas el reto (en
@@ -411,7 +429,7 @@ function runMeetTheQueensEpisode(activeNames, db, statsByName) {
 // ranking van a lip sync por su vida). ---
 function runLipsyncLegacyEpisode(activeNames, db, statsByName, maxElim = Infinity, usedChallengeIds = new Set(), immuneNames = new Set()) {
   const challenge = randomChallenge(db.challenges, { requireElim: true, usedChallengeIds });
-  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
+  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName, challenge.id) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
   if (immuneNames.size) results.forEach((r) => { if (immuneNames.has(r.name)) r.immune = true; });
@@ -529,7 +547,7 @@ function runTeamsEpisode(activeNames, db, statsByName, usedChallengeIds = new Se
   }
 
   const teamScores = teams.map((team) => {
-    const members = team.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
+    const members = team.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName, challenge.id) }));
     return { members, teamScore: average(members.map((m) => m.score)) };
   });
   teamScores.sort((a, b) => b.teamScore - a.teamScore || Math.random() - 0.5);
@@ -574,7 +592,7 @@ function runTeamsEpisode(activeNames, db, statsByName, usedChallengeIds = new Se
 // sin pasar por el fondo de la clasificación. ---
 function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships = {}, usedChallengeIds = new Set()) {
   const challenge = randomChallenge(db.challenges, { requireElim: true, usedChallengeIds });
-  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName) }));
+  const scored = activeNames.map((name) => ({ name, score: challengeScore(name, challenge.stats, db, statsByName, challenge.id) }));
   scored.sort((a, b) => b.score - a.score || Math.random() - 0.5);
   const n = scored.length;
   const results = scored.map((s) => ({ ...s, status: "SAFE" }));
