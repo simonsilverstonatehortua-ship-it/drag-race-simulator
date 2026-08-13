@@ -3349,6 +3349,33 @@ const ALL_SEASONS = [
         image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "PK_S2",
+    seasonName: "Drag Race Pakistán — Temporada 2",
+    franchise: "Pakistán",
+    contestants: [
+      { name: "Briyani", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Chai Sai", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Disko", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Falooda Bachah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Gulab Jamun Jaan", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Nazia Zoom", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Noor Mohabbat", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Rickshaw", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sari No Sari", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Shalimar Choti", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
