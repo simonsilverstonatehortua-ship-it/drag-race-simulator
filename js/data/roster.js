@@ -95,6 +95,7 @@ const FRANCHISE_FLAGS = {
   "Indonesia": "🇮🇩",
   "Dragula": "🧟",
   "La Más Draga": "💃",
+  "Pakistán": "🇵🇰",
 };
 
 const ALL_SEASONS = [
@@ -3316,6 +3317,36 @@ const ALL_SEASONS = [
         image: "img/indonesia-s6-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Semar Sayang", finalPlacement: "Por determinar", link: "#",
         image: "img/indonesia-s6-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  // Franquicia ficticia (no es un show real de Drag Race): reparto en orden alfabético, sin
+  // colocación final definida por el usuario, así que todas quedan como "Por determinar" con
+  // stats neutras y una imagen de marcador de posición compartida.
+  {
+    id: "PK_S1",
+    seasonName: "Drag Race Pakistán — Temporada 1",
+    franchise: "Pakistán",
+    contestants: [
+      { name: "Anarkali", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Aurt Reshma", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Jalebi Bachah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Kulfi Malkah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Monsoon Dhamaka", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Noor Jahan-Cee", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Parveen Boli", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Shahnaz Badshah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Shalimar Bagh", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Zubaida Aapa-la", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
