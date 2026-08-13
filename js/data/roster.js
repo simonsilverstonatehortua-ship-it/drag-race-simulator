@@ -3376,6 +3376,33 @@ const ALL_SEASONS = [
         image: "img/pakistan-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "PK_S3",
+    seasonName: "Drag Race Pakistán — Temporada 3",
+    franchise: "Pakistán",
+    contestants: [
+      { name: "Begum Besharam", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dupatta Disaster", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Heera Mandi", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Lahore Luxx", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Lassi Laila", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Masala Malkah", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mehndi Madness", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Paan Pyaari", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Qandeel Queen", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Tuck Art Tara", finalPlacement: "Por determinar", link: "#",
+        image: "img/pakistan-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
