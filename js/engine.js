@@ -225,10 +225,11 @@ function weightedPick(options) {
 // intactas las casillas ya asignadas antes, p.ej. WIN/TOP2 de Lipsync For Your Legacy).
 // "pool" ya viene ordenado de mejor a peor puntaje: las 2 últimas siempre van a lip sync
 // por su vida (la de menor puntaje de lip sync es eliminada, la otra sobrevive como BTM);
-// de las que quedan en medio, las 2 mejores quedan HIGH y la peor queda LOW. Con 5 o menos
-// activas no hay sitio para las 3 posiciones de en medio (HIGH/HIGH/LOW) sin pisar el
-// fondo: en ese caso se decide HIGH o LOW comparando el puntaje de cada una con la media
-// del grupo restante.
+// de las que quedan en medio, las 2 mejores quedan HIGH y la peor queda LOW (3 HIGH y 2 LOW
+// si hay 14 o más concursantes activas esta semana en total, contando también a quien ganó
+// el reto: con casts grandes no tiene sentido dejar a tantas simplemente en SAFE). Si no hay
+// sitio para esas posiciones de en medio sin pisar el fondo, se decide HIGH o LOW comparando
+// el puntaje de cada una con la media del grupo restante.
 //
 // Empates de puntaje en el reto (mismo puntaje exacto): comparten posición en vez de
 // desempatarse al azar.
@@ -281,13 +282,20 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
   const bottomNameSet = new Set(bottomPool.map((r) => r.name));
   const middlePool = pool.filter((r) => !bottomNameSet.has(r.name));
 
-  if (middlePool.length >= 3) {
+  // Con casts grandes (14+ concursantes activas esta semana) la estructura base reparte más
+  // HIGH/LOW en vez de dejar a tantas en SAFE sin distinguir: 1 WIN, 3 HIGH, 2 LOW, 1 BTM,
+  // 1 ELIM, en vez de la estructura normal de 1 WIN, 2 HIGH, 1 LOW, 1 BTM, 1 ELIM.
+  const bigCast = results.length >= 14;
+  const baseHighCount = bigCast ? 3 : 2;
+  const baseLowCount = bigCast ? 2 : 1;
+
+  if (middlePool.length >= baseHighCount + baseLowCount) {
     const midLen = middlePool.length;
-    let highCount = 2;
+    let highCount = baseHighCount;
     while (highCount < midLen - 1 && middlePool[highCount - 1].score === middlePool[highCount].score) {
       highCount++;
     }
-    let lowCount = 1;
+    let lowCount = baseLowCount;
     while (highCount + lowCount < midLen && middlePool[midLen - lowCount - 1].score === middlePool[midLen - lowCount].score) {
       lowCount++;
     }
@@ -345,12 +353,13 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 }
 
 // Simula un único reto entre un grupo de concursantes activas. Se puntúa a cada una
-// (media de las estadísticas relevantes del reto + un bono al azar de -3 a 5) y se ordena
-// de mejor a peor: la primera de la lista gana el reto (o todas las que empaten con ella
-// en la puntuación más alta); las 2 últimas van a lip sync por su vida (mismo método con
-// Lip Sync/Carisma/Originalidad/Nervio/Talento); de las que quedan en medio, las 2 mejores
-// quedan HIGH y la peor LOW (ver assignPlacementsAndElimination para el reparto y los
-// empates de puntaje).
+// (80% media de las estadísticas relevantes del reto + bono al azar, 20% Runway + su propio
+// bono al azar; ver challengeScore) y se ordena de mejor a peor: la primera de la lista gana
+// el reto (o todas las que empaten con ella en la puntuación más alta); las 2 últimas van a
+// lip sync por su vida (mismo método con Lip Sync/Carisma/Originalidad/Nervio/Talento); de
+// las que quedan en medio, las 2 mejores quedan HIGH y la peor LOW (3 HIGH y 2 LOW si hay
+// 14+ concursantes activas esta semana; ver assignPlacementsAndElimination para el reparto y
+// los empates de puntaje).
 // "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
 // final); por defecto sin límite. "forceChallengeId" fuerza un reto concreto (p.ej. el reto
 // de estreno elegido) en vez de sortearlo; "usedChallengeIds" evita repetir retos "de firma"
