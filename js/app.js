@@ -37,12 +37,6 @@ function contestantImage(name, seasonId) {
   return null;
 }
 
-function contestantLink(name, seasonId) {
-  const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.link);
-  const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
-  return real ? real.link : null;
-}
-
 // Stats de una concursante: si el usuario editó las de una concursante real, esa
 // personalización (guardada en DB.contestantOverrides) gana sobre las de fábrica.
 function contestantStats(name, seasonId) {
@@ -775,7 +769,6 @@ function renderRoster() {
       card.appendChild(el("strong", { text: c.name }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name, activeSeason.id)) }));
       if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
-      card.appendChild(el("a", { class: "link", href: contestantLink(c.name, activeSeason.id) || c.link, target: "_blank", rel: "noopener", text: "Ficha ↗" }));
       card.appendChild(el("div", { class: "card__actions" }, [
         el("button", { class: "btn btn--ghost", text: "Editar stats", onclick: () => openRealStatsForm(c, activeSeason.id) }),
       ]));
