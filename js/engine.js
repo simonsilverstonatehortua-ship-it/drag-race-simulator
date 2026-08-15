@@ -13,10 +13,10 @@
 // estadísticas relevantes del reto (js/data/challenges.js) más un bono al azar entre -3 y
 // 5, y 20% su Runway más su propio bono al azar entre -3 y 5 (ver challengeScore); los
 // retos de Design y Coreografía y looks de coreo quedan exentos de ese 20% de Runway, ya
-// que el propio reto construye el look. Para lip syncs se usa la media de Lip Sync/
-// Carisma/Originalidad/Nervio/Talento, con ese mismo bono al azar (ver lipsyncScore). Una
-// estadística que falte cuenta como 0: nunca se sustituye al azar, así que una concursante
-// con stats planas se puntúa tal cual, sin ningún añadido aleatorio de por medio.
+// que el propio reto construye el look. Para lip syncs se usa únicamente Lip Sync, con ese
+// mismo bono al azar (ver lipsyncScore). Una estadística que falte cuenta como 0: nunca se
+// sustituye al azar, así que una concursante con stats planas se puntúa tal cual, sin ningún
+// añadido aleatorio de por medio.
 
 const IMPLEMENTED_PREMIERE = ["PREMIERE_NORMAL", "PREMIERE_NORMAL_NOELIM", "PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_PORKCHOP", "PREMIERE_MEET_THE_QUEENS"];
 const IMPLEMENTED_RETURN = ["RETURN_NONE", "RETURN_RANDOM", "RETURN_LALAPARUZA"];
@@ -94,10 +94,6 @@ function randomStatBonus() {
   return -3 + Math.floor(Math.random() * 9);
 }
 
-// Estadísticas que decide un lip sync (no las de Lip Sync a secas: también Carisma,
-// Originalidad, Nervio y Talento).
-const LIPSYNC_SCORE_KEYS = ["lipsync", "charisma", "uniqueness", "nerve", "talent"];
-
 // Retos que ya construyen la pasarela/el look como parte del propio reto: sumarles encima
 // el 20% de Runway de challengeScore puntuaría lo mismo dos veces, así que se puntúan
 // 100% con la media de sus propias estadísticas.
@@ -124,13 +120,12 @@ function challengeScore(name, statKeys, db, statsByName, challengeId) {
   return relevantScore * 0.8 + runwayScore * 0.2;
 }
 
-// Puntuación de una concursante en un lip sync: media de Lip Sync, Carisma, Originalidad,
-// Nervio y Talento (una stat que falte cuenta como 0, nunca al azar) más un bono al azar
-// entre -3 y 5.
+// Puntuación de una concursante en un lip sync: únicamente su estadística de Lip Sync (si
+// no la tiene definida cuenta como 0, nunca al azar) más un bono al azar entre -3 y 5.
 function lipsyncScore(name, db, statsByName) {
   const stats = statsByName[name];
-  const vals = LIPSYNC_SCORE_KEYS.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : 0);
-  return average(vals) + randomStatBonus();
+  const lipsyncVal = (stats && typeof stats.lipsync === "number") ? stats.lipsync : 0;
+  return lipsyncVal + randomStatBonus();
 }
 
 // Umbral para considerar "alto" un empate exacto en la puntuación de lip sync (escala
@@ -356,8 +351,8 @@ function assignPlacementsAndElimination(results, db, statsByName, { noElim = fal
 // (80% media de las estadísticas relevantes del reto + bono al azar, 20% Runway + su propio
 // bono al azar; ver challengeScore) y se ordena de mejor a peor: la primera de la lista gana
 // el reto (o todas las que empaten con ella en la puntuación más alta); las 2 últimas van a
-// lip sync por su vida (mismo método con Lip Sync/Carisma/Originalidad/Nervio/Talento); de
-// las que quedan en medio, las 2 mejores quedan HIGH y la peor LOW (3 HIGH y 2 LOW si hay
+// lip sync por su vida (puntuadas únicamente por su Lip Sync + bono al azar); de las que
+// quedan en medio, las 2 mejores quedan HIGH y la peor LOW (3 HIGH y 2 LOW si hay
 // 14+ concursantes activas esta semana; ver assignPlacementsAndElimination para el reparto y
 // los empates de puntaje).
 // "maxElim" limita cuántas puede eliminar este episodio (para no bajar del tamaño de la
