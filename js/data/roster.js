@@ -97,6 +97,7 @@ const FRANCHISE_FLAGS = {
   "La Más Draga": "💃",
   "Pakistán": "🇵🇰",
   "Egipto": "🇪🇬",
+  "Camerún": "🇨🇲",
 };
 
 const ALL_SEASONS = [
@@ -3631,6 +3632,31 @@ const ALL_SEASONS = [
         image: "img/egipto-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Yara Al-Qāhira", finalPlacement: "Por determinar",
         image: "img/egipto-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  {
+    id: "CM_S1",
+    seasonName: "Drag Race Camerún — Temporada 1",
+    franchise: "Camerún",
+    contestants: [
+      { name: "Bébé Bamiléké", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Coco Ndolé", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Douala Deluxxe", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ebony Eclipse", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "King Bamenda", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "King François", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mamam Makossa", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mamam Yoncé", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Yaoundiva", finalPlacement: "Por determinar",
+        image: "img/camerun-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
