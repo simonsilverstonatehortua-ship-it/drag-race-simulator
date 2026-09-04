@@ -3717,6 +3717,33 @@ const ALL_SEASONS = [
         image: "img/camerun-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "CM_S4",
+    seasonName: "Drag Race Camerún — Temporada 4",
+    franchise: "Camerún",
+    contestants: [
+      { name: "Akwa Prince", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Elong Makossa", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ewale Kumba", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fassie Belle", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Kinè Makossa", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mboa Mona", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Muna Sawa", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ndolo Divine", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Nyango Wouri", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sali Ébène", finalPlacement: "Por determinar",
+        image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
