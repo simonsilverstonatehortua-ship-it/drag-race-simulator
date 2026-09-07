@@ -717,7 +717,16 @@ function renderRoster() {
   });
 
   franchises.forEach((franchise) => {
-    const totalContestants = franchise.seasons.reduce((sum, s) => sum + s.contestants.length, 0);
+    // Las temporadas "All Stars" propias de un país (p.ej. Drag Race España: All Stars,
+    // dentro de la franquicia "España") son casi enteramente reinas repetidas de las
+    // temporadas numeradas de ese mismo país (con ficha completa ahí, no aquí), así que no
+    // se cuentan en el total de concursantes para no inflarlo con duplicados. Esto no aplica
+    // a las franquicias "All Stars" y "Global All Stars" en sí mismas, que son All Stars por
+    // definición.
+    const isCountryAllStars = (s) => franchise.name !== "All Stars" && franchise.name !== "Global All Stars" && /All Stars/.test(s.seasonName);
+    const totalContestants = franchise.seasons
+      .filter((s) => !isCountryAllStars(s))
+      .reduce((sum, s) => sum + s.contestants.length, 0);
     const flag = window.FRANCHISE_FLAGS[franchise.name] || "";
     // Si el usuario colapsó manualmente esta franquicia (p.ej. cerró "Estados Unidos" para
     // no tener que hacer scroll mientras mira "All Stars"), respeta eso en el siguiente
