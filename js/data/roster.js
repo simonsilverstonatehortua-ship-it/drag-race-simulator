@@ -98,6 +98,7 @@ const FRANCHISE_FLAGS = {
   "Pakistán": "🇵🇰",
   "Egipto": "🇪🇬",
   "Camerún": "🇨🇲",
+  "Senegal": "🇸🇳",
 };
 
 const ALL_SEASONS = [
@@ -3775,6 +3776,29 @@ const ALL_SEASONS = [
         image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Sali Ébène", finalPlacement: "Por determinar",
         image: "img/camerun-s4-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  {
+    id: "SN_S1",
+    seasonName: "Drag Race Senegal — Temporada 1",
+    franchise: "Senegal",
+    contestants: [
+      { name: "Dakarling", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fatou Fantastique", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mame Queen", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Roi Sabar", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Terenga Tina", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Thiéboudiore", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Wolofoncé", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Youssou N'Dival", finalPlacement: "Por determinar",
+        image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
