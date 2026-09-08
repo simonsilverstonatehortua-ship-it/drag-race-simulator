@@ -3801,6 +3801,31 @@ const ALL_SEASONS = [
         image: "img/senegal-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "SN_S2",
+    seasonName: "Drag Race Senegal — Temporada 2",
+    franchise: "Senegal",
+    contestants: [
+      { name: "Baobab Blonde", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Biddiiw Bu Ñuul", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ceebu Chic", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Le Sabaron", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mademoiselle Gorée", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "N'Dour de Force", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ndeye Minaj", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Saint-Louis Vuitton", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sénégaga", finalPlacement: "Por determinar",
+        image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
