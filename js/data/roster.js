@@ -3826,6 +3826,31 @@ const ALL_SEASONS = [
         image: "img/senegal-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "SN_S3",
+    seasonName: "Drag Race Senegal — Temporada 3",
+    franchise: "Senegal",
+    contestants: [
+      { name: "Awa Ba", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Cheikh", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Kiné Ba", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mame Ndiaye", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ndeye Diop", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Signare de Force", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sokhna Fall", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Thiébou Jenn", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Yacine Sène", finalPlacement: "Por determinar",
+        image: "img/senegal-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
