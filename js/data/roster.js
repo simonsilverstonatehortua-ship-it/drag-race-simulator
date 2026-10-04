@@ -2941,6 +2941,39 @@ const ALL_SEASONS = [
         image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/9/94/FrankieDoomTitans2CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20250917182816", stats: deriveStats({ acting: 7, comedy: 6, dance: 6, design: 6, improv: 6, runway: 7, lipsync: 6 }) },
     ],
   },
+  // Temporada todavía sin estrenar (estreno el 27 de octubre de 2026): solo se conoce el
+  // reparto anunciado, sin ningún resultado ni colocación. Stats planas en 7.
+  {
+    id: "BBD7",
+    seasonName: "The Boulet Brothers' Dragula — Temporada 7",
+    franchise: "Dragula",
+    contestants: [
+      { name: "Annie Agurl", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/36/AnnieAgurlTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151613", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Areal Haunting", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/3/35/ArealHauntingTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151640", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "DVVSK", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f0/DVVSKTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151716", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      // Felony Dodger y Satanna ya tienen ficha completa en su temporada anterior (BBD2 y
+      // BBD5); esta temporada aún no se ha emitido, así que aquí solo su estado.
+      { name: "Felony Dodger", finalPlacement: "Por determinar" },
+      { name: "Inkubus", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/4/41/InkubusTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151813", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Koochie Koochie Ku", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/5/5e/KoochieKoochieKuTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151844", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Krustyna Clown", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/1/17/KrustynaClownTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151911", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Purus", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/d/d2/PurusTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002151939", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Samuel Bendix", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/e/e0/SamuelBendixTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002152043", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Satanna", finalPlacement: "Por determinar" },
+      { name: "Scythe", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/f/f0/ScytheTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002152155", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Vanda LaRose", finalPlacement: "Por determinar",
+        image: "https://static.wikia.nocookie.net/logosrupaulsdragrace/images/0/03/VandaLaRoseTBBD7CastMug.jpg/revision/latest/scale-to-width-down/105?cb=20261002152222", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
   // La Más Draga no tiene stats reales modeladas en la fuente (esopare); todas sus
   // concursantes usan una base neutra de 7 en las 7 stats core.
   {
