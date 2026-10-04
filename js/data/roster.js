@@ -3976,6 +3976,33 @@ const ALL_SEASONS = [
         image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "MG_S2",
+    seasonName: "Drag Race Madagascar — Temporada 2",
+    franchise: "Madagascar",
+    contestants: [
+      { name: "Aina Ravaka", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Baobelle", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fanja Ravaka", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Hasina Mora", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Lova Rouge", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Nosy Vibe", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Rindra Vazo", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Soa Mena", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Toky Kintana", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Voahangy Bleu", finalPlacement: "Por determinar",
+        image: "img/madagascar-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
