@@ -99,6 +99,7 @@ const FRANCHISE_FLAGS = {
   "Egipto": "🇪🇬",
   "Camerún": "🇨🇲",
   "Senegal": "🇸🇳",
+  "Madagascar": "🇲🇬",
 };
 
 const ALL_SEASONS = [
@@ -3946,6 +3947,33 @@ const ALL_SEASONS = [
         image: "img/centroamerica-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Xibalbá", finalPlacement: "Por determinar",
         image: "img/centroamerica-s3-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  {
+    id: "MG_S1",
+    seasonName: "Drag Race Madagascar — Temporada 1",
+    franchise: "Madagascar",
+    contestants: [
+      { name: "Baobabe", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Emperor Sakalava", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Fara", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Malagasy Jules", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Mora Mora", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ranavalona Nasty", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ravaka mamirapirata", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Tana Turner", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Vani", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Zebu Zaa", finalPlacement: "Por determinar",
+        image: "img/madagascar-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
