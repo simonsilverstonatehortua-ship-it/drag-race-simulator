@@ -680,6 +680,20 @@ function hasRunwayPart(ep) {
   return ep.results.some((r) => r.runwayScore != null);
 }
 
+// Mini reto previo al reto principal (solo narrativa por ahora: la ganadora no cambia los
+// resultados de la semana).
+function miniScreen(ep) {
+  return {
+    title: `${ep.label}: mini reto — ${ep.mini.challenge}`,
+    button: "Ir al reto principal",
+    body: () => {
+      const wrap = performanceBody("Antes del reto principal, las reinas se juegan un mini reto...", ep.mini.results, "score");
+      wrap.appendChild(seasonRow("🏆 Ganadora del mini reto", [ep.mini.winner]));
+      return wrap;
+    },
+  };
+}
+
 function challengeScreen(ep) {
   const field = ep.results.some((r) => r.challengeScore != null) ? "challengeScore" : "score";
   return {
@@ -838,6 +852,7 @@ function buildSeasonScreens(result) {
     const group = ep.results.filter((r) => LIPSYNC_STATUSES.includes(r.status));
     const hasLipsync = group.length >= 2;
     const hasDecision = group.length > 0 || !!ep.lipsyncNote;
+    if (ep.mini) screens.push(miniScreen(ep));
     screens.push(challengeScreen(ep));
     if (hasRunwayPart(ep)) screens.push(runwayScreen(ep));
     screens.push(judgingScreen(ep, hasLipsync ? "Lip sync por la vida" : (hasDecision ? "Continuar" : "Ver el track record")));

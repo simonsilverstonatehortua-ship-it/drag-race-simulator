@@ -62,6 +62,7 @@ class ChallengeHistory extends Set {
   constructor() {
     super();
     this.last = null;
+    this.lastMini = null;
     this.forceSnatch = false;
   }
 }
@@ -73,7 +74,9 @@ class ChallengeHistory extends Set {
 // "forceId": fuerza un reto concreto (p.ej. el reto de estreno elegido) en vez de al azar.
 // Nunca sale el mismo reto en dos episodios seguidos (salvo que no quede otra opción).
 function randomChallenge(challenges, { requireElim = false, usedChallengeIds = new Set(), forceId = null } = {}) {
-  let maxis = challenges;
+  // Los mini retos (category "mini") nunca son el reto principal del episodio.
+  const mainChallenges = challenges.filter((c) => c.category !== "mini");
+  let maxis = mainChallenges.length ? mainChallenges : challenges;
   if (requireElim) {
     const withElim = maxis.filter((c) => !c.noElim);
     if (withElim.length) maxis = withElim;
@@ -97,6 +100,33 @@ function randomChallenge(challenges, { requireElim = false, usedChallengeIds = n
   if (NO_REPEAT_CHALLENGE_IDS.has(picked.id)) usedChallengeIds.add(picked.id);
   usedChallengeIds.last = picked.id;
   return picked;
+}
+
+// Probabilidad de que un episodio tenga mini reto antes del reto principal.
+const MINI_CHALLENGE_CHANCE = 0.75;
+
+// Mini reto previo al reto principal: entre las concursantes del episodio, puntuadas con la
+// media de las estadísticas del mini reto + el bono al azar de -1 a 5 (sin pasarela aparte).
+// Gana la de mayor puntuación (desempate al azar). Por ahora solo es narrativa: no cambia los
+// resultados del episodio. Devuelve null si esa semana no hay mini reto (o no hay ninguno en
+// el catálogo). Nunca repite el mismo mini reto en dos episodios seguidos.
+function runMiniChallenge(names, db, statsByName, history) {
+  if (names.length < 2 || Math.random() >= MINI_CHALLENGE_CHANCE) return null;
+  let minis = db.challenges.filter((c) => c.category === "mini");
+  if (!minis.length) return null;
+  const notPrevious = minis.filter((c) => c.id !== history.lastMini);
+  if (notPrevious.length) minis = notPrevious;
+  const mini = minis[Math.floor(Math.random() * minis.length)];
+  history.lastMini = mini.id;
+
+  const keys = mini.stats && mini.stats.length ? mini.stats : ALL_STAT_KEYS;
+  const results = names.map((name) => {
+    const stats = statsByName[name];
+    const vals = keys.map((k) => (stats && typeof stats[k] === "number") ? stats[k] : 0);
+    return { name, score: average(vals) + performanceBonus() };
+  });
+  results.sort((a, b) => b.score - a.score || Math.random() - 0.5);
+  return { challenge: mini.label, results, winner: results[0].name };
 }
 
 // El Snatch Game sale en todas las temporadas. Antes de cada episodio normal se decide si
@@ -836,6 +866,8 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   // Game pendiente; ver ChallengeHistory): se comparte esta misma referencia en todas las
   // llamadas para que no se repitan retos de firma ni el mismo reto dos episodios seguidos.
   const usedChallengeIds = new ChallengeHistory();
+  // Mini reto de un episodio, entre las concursantes que participan en él (ver runMiniChallenge).
+  const miniFor = (ep) => runMiniChallenge(ep.results.map((r) => r.name), db, statsByName, usedChallengeIds);
 
   // Twist de Inmunidad: quien gana el reto de la semana no puede caer en el fondo la
   // semana siguiente (ver assignPlacementsAndElimination). Se recalcula tras cada episodio
@@ -891,7 +923,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   } else if (porkchopPremiere) {
     const maxElim = Math.max(0, active.length - finaleSize);
     const ep = runPorkchopPremiere(active, db, statsByName, maxElim, openingChallengeId, usedChallengeIds, immuneNames);
-    log.push({ label: "Episodio 1 (Porkchop)", ...ep });
+    log.push({ label: "Episodio 1 (Porkchop)", ...ep, mini: miniFor(ep) });
     processElimination(ep);
     if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
   } else if (doublePremiere) {
@@ -900,17 +932,17 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
     const groupB = shuffled.slice(Math.ceil(shuffled.length / 2));
     const maxElimA = Math.max(0, active.length - finaleSize);
     const epA = runEpisode(groupA, db, { noElim: noElimPremiere, maxElim: maxElimA, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
-    log.push({ label: "Episodio 1a (grupo A)", ...epA });
+    log.push({ label: "Episodio 1a (grupo A)", ...epA, mini: miniFor(epA) });
     processElimination(epA);
     const maxElimB = Math.max(0, active.length - finaleSize);
     const epB = runEpisode(groupB, db, { noElim: noElimPremiere, maxElim: maxElimB, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
-    log.push({ label: "Episodio 1b (grupo B)", ...epB });
+    log.push({ label: "Episodio 1b (grupo B)", ...epB, mini: miniFor(epB) });
     processElimination(epB);
     if (immunityEnabled) immuneNames = new Set([...winnersOf(epA), ...winnersOf(epB)]);
   } else {
     const maxElim = Math.max(0, active.length - finaleSize);
     const ep = runEpisode(active, db, { noElim: noElimPremiere, maxElim, forceChallengeId: openingChallengeId, usedChallengeIds, immuneNames }, statsByName);
-    log.push({ label: "Episodio 1", ...ep });
+    log.push({ label: "Episodio 1", ...ep, mini: miniFor(ep) });
     processElimination(ep);
     if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
   }
@@ -932,7 +964,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
     } else {
       ep = runEpisode(active, db, { maxElim, usedChallengeIds, immuneNames }, statsByName);
     }
-    log.push({ label: `Episodio ${episodeNum}`, ...ep });
+    log.push({ label: `Episodio ${episodeNum}`, ...ep, mini: miniFor(ep) });
     processElimination(ep);
     if (immunityEnabled) immuneNames = new Set(winnersOf(ep));
 
@@ -992,8 +1024,11 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
 
   const finalistsResults = finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
     status: f.name === winnerName ? "WINNER" : f.name === runnerUpName ? "RUNNER_UP" : "SAFE" }));
-  const eliminatedGuestResults = eliminated.map((name) => ({ name, score: null,
-    status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" }));
+  // Miss Simpatía se entrega una sola vez: en la reunión (si es su propio capítulo) o en la
+  // final (si la reunión va dentro de ella), nunca en las dos. Donde no se entrega, la ganadora
+  // sale como una invitada más.
+  const guestResults = (awardsMissCongeniality) => eliminated.map((name) => ({ name, score: null,
+    status: awardsMissCongeniality && name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" }));
 
   const guestsNote = eliminated.length
     ? ` Las eliminadas vuelven como invitadas.${reunionType === "SAME" && missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`
@@ -1001,7 +1036,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
-    results: [...finalistsResults, ...eliminatedGuestResults],
+    results: [...finalistsResults, ...guestResults(reunionType === "SAME")],
     eliminatedNames: [],
     lipsyncNote: finaleLipsyncNote + guestsNote,
   };
@@ -1013,7 +1048,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
     log.push({
       label: "Reunión",
       challenge: "Reunión",
-      results: [...finalists.map((name) => ({ name, score: null, status: "RUN" })), ...eliminatedGuestResults],
+      results: [...finalists.map((name) => ({ name, score: null, status: "RUN" })), ...guestResults(true)],
       eliminatedNames: [],
       lipsyncNote: `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""} Las finalistas ya están confirmadas pero todavía no han hecho el lip sync final.`,
     });

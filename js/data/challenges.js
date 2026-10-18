@@ -1,5 +1,6 @@
 // Catálogo de tipos de reto (maxi challenges), extraídos de tu hoja TRACKRECORDS.
-// category: "maxi" (reto principal) | "mini" (mini reto) | "runway" (solo pasarela)
+// category: "maxi" (reto principal) | "mini" (mini reto: se juega antes del reto principal
+// y nunca sale como reto principal) | "runway" (solo pasarela)
 // stats: qué estadísticas de la concursante (js/data/roster.js) son relevantes para este
 // reto; el motor de simulación (js/engine.js) las usa para influir en la puntuación en
 // vez de puntuar totalmente al azar. Si se deja vacío (p.ej. en retos personalizados sin
@@ -43,6 +44,27 @@ const DEFAULT_CHALLENGES = [
   { id: "CHOREO_LOOKS", label: "Coreografía y looks de coreo", category: "maxi", custom: false,
     stats: ["dance", "design", "makeup"],
     description: "Reto doble: montar una coreografía grupal/individual y diseñar los looks que se lucirán en ella." },
+
+  // Mini retos (category: "mini"): el motor los juega antes del reto principal en casi todos
+  // los episodios. Nunca se eligen como reto principal.
+  { id: "MINI_RUNWAY", label: "Pasarela exprés", category: "mini", custom: false, stats: ["runway", "makeup"],
+    description: "Una pasarela relámpago con un look improvisado." },
+  { id: "MINI_IMPROV", label: "Improvisación relámpago", category: "mini", custom: false, stats: ["improv", "comedy"],
+    description: "Una improvisación cómica de un minuto con un tema sorpresa." },
+  { id: "MINI_DANCE", label: "Baile exprés", category: "mini", custom: false, stats: ["dance"],
+    description: "Aprender y bailar una coreografía corta en tiempo récord." },
+  { id: "MINI_LIPSYNC", label: "Lip sync relámpago", category: "mini", custom: false, stats: ["lipsync"],
+    description: "Un lip sync de treinta segundos a una canción sorpresa." },
+  { id: "MINI_DESIGN", label: "Carrera de diseño", category: "mini", custom: false, stats: ["design"],
+    description: "Montar una prenda con lo que haya a mano en cinco minutos." },
+  { id: "MINI_READING", label: "Reading Is Fundamental", category: "mini", custom: false, stats: ["verses", "comedy"],
+    description: "Un duelo de reads: gana la que tire las mejores indirectas." },
+  { id: "MINI_SINGING", label: "Canto a capela", category: "mini", custom: false, stats: ["singing"],
+    description: "Cantar en directo, sin música, un estribillo conocido." },
+  { id: "MINI_ACTING", label: "Escena dramática exprés", category: "mini", custom: false, stats: ["acting"],
+    description: "Una escena dramática de un minuto con un guion de una línea." },
+  { id: "MINI_PHOTO", label: "Sesión de fotos exprés", category: "mini", custom: false, stats: ["runway", "charisma"],
+    description: "Una sesión de fotos relámpago con tres poses." },
 ];
 
 // Escala de puntuación por reto usada en tu hoja (0 a 10).
