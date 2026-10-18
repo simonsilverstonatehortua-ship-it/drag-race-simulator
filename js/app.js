@@ -782,6 +782,8 @@ function finalPerformanceScreen(ep) {
         (groups[tier] = groups[tier] || []).push(r.name);
       });
       tiers.forEach((tier) => { if (groups[tier]) wrap.appendChild(seasonRow(TIER_LABELS[tier], groups[tier])); });
+      const guests = ep.results.filter((r) => r.status === "GUEST" || r.status === "MISS_CONGENIALITY").map((r) => r.name);
+      if (guests.length) wrap.appendChild(seasonRow("Las eliminadas vuelven como invitadas", guests));
       return wrap;
     },
   };

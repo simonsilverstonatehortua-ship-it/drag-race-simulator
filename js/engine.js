@@ -44,19 +44,34 @@ const RELATIONSHIP_LEVELS = ["le cae muy bien", "le cae bien", "normal", "le cae
 const OPENING_CHALLENGE_IDS = ["TALENT_SHOW", "GIRL_GROUP", "DESIGN", "RUNWAY"];
 window.OPENING_CHALLENGE_IDS = OPENING_CHALLENGE_IDS;
 
-// Tipos de reunión, elegidos al azar cada temporada: sin reunión, antes de la final (su
-// propio capítulo), el mismo capítulo que la final, o después de la final.
-const REUNION_TYPES = ["NONE", "BEFORE", "SAME", "AFTER"];
+// Tipos de reunión, elegidos al azar cada temporada: antes de la final (su propio capítulo)
+// o dentro de la propia final. Nunca después de la final. En ambos casos las eliminadas
+// vuelven como invitadas (GUEST) en la final.
+const REUNION_TYPES = ["BEFORE", "SAME"];
 
 // Retos "de firma" que no se repiten dos veces en la misma temporada (a diferencia de
 // retos genéricos como Actuación o Coreografía, que sí pueden repetirse con otra temática).
 const NO_REPEAT_CHALLENGE_IDS = new Set(["TALENT_SHOW", "RUSICAL", "BALL", "MAKEOVER", "MUSIC_VIDEO", "SNATCH_GAME", "ROAST", "RUMIX"]);
 
+const SNATCH_GAME_ID = "SNATCH_GAME";
+
+// Historial de retos de una temporada, compartido en todas las llamadas. Como Set guarda los
+// ids de los retos "de firma" ya salidos; además recuerda el último reto (para no repetirlo
+// en dos episodios seguidos) y si este episodio toca forzar el Snatch Game.
+class ChallengeHistory extends Set {
+  constructor() {
+    super();
+    this.last = null;
+    this.forceSnatch = false;
+  }
+}
+
 // "requireElim": excluye retos marcados "noElim" para formatos (equipos, Lipsync Assassin,
 // Lipsync For Your Legacy) cuya lógica exige que alguien se vaya esa semana.
-// "usedChallengeIds": set (compartido durante toda la temporada) de ids de retos "de firma"
-// ya salidos, para no repetirlos; se actualiza aquí mismo con el reto elegido.
+// "usedChallengeIds": historial (ver ChallengeHistory) compartido durante toda la temporada;
+// se actualiza aquí mismo con el reto elegido.
 // "forceId": fuerza un reto concreto (p.ej. el reto de estreno elegido) en vez de al azar.
+// Nunca sale el mismo reto en dos episodios seguidos (salvo que no quede otra opción).
 function randomChallenge(challenges, { requireElim = false, usedChallengeIds = new Set(), forceId = null } = {}) {
   let maxis = challenges;
   if (requireElim) {
@@ -68,14 +83,30 @@ function randomChallenge(challenges, { requireElim = false, usedChallengeIds = n
   if (forceId) {
     picked = maxis.find((c) => c.id === forceId);
   }
+  if (!picked && usedChallengeIds.forceSnatch) {
+    picked = maxis.find((c) => c.id === SNATCH_GAME_ID && !usedChallengeIds.has(c.id) && c.id !== usedChallengeIds.last);
+  }
   if (!picked) {
     const notRepeated = maxis.filter((c) => !(NO_REPEAT_CHALLENGE_IDS.has(c.id) && usedChallengeIds.has(c.id)));
     if (notRepeated.length) maxis = notRepeated;
+    const notPrevious = maxis.filter((c) => c.id !== usedChallengeIds.last);
+    if (notPrevious.length) maxis = notPrevious;
     picked = maxis[Math.floor(Math.random() * maxis.length)];
   }
 
   if (NO_REPEAT_CHALLENGE_IDS.has(picked.id)) usedChallengeIds.add(picked.id);
+  usedChallengeIds.last = picked.id;
   return picked;
+}
+
+// El Snatch Game sale en todas las temporadas. Antes de cada episodio normal se decide si
+// toca forzarlo (si todavía no ha salido): la probabilidad es 1 / (episodios normales que
+// quedan menos uno), así que cae en un momento al azar de la temporada y, como tarde, sale
+// cuando quedan dos episodios. Ese margen de uno cubre las eliminaciones dobles por empate,
+// que pueden acortar la temporada antes de que le toque salir.
+function scheduleSnatchGame(history, activeCount, finaleSize) {
+  const remaining = Math.max(1, activeCount - finaleSize);
+  history.forceSnatch = !history.has(SNATCH_GAME_ID) && Math.random() < 1 / Math.max(1, remaining - 1);
 }
 
 function shuffle(arr) {
@@ -801,9 +832,10 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   const relationships = presetRelationships
     ? normalizeRelationships(contestantNames, presetRelationships)
     : generateRelationships(contestantNames, statsByName);
-  // Retos "de firma" ya salidos esta temporada (ver NO_REPEAT_CHALLENGE_IDS): se comparte
-  // esta misma referencia en todas las llamadas para que no se repitan en toda la temporada.
-  const usedChallengeIds = new Set();
+  // Historial de retos de la temporada (retos "de firma" ya salidos, último reto, Snatch
+  // Game pendiente; ver ChallengeHistory): se comparte esta misma referencia en todas las
+  // llamadas para que no se repitan retos de firma ni el mismo reto dos episodios seguidos.
+  const usedChallengeIds = new ChallengeHistory();
 
   // Twist de Inmunidad: quien gana el reto de la semana no puede caer en el fondo la
   // semana siguiente (ver assignPlacementsAndElimination). Se recalcula tras cada episodio
@@ -843,7 +875,12 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
 
   // Si se deja en "Al azar" (sin elegir un reto de estreno concreto), el sorteo es solo
   // entre los 4 retos de estreno, no entre todo el catálogo.
+  // Excepción: en una temporada tan corta que el estreno es el único episodio normal (el
+  // estreno doble elimina hasta 2, uno por grupo), el estreno es el Snatch Game para que
+  // salga en todas las temporadas.
+  const premiereIsOnlyRegularEpisode = active.length - finaleSize <= (doublePremiere ? 2 : 1);
   const openingChallengeId = formatChoice.openingChallenge
+    || (premiereIsOnlyRegularEpisode && !meetTheQueensPremiere ? SNATCH_GAME_ID : null)
     || OPENING_CHALLENGE_IDS[Math.floor(Math.random() * OPENING_CHALLENGE_IDS.length)];
 
   if (meetTheQueensPremiere) {
@@ -884,6 +921,7 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   while (active.length > finaleSize) {
     let ep;
     const maxElim = Math.max(0, active.length - finaleSize);
+    scheduleSnatchGame(usedChallengeIds, active.length, finaleSize);
     if (formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" && active.length >= 3) {
       ep = runLipsyncAssassinEpisode(active, db, statsByName, relationships, usedChallengeIds);
     } else if (formatChoice.season === "SEASON_LIPSYNC_LEGACY" && active.length >= 3) {
@@ -947,9 +985,9 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   // finalista); se elige según quién mejor se lleve con el resto en la tabla de relaciones.
   const missCongeniality = eliminated.length ? pickMissCongeniality(eliminated, relationships) : null;
 
-  // Reunión: al azar, puede no haberla, ir antes de la final (como su propio capítulo),
-  // ser el mismo capítulo que la final, o ir después. Es donde el resto de la temporada
-  // "vuelve" (GUEST) y se revela Miss Simpatía, al estilo de la wiki/el Excel.
+  // Reunión: al azar, o es su propio capítulo antes de la final (BEFORE) o ocurre dentro de la
+  // propia final (SAME); nunca después. Es donde se revela Miss Simpatía. En ambos casos las
+  // eliminadas vuelven como invitadas (GUEST) en la final.
   const reunionType = REUNION_TYPES[Math.floor(Math.random() * REUNION_TYPES.length)];
 
   const finalistsResults = finaleScoredForLog.map((f) => ({ name: f.name, score: f.score,
@@ -957,38 +995,30 @@ function simulateSeason(contestantNames, formatChoice, db, statsByName = {}, pre
   const eliminatedGuestResults = eliminated.map((name) => ({ name, score: null,
     status: name === missCongeniality ? "MISS_CONGENIALITY" : "GUEST" }));
 
+  const guestsNote = eliminated.length
+    ? ` Las eliminadas vuelven como invitadas.${reunionType === "SAME" && missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`
+    : "";
   const finalLogEntry = {
     label: "Final",
     challenge: finaleLabel,
-    results: reunionType === "SAME" ? [...finalistsResults, ...eliminatedGuestResults] : finalistsResults,
+    results: [...finalistsResults, ...eliminatedGuestResults],
     eliminatedNames: [],
-    lipsyncNote: finaleLipsyncNote,
+    lipsyncNote: finaleLipsyncNote + guestsNote,
   };
 
-  // En la reunión (cuando es su propio capítulo) las finalistas también "aparecen": si es
-  // antes de la final todavía no han hecho el lip sync final, así que quedan como RUN (ya
-  // clasificadas, corriendo por la corona); si es después, ya se coronó todo y quedan como
-  // invitadas más (GUEST), igual que el resto de la temporada.
-  let reunionResults = eliminatedGuestResults;
-  let reunionNote = `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""}`;
+  // Reunión como capítulo propio (antes de la final): las finalistas también "aparecen", pero
+  // todavía no han hecho el lip sync final, así que quedan como RUN (ya clasificadas,
+  // corriendo por la corona).
   if (reunionType === "BEFORE") {
-    reunionResults = [...finalists.map((name) => ({ name, score: null, status: "RUN" })), ...eliminatedGuestResults];
-    reunionNote += " Las finalistas ya están confirmadas pero todavía no han hecho el lip sync final.";
-  } else if (reunionType === "AFTER") {
-    reunionResults = [...finalists.map((name) => ({ name, score: null, status: "GUEST" })), ...eliminatedGuestResults];
-    reunionNote += " Las finalistas también vuelven, ya coronada la temporada.";
+    log.push({
+      label: "Reunión",
+      challenge: "Reunión",
+      results: [...finalists.map((name) => ({ name, score: null, status: "RUN" })), ...eliminatedGuestResults],
+      eliminatedNames: [],
+      lipsyncNote: `Las eliminadas de la temporada vuelven para la reunión.${missCongeniality ? ` ${missCongeniality} gana Miss Simpatía.` : ""} Las finalistas ya están confirmadas pero todavía no han hecho el lip sync final.`,
+    });
   }
-  const reunionLogEntry = {
-    label: "Reunión",
-    challenge: "Reunión",
-    results: reunionResults,
-    eliminatedNames: [],
-    lipsyncNote: reunionNote,
-  };
-
-  if (reunionType === "BEFORE") log.push(reunionLogEntry);
   log.push(finalLogEntry);
-  if (reunionType === "AFTER") log.push(reunionLogEntry);
 
   const finalPlacements = { [winnerName]: "WINNER", [runnerUpName]: "RUNNER_UP" };
   restNames.forEach((name, i) => { finalPlacements[name] = `${i + 3}º lugar`; });
