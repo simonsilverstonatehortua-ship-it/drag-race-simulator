@@ -102,6 +102,7 @@ const FRANCHISE_FLAGS = {
   "Madagascar": "🇲🇬",
   "Etiopía": "🇪🇹",
   "Rumanía": "🇷🇴",
+  "Malasia": "🇲🇾",
 };
 
 const ALL_SEASONS = [
@@ -4152,6 +4153,33 @@ const ALL_SEASONS = [
         image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Sânziana Soare", finalPlacement: "Por determinar",
         image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  {
+    id: "MY_S1",
+    seasonName: "Drag Race Malasia — Temporada 1",
+    franchise: "Malasia",
+    contestants: [
+      { name: "Bunga Raya", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Cik Embun", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dayang Dara", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Intan Kasturi", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Jebat", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Laksamana", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Melur Malam", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Nyonya Black", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Puteri Mayang", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Santubong", finalPlacement: "Por determinar",
+        image: "img/malasia-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
