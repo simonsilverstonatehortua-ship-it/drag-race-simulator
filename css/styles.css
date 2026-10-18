@@ -513,6 +513,30 @@ footer {
   margin-bottom: 1rem;
 }
 
+.season-screen__step { margin-bottom: 0.3rem; }
+.season-screen__title { margin: 0 0 1rem; }
+.season-row { margin-bottom: 1rem; }
+.season-row__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--teal);
+  margin-bottom: 0.4rem;
+}
+.season-names { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.season-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem 0.25rem 0.3rem;
+  font-size: 0.9rem;
+}
+.season-line { font-size: 1.1rem; margin: 0.6rem 0; }
+.season-line--out { color: var(--magenta); font-weight: 700; }
+
 .episode {
   border: 1px solid var(--line);
   border-radius: var(--radius);

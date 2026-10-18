@@ -3,8 +3,7 @@ let DB = window.RulesStore.loadDB();
 const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
-let lastSimResult = null;
-let revealedEpisodes = 1;
+let seasonPlayer = null;
 let rosterSeasonTab = {};
 let rosterDrawerOpen = {};
 
@@ -146,6 +145,7 @@ let selectedTwists = new Set();
 // ahí para no declarar el mismo identificador dos veces en el ámbito global compartido).
 
 function renderSimulate() {
+  if (seasonPlayer) return renderSeasonScreen();
   const wrap = el("div", { class: "section" });
   wrap.appendChild(el("div", { class: "section__head" }, [
     el("h2", { text: "Simular temporada" }),
@@ -285,8 +285,6 @@ function renderSimulate() {
     el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: runSimulation }),
   ]));
 
-  if (lastSimResult) wrap.appendChild(renderSimResult(lastSimResult, revealedEpisodes));
-
   return wrap;
 }
 
@@ -302,9 +300,9 @@ function runSimulation() {
   const names = [...simSelection];
   if (names.length < 3) return alert("Selecciona al menos 3 concursantes.");
   const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName());
-  lastSimResult = result;
-  revealedEpisodes = 1;
+  seasonPlayer = { result, screens: buildSeasonScreens(result), index: 0 };
   render();
+  window.scrollTo(0, 0);
 }
 
 // Agrupa el log de la temporada en columnas de trackrecord (solo los episodios que
@@ -494,63 +492,268 @@ function trackRecordTable(track, shown, result) {
   return tableWrap;
 }
 
-function renderSimResult(result, revealedCount) {
-  const wrap = el("div", { class: "sim-result" });
+// ---------- REPRODUCTOR DE TEMPORADA (capítulo a capítulo) ----------
+// Al simular, la temporada ya viene calculada entera (result.log). Aquí solo se presenta
+// pantalla a pantalla, como los simuladores de referencia: cada pantalla sustituye a la
+// anterior y se avanza con un botón. Cada capítulo recorre: reto → jurado → (lip sync →
+// decisión) → track record con PPE hasta ese momento.
+
+const TIER_LABELS = {
+  great: "Actuación genial",
+  good: "Buena actuación",
+  ok: "Actuación correcta",
+  bad: "Mala actuación",
+  flop: "Un desastre (flop)",
+  skip: "Pasan directas (ganaron su mini reto)",
+};
+const TIER_ORDER = ["great", "good", "ok", "bad", "flop", "skip"];
+const LIPSYNC_STATUSES = ["BTM", "BTM_MULTI", "ELIM", "ELIM_MULTI"];
+
+// El nivel de actuación de cada reina sale de su estado final en el episodio, que a su vez
+// sale de su puntuación: así lo que se ve en el reto nunca contradice al jurado.
+function tierOfResult(r) {
+  if (r.score == null) return "skip";
+  if (["WIN", "WIN_TIE", "TOP2"].includes(r.status)) return "great";
+  if (["HIGH", "HIGH_GROUP"].includes(r.status)) return "good";
+  if (r.status === "LOW") return "bad";
+  if (LIPSYNC_STATUSES.includes(r.status)) return "flop";
+  return "ok";
+}
+
+function joinNames(names) {
+  if (names.length <= 1) return names.join("");
+  if (names.length === 2) return names.join(" y ");
+  return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
+}
+
+function seasonNames(names) {
+  const row = el("div", { class: "season-names" });
+  names.forEach((name) => {
+    const chip = el("span", { class: "season-name" });
+    const avatar = avatarImg(name, "avatar--result");
+    if (avatar) chip.appendChild(avatar);
+    chip.appendChild(el("span", { text: name }));
+    row.appendChild(chip);
+  });
+  return row;
+}
+
+function seasonRow(label, names) {
+  return el("div", { class: "season-row" }, [
+    el("div", { class: "season-row__label", text: label }),
+    seasonNames(names),
+  ]);
+}
+
+function introScreen(result) {
+  return {
+    title: "¡Conoce a las concursantes!",
+    button: "Empezar la temporada",
+    body: () => {
+      const wrap = el("div", {});
+      if (result.notes.length) {
+        const notesBox = el("div", { class: "notes-box" });
+        result.notes.forEach((n) => notesBox.appendChild(el("p", { class: "muted small", text: "⚠ " + n })));
+        wrap.appendChild(notesBox);
+      }
+      const names = Object.keys(result.relationships);
+      wrap.appendChild(el("p", { class: "muted", text: `${names.length} concursantes compiten por la corona.` }));
+      wrap.appendChild(seasonNames(names));
+      wrap.appendChild(el("h3", { class: "group-title", text: "Relaciones antes de empezar" }));
+      wrap.appendChild(el("p", { class: "muted small", text: "Quién opina qué de quién (fila = quién opina, columna = sobre quién). Cuanta más Estrategia tenga una concursante, más marcadas son sus opiniones." }));
+      wrap.appendChild(relationshipsTable(names, result.relationships));
+      return wrap;
+    },
+  };
+}
+
+function challengeScreen(ep) {
+  return {
+    title: `${ep.label}: ${ep.challenge}`,
+    button: "Ir al jurado",
+    body: () => {
+      const wrap = el("div", {});
+      wrap.appendChild(el("p", { class: "muted", text: "Las reinas dan todo en el reto de hoy..." }));
+      TIER_ORDER.forEach((tier) => {
+        const names = ep.results.filter((r) => tierOfResult(r) === tier).map((r) => r.name);
+        if (names.length) wrap.appendChild(seasonRow(TIER_LABELS[tier], names));
+      });
+      return wrap;
+    },
+  };
+}
+
+function judgingScreen(ep, button) {
+  return {
+    title: "Las jueces han decidido",
+    button,
+    body: () => {
+      const by = (...ids) => ep.results.filter((r) => ids.includes(r.status)).map((r) => r.name);
+      const wrap = el("div", {});
+      const rows = [
+        ["Ganadora del reto", by("WIN", "WIN_TIE")],
+        ["Top 2", by("TOP2")],
+        ["Tops del reto", by("HIGH", "HIGH_GROUP")],
+        ["A salvo", by("SAFE")],
+        ["En el bottom, a salvo de la eliminación", by("LOW")],
+        ["Al lip sync por su vida", by(...LIPSYNC_STATUSES)],
+      ];
+      rows.forEach(([label, names]) => { if (names.length) wrap.appendChild(seasonRow(label, names)); });
+      return wrap;
+    },
+  };
+}
+
+function lipsyncScreen(group) {
+  return {
+    title: "Lip sync por la vida",
+    button: "Mostrar resultado",
+    body: () => {
+      const wrap = el("div", {});
+      wrap.appendChild(el("p", { class: "muted", text: "Ha llegado la hora... de hacer lip sync por vuestras vidas. ¡Buena suerte!" }));
+      wrap.appendChild(seasonNames(group.map((r) => r.name)));
+      return wrap;
+    },
+  };
+}
+
+function decisionScreen(ep, group) {
+  return {
+    title: group.length ? "La decisión" : "Un momento especial",
+    button: "Ver el track record",
+    body: () => {
+      const wrap = el("div", {});
+      const eliminated = group.filter((r) => r.status === "ELIM" || r.status === "ELIM_MULTI").map((r) => r.name);
+      const stays = group.filter((r) => r.status === "BTM").map((r) => r.name);
+      const doubleShantay = group.filter((r) => r.status === "BTM_MULTI").map((r) => r.name);
+      if (doubleShantay.length) wrap.appendChild(el("p", { class: "season-line", text: `${joinNames(doubleShantay)}: doble shantay, nadie se va a casa esta semana.` }));
+      if (stays.length) wrap.appendChild(el("p", { class: "season-line", text: `${joinNames(stays)}, shantay, ${stays.length > 1 ? "os quedáis" : "te quedas"}.` }));
+      if (eliminated.length) wrap.appendChild(el("p", { class: "season-line season-line--out", text: `${joinNames(eliminated)}, sashay away...` }));
+      if (ep.lipsyncNote) wrap.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
+      return wrap;
+    },
+  };
+}
+
+function trackRecordScreen(ep, track, result, shownColumns) {
+  return {
+    title: `Track record · ${ep.label}`,
+    button: "Continuar",
+    body: () => trackRecordTable(track, shownColumns, result),
+  };
+}
+
+function noteScreen(ep) {
+  return {
+    title: ep.label,
+    button: "Continuar",
+    body: () => el("p", { text: ep.lipsyncNote }),
+  };
+}
+
+function finalPerformanceScreen(ep) {
+  return {
+    title: `${ep.label}: ${ep.challenge}`,
+    button: "Ver la decisión",
+    body: () => {
+      const wrap = el("div", {});
+      wrap.appendChild(el("p", { class: "muted", text: "Las finalistas dan su última actuación..." }));
+      const tiers = ["great", "good", "ok", "bad"];
+      const groups = {};
+      ep.results.filter((r) => r.score != null).forEach((r, i) => {
+        const tier = tiers[Math.min(i, tiers.length - 1)];
+        (groups[tier] = groups[tier] || []).push(r.name);
+      });
+      tiers.forEach((tier) => { if (groups[tier]) wrap.appendChild(seasonRow(TIER_LABELS[tier], groups[tier])); });
+      return wrap;
+    },
+  };
+}
+
+function finalDecisionScreen(ep) {
+  return {
+    title: "La corona",
+    button: "Ver la clasificación final",
+    body: () => el("p", { text: ep.lipsyncNote }),
+  };
+}
+
+function finalClassificationScreen(result, track) {
+  return {
+    title: `¡${result.winnerName} es la ganadora!`,
+    button: "Volver a simular",
+    body: () => {
+      const wrap = el("div", {});
+      wrap.appendChild(el("h3", { class: "group-title", text: "Track record completo" }));
+      wrap.appendChild(trackRecordTable(track, track.columns.length, result));
+      wrap.appendChild(el("h3", { class: "group-title", text: "Clasificación final" }));
+      const podium = el("div", { class: "grid" });
+      Object.entries(result.finalPlacements)
+        .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
+        .forEach(([name, place]) => {
+          const card = el("div", { class: "card card--queen" });
+          const avatar = avatarImg(name, "avatar--podium");
+          if (avatar) card.appendChild(avatar);
+          card.appendChild(el("strong", { text: name }));
+          card.appendChild(el("div", { class: "muted small", text: place }));
+          if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
+          podium.appendChild(card);
+        });
+      wrap.appendChild(podium);
+      return wrap;
+    },
+  };
+}
+
+function buildSeasonScreens(result) {
   const track = buildTrackRecord(result);
-  const totalCols = track.columns.length;
-  const shown = Math.min(revealedCount, totalCols);
+  const columnOfLogIndex = new Map(track.columns.map((c, i) => [c.idx, i]));
+  const screens = [introScreen(result)];
 
-  wrap.appendChild(el("h3", { class: "group-title", text: "Resultado" }));
+  result.log.forEach((ep, idx) => {
+    const hasResults = ep.results && ep.results.length > 0;
+    if (!hasResults) { if (ep.lipsyncNote) screens.push(noteScreen(ep)); return; }
+    if (ep.label === "Reunión") { screens.push(noteScreen({ label: "La reunión", lipsyncNote: ep.lipsyncNote })); return; }
+    if (ep.label === "Final") { screens.push(finalPerformanceScreen(ep), finalDecisionScreen(ep)); return; }
 
-  if (result.notes.length) {
-    const notesBox = el("div", { class: "notes-box" });
-    result.notes.forEach((n) => notesBox.appendChild(el("p", { class: "muted small", text: "⚠ " + n })));
-    wrap.appendChild(notesBox);
-  }
-
-  if (result.relationships) {
-    wrap.appendChild(el("h3", { class: "group-title", text: "Relaciones antes de empezar" }));
-    wrap.appendChild(el("p", { class: "muted small", text: "Quién opina qué de quién (fila = quién opina, columna = sobre quién). Cuanta más Estrategia tenga una concursante, más marcadas son sus opiniones." }));
-    wrap.appendChild(relationshipsTable(Object.keys(result.relationships), result.relationships));
-  }
-
-  wrap.appendChild(trackRecordTable(track, shown, result));
-
-  // Regresos/LaLaParUza: no forman su propia columna en la tabla (no reparten estados),
-  // así que se anotan aparte. El reto de cada capítulo normal ya sale en la tabla, debajo
-  // del número de episodio.
-  const cutoff = shown <= 0 ? -1 : (track.columns[shown] ? track.columns[shown].idx : track.indexed.length) - 1;
-  result.log.slice(0, cutoff + 1).forEach((ep) => {
-    if (ep.results && ep.results.length > 0) return;
-    if (!ep.lipsyncNote) return;
-    const epBox = el("div", { class: "episode" });
-    epBox.appendChild(el("div", { class: "episode__head" }, [el("strong", { text: ep.label })]));
-    epBox.appendChild(el("p", { class: "muted small", text: ep.lipsyncNote }));
-    wrap.appendChild(epBox);
+    const group = ep.results.filter((r) => LIPSYNC_STATUSES.includes(r.status));
+    const hasLipsync = group.length >= 2;
+    const hasDecision = group.length > 0 || !!ep.lipsyncNote;
+    screens.push(challengeScreen(ep));
+    screens.push(judgingScreen(ep, hasLipsync ? "Lip sync por la vida" : (hasDecision ? "Continuar" : "Ver el track record")));
+    if (hasLipsync) screens.push(lipsyncScreen(group));
+    if (hasDecision) screens.push(decisionScreen(ep, group));
+    screens.push(trackRecordScreen(ep, track, result, columnOfLogIndex.get(idx) + 1));
   });
 
-  if (shown < totalCols) {
-    wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
-      el("button", { class: "btn btn--accent", text: "▶ Siguiente episodio", onclick: () => { revealedEpisodes = shown + 1; render(); } }),
-      el("button", { class: "btn btn--ghost", text: "Revelar todo", onclick: () => { revealedEpisodes = totalCols; render(); } }),
-    ]));
-  } else {
-    wrap.appendChild(el("h3", { class: "group-title", text: "Clasificación final" }));
-    const podium = el("div", { class: "grid" });
-    Object.entries(result.finalPlacements)
-      .sort((a, b) => placementRank(a[1]) - placementRank(b[1]))
-      .forEach(([name, place]) => {
-        const card = el("div", { class: "card card--queen" });
-        const avatar = avatarImg(name, "avatar--podium");
-        if (avatar) card.appendChild(avatar);
-        card.appendChild(el("strong", { text: name }));
-        card.appendChild(el("div", { class: "muted small", text: place }));
-        if (name === result.missCongeniality) card.appendChild(el("div", { class: "badge", text: "Miss Simpatía" }));
-        podium.appendChild(card);
-      });
-    wrap.appendChild(podium);
-  }
+  screens.push(finalClassificationScreen(result, track));
+  return screens;
+}
 
+function exitSeason() {
+  seasonPlayer = null;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function renderSeasonScreen() {
+  const { screens, index } = seasonPlayer;
+  const screen = screens[index];
+  const isLast = index === screens.length - 1;
+  const go = (to) => { seasonPlayer.index = to; render(); window.scrollTo(0, 0); };
+
+  const wrap = el("div", { class: "section season-screen" });
+  wrap.appendChild(el("div", { class: "season-screen__step muted small", text: `Pantalla ${index + 1} de ${screens.length}` }));
+  wrap.appendChild(el("h2", { class: "season-screen__title", text: screen.title }));
+  wrap.appendChild(screen.body());
+
+  const actions = el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1.2rem;" });
+  actions.appendChild(el("button", { class: "btn btn--accent", text: screen.button, onclick: isLast ? exitSeason : () => go(index + 1) }));
+  if (!isLast) {
+    actions.appendChild(el("button", { class: "btn btn--ghost", text: "Saltar al final", onclick: () => go(screens.length - 1) }));
+    actions.appendChild(el("button", { class: "btn btn--ghost", text: "Salir", onclick: exitSeason }));
+  }
+  wrap.appendChild(actions);
   return wrap;
 }
 
@@ -796,6 +999,7 @@ function renderRoster() {
 // myrainboww.github.io. No cambia Estreno/Regreso/Temporada/Final: solo el reparto y las
 // opciones/twists.
 function simulateSeasonPreset(season) {
+  seasonPlayer = null;
   simSelection = new Set(season.contestants.map((c) => c.name));
   selectedTwists = new Set((season.preset && season.preset.twists) || []);
   formatChoice.twists = [...selectedTwists];
