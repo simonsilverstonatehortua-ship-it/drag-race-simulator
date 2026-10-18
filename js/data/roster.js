@@ -101,6 +101,7 @@ const FRANCHISE_FLAGS = {
   "Senegal": "🇸🇳",
   "Madagascar": "🇲🇬",
   "Etiopía": "🇪🇹",
+  "Rumanía": "🇷🇴",
 };
 
 const ALL_SEASONS = [
@@ -4097,6 +4098,33 @@ const ALL_SEASONS = [
         image: "img/etiopia-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
       { name: "Zewditu Zen", finalPlacement: "Por determinar",
         image: "img/etiopia-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
+  {
+    id: "RO_S1",
+    seasonName: "Drag Race Rumanía — Temporada 1",
+    franchise: "Rumanía",
+    contestants: [
+      { name: "Brândușa Velvet", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Crina De Vil", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Doina Divină", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Domnița Roz", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Drăgaica", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ia Bonita", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Lăcrămioara", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Muma Pădurii", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Vampira Valahia", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Zâna Zin", finalPlacement: "Por determinar",
+        image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
 ];
