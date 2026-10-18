@@ -534,6 +534,42 @@ footer {
   padding: 0.25rem 0.8rem 0.25rem 0.3rem;
   font-size: 0.9rem;
 }
+.season-name--btn {
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.season-name--btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+.season-name--active { border-color: var(--magenta); background: #2c1d3a; }
+
+.rel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.rel-row__name { display: inline-flex; align-items: center; gap: 0.6rem; }
+.rel-options { display: flex; gap: 0.35rem; }
+.rel-btn {
+  min-width: 2.6rem;
+  padding: 0.35rem 0.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.rel-btn:hover { border-color: var(--teal); }
+.rel-btn--active { color: #fff; }
+.rel-overview { margin-top: 1rem; }
+.rel-overview summary { cursor: pointer; color: var(--teal); margin-bottom: 0.6rem; }
+
 .season-line { font-size: 1.1rem; margin: 0.6rem 0; }
 .season-line--out { color: var(--magenta); font-weight: 700; }
 

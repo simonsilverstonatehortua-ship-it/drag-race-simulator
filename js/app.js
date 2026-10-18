@@ -4,6 +4,7 @@ const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
 let seasonPlayer = null;
+let relationshipSetup = null;
 let rosterSeasonTab = {};
 let rosterDrawerOpen = {};
 
@@ -146,6 +147,7 @@ let selectedTwists = new Set();
 
 function renderSimulate() {
   if (seasonPlayer) return renderSeasonScreen();
+  if (relationshipSetup) return renderRelationshipSetup();
   const wrap = el("div", { class: "section" });
   wrap.appendChild(el("div", { class: "section__head" }, [
     el("h2", { text: "Simular temporada" }),
@@ -282,7 +284,7 @@ function renderSimulate() {
 
   // 4. Simular
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1rem;" }, [
-    el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: runSimulation }),
+    el("button", { class: "btn btn--accent", text: "▶ Simular temporada", onclick: startRelationshipSetup }),
   ]));
 
   return wrap;
@@ -296,13 +298,109 @@ function buildStatsByName() {
   return map;
 }
 
-function runSimulation() {
+// Paso previo a la temporada: "Conoce a las concursantes", donde se eligen las relaciones
+// entre ellas o se dejan al azar. Empiezan ya generadas al azar (según la Estrategia de cada
+// una), así que continuar sin tocar nada funciona como antes.
+function startRelationshipSetup() {
   const names = [...simSelection];
   if (names.length < 3) return alert("Selecciona al menos 3 concursantes.");
-  const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName());
+  relationshipSetup = {
+    names,
+    relationships: window.SimEngine.generateRelationships(names, buildStatsByName()),
+    selected: names[0],
+  };
+  render();
+  window.scrollTo(0, 0);
+}
+
+function runSimulation() {
+  const { names, relationships } = relationshipSetup;
+  const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName(), relationships);
+  relationshipSetup = null;
   seasonPlayer = { result, screens: buildSeasonScreens(result), index: 0 };
   render();
   window.scrollTo(0, 0);
+}
+
+function renderRelationshipSetup() {
+  const setup = relationshipSetup;
+  const levels = window.SimEngine.RELATIONSHIP_LEVELS;
+  const others = setup.names.filter((n) => n !== setup.selected);
+  // Volver a pintar sin saltar al principio de la página (hay muchos botones que tocar).
+  const refresh = () => { const y = window.scrollY; render(); window.scrollTo(0, y); };
+
+  const wrap = el("div", { class: "section season-screen" });
+  wrap.appendChild(el("h2", { class: "season-screen__title", text: "¡Conoce a las concursantes!" }));
+  wrap.appendChild(el("p", { class: "muted", text: "Elige qué opina cada concursante de las demás, o déjalo al azar. Las relaciones influyen en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
+
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
+    el("button", { class: "btn btn--ghost", text: "🎲 Randomizar todo", onclick: () => {
+      setup.relationships = window.SimEngine.generateRelationships(setup.names, buildStatsByName());
+      refresh();
+    } }),
+    el("button", { class: "btn btn--ghost", text: "Reiniciar todo (normal)", onclick: () => {
+      setup.names.forEach((a) => setup.names.forEach((b) => { if (a !== b) setup.relationships[a][b] = "normal"; }));
+      refresh();
+    } }),
+  ]));
+
+  // Selector de concursante: se editan sus opiniones sobre todas las demás.
+  const picker = el("div", { class: "season-names" });
+  setup.names.forEach((name) => {
+    const chip = el("button", { type: "button", class: "season-name season-name--btn" + (name === setup.selected ? " season-name--active" : ""),
+      onclick: () => { setup.selected = name; refresh(); } });
+    const avatar = avatarImg(name, "avatar--result");
+    if (avatar) chip.appendChild(avatar);
+    chip.appendChild(el("span", { text: name }));
+    picker.appendChild(chip);
+  });
+  wrap.appendChild(picker);
+
+  wrap.appendChild(el("h3", { class: "group-title", text: `Qué opina ${setup.selected} de las demás` }));
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
+    el("button", { class: "btn btn--ghost", text: `🎲 Solo ${setup.selected} al azar`, onclick: () => {
+      const generated = window.SimEngine.generateRelationships(setup.names, buildStatsByName());
+      setup.relationships[setup.selected] = generated[setup.selected];
+      refresh();
+    } }),
+  ]));
+
+  others.forEach((other) => {
+    const row = el("div", { class: "rel-row" });
+    const who = el("span", { class: "rel-row__name" });
+    const avatar = avatarImg(other, "avatar--result");
+    if (avatar) who.appendChild(avatar);
+    who.appendChild(el("span", { text: other }));
+    row.appendChild(who);
+    const options = el("div", { class: "rel-options" });
+    levels.forEach((level) => {
+      const style = RELATIONSHIP_STYLE[level];
+      const active = setup.relationships[setup.selected][other] === level;
+      options.appendChild(el("button", {
+        type: "button",
+        class: "rel-btn" + (active ? " rel-btn--active" : ""),
+        title: level,
+        style: active ? `background:${style.color};border-color:${style.color};` : "",
+        text: style.symbol,
+        onclick: () => { setup.relationships[setup.selected][other] = level; refresh(); },
+      }));
+    });
+    row.appendChild(options);
+    wrap.appendChild(row);
+  });
+
+  wrap.appendChild(el("p", { class: "muted small", text: "++ le cae muy bien · + le cae bien · • normal · − le cae mal · −− le cae muy mal" }));
+
+  const overview = el("details", { class: "rel-overview" });
+  overview.appendChild(el("summary", { text: "Ver la tabla completa de relaciones" }));
+  overview.appendChild(relationshipsTable(setup.names, setup.relationships));
+  wrap.appendChild(overview);
+
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1.2rem;" }, [
+    el("button", { class: "btn btn--accent", text: "▶ Empezar la temporada", onclick: runSimulation }),
+    el("button", { class: "btn btn--ghost", text: "Volver", onclick: () => { relationshipSetup = null; render(); window.scrollTo(0, 0); } }),
+  ]));
+  return wrap;
 }
 
 // Agrupa el log de la temporada en columnas de trackrecord (solo los episodios que
@@ -506,18 +604,37 @@ const TIER_LABELS = {
   flop: "Un desastre (flop)",
   skip: "Pasan directas (ganaron su mini reto)",
 };
-const TIER_ORDER = ["great", "good", "ok", "bad", "flop", "skip"];
 const LIPSYNC_STATUSES = ["BTM", "BTM_MULTI", "ELIM", "ELIM_MULTI"];
 
-// El nivel de actuación de cada reina sale de su estado final en el episodio, que a su vez
-// sale de su puntuación: así lo que se ve en el reto nunca contradice al jurado.
-function tierOfResult(r) {
-  if (r.score == null) return "skip";
-  if (["WIN", "WIN_TIE", "TOP2"].includes(r.status)) return "great";
-  if (["HIGH", "HIGH_GROUP"].includes(r.status)) return "good";
-  if (r.status === "LOW") return "bad";
-  if (LIPSYNC_STATUSES.includes(r.status)) return "flop";
-  return "ok";
+// Nivel de actuación de cada reina en una parte del episodio (el reto o la pasarela), según
+// su puntuación en esa parte frente a las demás: el 20% mejor es "genial", el siguiente 25%
+// "buena", otro 25% "correcta", el siguiente 20% "mala" y el 10% peor "desastre". Las
+// empatadas comparten nivel. Devuelve { nombre: nivel } solo para quienes tienen esa
+// puntuación (en Porkchop, por ejemplo, no todas compiten en el reto principal).
+function tiersByScore(results, field) {
+  const scored = results.filter((r) => r[field] != null).sort((a, b) => b[field] - a[field]);
+  const tiers = {};
+  let groupStart = 0;
+  scored.forEach((r, i) => {
+    if (i > 0 && r[field] !== scored[i - 1][field]) groupStart = i;
+    const p = groupStart / scored.length;
+    tiers[r.name] = p < 0.2 ? "great" : p < 0.45 ? "good" : p < 0.7 ? "ok" : p < 0.9 ? "bad" : "flop";
+  });
+  return tiers;
+}
+
+// Una parte del episodio (reto o pasarela) en pantalla: las reinas agrupadas por nivel.
+function performanceBody(intro, results, field) {
+  const wrap = el("div", {});
+  wrap.appendChild(el("p", { class: "muted", text: intro }));
+  const tiers = tiersByScore(results, field);
+  ["great", "good", "ok", "bad", "flop"].forEach((tier) => {
+    const names = results.filter((r) => tiers[r.name] === tier).map((r) => r.name);
+    if (names.length) wrap.appendChild(seasonRow(TIER_LABELS[tier], names));
+  });
+  const skipped = results.filter((r) => r.score == null).map((r) => r.name);
+  if (field !== "runwayScore" && skipped.length) wrap.appendChild(seasonRow(TIER_LABELS.skip, skipped));
+  return wrap;
 }
 
 function joinNames(names) {
@@ -545,41 +662,38 @@ function seasonRow(label, names) {
   ]);
 }
 
+// Avisos del motor (formatos que aún no están implementados). Solo hay pantalla de aviso
+// si hay algo que avisar; las relaciones ya se eligieron antes de empezar.
 function introScreen(result) {
   return {
-    title: "¡Conoce a las concursantes!",
+    title: "Antes de empezar",
     button: "Empezar la temporada",
     body: () => {
-      const wrap = el("div", {});
-      if (result.notes.length) {
-        const notesBox = el("div", { class: "notes-box" });
-        result.notes.forEach((n) => notesBox.appendChild(el("p", { class: "muted small", text: "⚠ " + n })));
-        wrap.appendChild(notesBox);
-      }
-      const names = Object.keys(result.relationships);
-      wrap.appendChild(el("p", { class: "muted", text: `${names.length} concursantes compiten por la corona.` }));
-      wrap.appendChild(seasonNames(names));
-      wrap.appendChild(el("h3", { class: "group-title", text: "Relaciones antes de empezar" }));
-      wrap.appendChild(el("p", { class: "muted small", text: "Quién opina qué de quién (fila = quién opina, columna = sobre quién). Cuanta más Estrategia tenga una concursante, más marcadas son sus opiniones." }));
-      wrap.appendChild(relationshipsTable(names, result.relationships));
-      return wrap;
+      const notesBox = el("div", { class: "notes-box" });
+      result.notes.forEach((n) => notesBox.appendChild(el("p", { class: "muted small", text: "⚠ " + n })));
+      return notesBox;
     },
   };
 }
 
+function hasRunwayPart(ep) {
+  return ep.results.some((r) => r.runwayScore != null);
+}
+
 function challengeScreen(ep) {
+  const field = ep.results.some((r) => r.challengeScore != null) ? "challengeScore" : "score";
   return {
     title: `${ep.label}: ${ep.challenge}`,
+    button: hasRunwayPart(ep) ? "Ir a la pasarela" : "Ir al jurado",
+    body: () => performanceBody("Las reinas dan todo en el reto de hoy...", ep.results, field),
+  };
+}
+
+function runwayScreen(ep) {
+  return {
+    title: `${ep.label}: la pasarela`,
     button: "Ir al jurado",
-    body: () => {
-      const wrap = el("div", {});
-      wrap.appendChild(el("p", { class: "muted", text: "Las reinas dan todo en el reto de hoy..." }));
-      TIER_ORDER.forEach((tier) => {
-        const names = ep.results.filter((r) => tierOfResult(r) === tier).map((r) => r.name);
-        if (names.length) wrap.appendChild(seasonRow(TIER_LABELS[tier], names));
-      });
-      return wrap;
-    },
+    body: () => performanceBody("Y ahora, la pasarela de la semana...", ep.results, "runwayScore"),
   };
 }
 
@@ -590,6 +704,9 @@ function judgingScreen(ep, button) {
     body: () => {
       const by = (...ids) => ep.results.filter((r) => ids.includes(r.status)).map((r) => r.name);
       const wrap = el("div", {});
+      wrap.appendChild(el("p", { class: "muted small", text: hasRunwayPart(ep)
+        ? "Resultado de la semana: 70% reto + 30% pasarela."
+        : "En este reto no hay pasarela aparte: el resultado sale solo del reto." }));
       const rows = [
         ["Ganadora del reto", by("WIN", "WIN_TIE")],
         ["Top 2", by("TOP2")],
@@ -708,7 +825,7 @@ function finalClassificationScreen(result, track) {
 function buildSeasonScreens(result) {
   const track = buildTrackRecord(result);
   const columnOfLogIndex = new Map(track.columns.map((c, i) => [c.idx, i]));
-  const screens = [introScreen(result)];
+  const screens = result.notes.length ? [introScreen(result)] : [];
 
   result.log.forEach((ep, idx) => {
     const hasResults = ep.results && ep.results.length > 0;
@@ -720,6 +837,7 @@ function buildSeasonScreens(result) {
     const hasLipsync = group.length >= 2;
     const hasDecision = group.length > 0 || !!ep.lipsyncNote;
     screens.push(challengeScreen(ep));
+    if (hasRunwayPart(ep)) screens.push(runwayScreen(ep));
     screens.push(judgingScreen(ep, hasLipsync ? "Lip sync por la vida" : (hasDecision ? "Continuar" : "Ver el track record")));
     if (hasLipsync) screens.push(lipsyncScreen(group));
     if (hasDecision) screens.push(decisionScreen(ep, group));
@@ -1000,6 +1118,7 @@ function renderRoster() {
 // opciones/twists.
 function simulateSeasonPreset(season) {
   seasonPlayer = null;
+  relationshipSetup = null;
   simSelection = new Set(season.contestants.map((c) => c.name));
   selectedTwists = new Set((season.preset && season.preset.twists) || []);
   formatChoice.twists = [...selectedTwists];
