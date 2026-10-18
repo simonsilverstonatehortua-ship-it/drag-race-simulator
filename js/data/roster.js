@@ -4127,6 +4127,33 @@ const ALL_SEASONS = [
         image: "img/rumania-s1-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
     ],
   },
+  {
+    id: "RO_S2",
+    seasonName: "Drag Race Rumanía — Temporada 2",
+    franchise: "Rumanía",
+    contestants: [
+      { name: "Barbarei Pop", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Codrina Lupu", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Cosânzeana", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Daciana Fieraru", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Dochia", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Ilinca De Argint", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Lolita La Rioja", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Muma Neagră", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Radu Roșu", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+      { name: "Sânziana Soare", finalPlacement: "Por determinar",
+        image: "img/rumania-s2-placeholder.svg", stats: deriveStats({ acting: 7, comedy: 7, dance: 7, design: 7, improv: 7, runway: 7, lipsync: 7 }) },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
