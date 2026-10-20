@@ -682,6 +682,7 @@ footer {
 .ref-tr-photo { text-align: center !important; padding: 0.2rem 0.4rem !important; }
 .ref-tr-sub { display: block; font-family: inherit; font-weight: 500; font-style: italic; font-size: 0.62rem; margin-top: 0.15rem; }
 .trackrecord-cell { white-space: pre-line; }
+.trackrecord-challenge-row th { white-space: pre-line; }
 .ref-lipsync-table td, .ref-lipsync-table th { text-align: left; white-space: normal; }
 .ref-song small { color: var(--muted); }
 .ref-win { color: #6fd98c; font-weight: 700; }

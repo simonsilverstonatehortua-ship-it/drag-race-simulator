@@ -206,3 +206,30 @@ de "slayers", "floppers", lip sync de seis y LaLaPaRUza Smackdown) y las relacio
 tras cada Untucked. Las puntuaciones salen de las 7 estadísticas básicas de cada reina
 (acting, comedy, dance, design, improv, runway, lipsync) con la misma fórmula que el original.
 Los demás formatos siguen usando `js/engine.js` hasta que se copien también.
+
+### Segundo simulador de referencia: esopare
+
+[esopare.github.io/esoteric-drag-race-simulator](https://esopare.github.io/esoteric-drag-race-simulator/)
+parece una copia del de myrainboww, pero es una versión bastante ampliada (más de 37.000
+líneas de código frente a 19.000). `js/refsim.js` usa los dos: la base de myrainboww y, encima,
+lo que añade esopare, traducido en `js/data/refdata-eso.js` y `js/data/refreads-eso.js`:
+
+- **Mini retos con nombre** (29), puntuados con la habilidad de cada tipo; los gana quien mejor
+  lo hace, y también la lectura y los títeres se puntúan.
+- **Retos principales nuevos** con reparto ponderado: sesión de fotos, certamen, canto, RDR
+  Live, diseño de personaje, show de talentos + pasarela, monólogos, Untucked actuado,
+  batallas de roast, Rappin' Roast, ¿Quién lo lleva mejor?, memorias, Las Vegas, transformación
+  + girl group y diseño de habitaciones (varios en equipos).
+- **Jurado**: RuPaul, panel de tres jueces y un invitado especial cada semana; Untucked de las
+  reinas a salvo; críticas del jurado (RuPaul 80 %, el panel y el invitado).
+- Frase de salida de cada eliminada, discurso de la ganadora, "Antes de esta noche, se os pidió
+  que prepararais un lip sync con...", más motivos de "quién debería irse a casa", más pullas y
+  canciones.
+- **Final Top 3** (en los dos): las tres hacen lip sync si están igualadas o la tercera se va
+  antes; las dos subcampeonas comparten el 2º/3º puesto. Con 3 reinas y un doble shantay, la
+  final del Top 2 puede ampliarse a Top 3.
+
+Donde esopare cambia una regla de myrainboww se sigue esopare, salvo en tres cosas que ya
+estaban pedidas: el Snatch Game sale en todas las temporadas, no se repite el mismo reto dos
+episodios seguidos y los episodios especiales raros (slayers, floppers, lip sync de seis,
+LaLaPaRUza) se mantienen, porque en esopare han quedado desactivados.
