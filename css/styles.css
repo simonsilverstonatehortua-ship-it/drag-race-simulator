@@ -663,6 +663,30 @@ footer {
   color: #141019;
 }
 
+/* Pantallas del simulador "estilo myrainboww" (js/refsim.js) */
+.ref-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.7rem 0;
+}
+.ref-row__pics { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ref-row__text { flex: 1 1 240px; font-size: 1.02rem; font-weight: 600; }
+.avatar--ref { width: 64px; height: 64px; border-width: 3px; }
+.avatar--tr { width: 44px; height: 44px; border-radius: 6px; }
+.ref-hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; }
+.ref-italic { font-style: italic; }
+.ref-tr-rank { text-align: left; white-space: pre-line; font-weight: 700; background: #f5ebf5; color: #141019; }
+.ref-tr-name { text-align: left; font-weight: 700; white-space: normal; max-width: 150px; }
+.ref-tr-photo { text-align: center !important; padding: 0.2rem 0.4rem !important; }
+.ref-tr-sub { display: block; font-family: inherit; font-weight: 500; font-style: italic; font-size: 0.62rem; margin-top: 0.15rem; }
+.trackrecord-cell { white-space: pre-line; }
+.ref-lipsync-table td, .ref-lipsync-table th { text-align: left; white-space: normal; }
+.ref-song small { color: var(--muted); }
+.ref-win { color: #6fd98c; font-weight: 700; }
+.ref-lose { color: var(--magenta); font-weight: 700; }
+
 @media (max-width: 600px) {
   .marquee { padding: 1.8rem 1rem 1.2rem; }
 }

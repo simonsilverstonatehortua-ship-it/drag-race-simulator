@@ -212,11 +212,19 @@ function renderSimulate() {
 
   // 2. Formato
   wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
+  // Aviso: con Estreno normal + Regular + Top 2 + sin regresos ni opciones, la temporada se
+  // juega con la copia del simulador de referencia (js/refsim.js).
+  const refNote = el("p", { class: "muted small" });
+  const updateRefNote = () => {
+    refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
+      ? "✓ Este formato usa la copia del simulador de referencia (myrainboww): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2 + sin regresos ni opciones.";
+  };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
     const options = DB.formats.filter((f) => f.group === group);
     const select = el("select", {
-      onchange: (e) => { formatChoice[group] = e.target.value; },
+      onchange: (e) => { formatChoice[group] = e.target.value; updateRefNote(); },
     });
     options.forEach((f) => {
       const opt = el("option", { value: f.id, text: f.label });
@@ -226,6 +234,8 @@ function renderSimulate() {
     formatGrid.appendChild(el("label", { class: "form-row" }, [el("span", { text: label }), select]));
   });
   wrap.appendChild(formatGrid);
+  wrap.appendChild(refNote);
+  updateRefNote();
 
   wrap.appendChild(el("p", { class: "muted small", text: "Reto de estreno: con qué reto empieza la temporada (episodio 1), o al azar. No aplica al estreno Meet the Queens." }));
   const openingSelect = el("select", {
@@ -253,6 +263,7 @@ function renderSimulate() {
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) selectedTwists.add(t.id); else selectedTwists.delete(t.id);
       formatChoice.twists = [...selectedTwists];
+      updateRefNote();
     });
     const labelEl = el("label", { class: "form-row form-row--checkbox", title: t.description }, [checkbox, el("span", { text: t.label })]);
     twistsWrap.appendChild(labelEl);
@@ -315,9 +326,20 @@ function startRelationshipSetup() {
 
 function runSimulation() {
   const { names, relationships } = relationshipSetup;
-  const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName(), relationships);
   relationshipSetup = null;
-  seasonPlayer = { result, screens: buildSeasonScreens(result), index: 0 };
+  if (window.RefSim && window.RefSim.canRun(formatChoice)) {
+    // Estreno normal + regular + Top 2 + sin regresos: copia del simulador de referencia
+    // (js/refsim.js), con sus propias pantallas.
+    const result = window.RefSim.simulate(names, formatChoice, buildStatsByName(), relationships);
+    seasonPlayer = {
+      result,
+      screens: result.screens.map((s) => ({ title: s.title, button: s.button, body: () => renderRefBlocks(s.blocks) })),
+      index: 0,
+    };
+  } else {
+    const result = window.SimEngine.simulateSeason(names, formatChoice, DB, buildStatsByName(), relationships);
+    seasonPlayer = { result, screens: buildSeasonScreens(result), index: 0 };
+  }
   render();
   window.scrollTo(0, 0);
 }
@@ -331,7 +353,7 @@ function renderRelationshipSetup() {
 
   const wrap = el("div", { class: "section season-screen" });
   wrap.appendChild(el("h2", { class: "season-screen__title", text: "¡Conoce a las concursantes!" }));
-  wrap.appendChild(el("p", { class: "muted", text: "Elige qué opina cada concursante de las demás, o déjalo al azar. Las relaciones influyen en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
+  wrap.appendChild(el("p", { class: "muted", text: "Elige qué opina cada concursante de las demás, o déjalo al azar. Las relaciones influyen en Untucked (pelas, alianzas y enemistades), en los equipos de los retos, en a quién votan para irse a casa, en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
 
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
     el("button", { class: "btn btn--ghost", text: "🎲 Randomizar todo", onclick: () => {
@@ -863,6 +885,180 @@ function buildSeasonScreens(result) {
 
   screens.push(finalClassificationScreen(result, track));
   return screens;
+}
+
+// ---------- Pantallas del simulador "estilo myrainboww" (js/refsim.js) ----------
+// refsim.js devuelve cada pantalla como una lista de bloques (texto, filas de reinas, tabla de
+// track record...); aquí se pintan.
+function refQueensRow(block) {
+  const row = el("div", { class: "ref-row" });
+  const pics = el("div", { class: "ref-row__pics" });
+  (block.names || []).forEach((n) => {
+    const img = avatarImg(n, "avatar--ref");
+    if (!img) return;
+    if (block.color) img.style.borderColor = block.color;
+    pics.appendChild(img);
+  });
+  if (pics.childNodes.length) row.appendChild(pics);
+  if (block.text) row.appendChild(el("div", { class: "ref-row__text", text: block.text }));
+  return row;
+}
+
+function refTextWithBreaks(node, text) {
+  String(text).split("\n").forEach((line, i) => {
+    if (i) node.appendChild(document.createElement("br"));
+    node.appendChild(document.createTextNode(line));
+  });
+}
+
+function refTrackRecord(block) {
+  const tableWrap = el("div", { class: "table-wrap" });
+  const table = el("table", { class: "stats-table trackrecord-table" });
+  const thead = el("thead");
+  const head = el("tr");
+  ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2", class: "trackrecord-th--span" })));
+  block.columns.forEach((_, i) => head.appendChild(el("th", { text: `Ep. ${i + 1}` })));
+  head.appendChild(el("th", { text: "PPE", rowspan: "2", class: "trackrecord-th--span" }));
+  thead.appendChild(head);
+  const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
+  block.columns.forEach((c) => challengeRow.appendChild(el("th", { text: c })));
+  thead.appendChild(challengeRow);
+  table.appendChild(thead);
+
+  const tbody = el("tbody");
+  block.rows.forEach((row) => {
+    const tr = el("tr");
+    const rank = el("td", { class: "ref-tr-rank" });
+    refTextWithBreaks(rank, row.rank);
+    tr.appendChild(rank);
+    tr.appendChild(el("td", { class: "ref-tr-name", text: row.name }));
+    const photo = el("td", { class: "ref-tr-photo" });
+    const avatar = avatarImg(row.name, "avatar--tr");
+    if (avatar) photo.appendChild(avatar);
+    tr.appendChild(photo);
+    row.cells.forEach((cell) => {
+      let style = "";
+      if (cell.bg) style += `background:${cell.bg};`;
+      if (cell.fg) style += `color:${cell.fg};`;
+      if (cell.bold) style += "font-weight:800;";
+      const td = el("td", { class: "trackrecord-cell", style });
+      refTextWithBreaks(td, cell.text);
+      if (cell.sub) {
+        td.appendChild(document.createElement("br"));
+        td.appendChild(el("small", { class: "ref-tr-sub", text: cell.sub }));
+      }
+      tr.appendChild(td);
+    });
+    tr.appendChild(el("td", { class: "trackrecord-cell", style: "background:lightgray;font-weight:800;", text: row.ppe }));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  const box = el("div", {});
+  box.appendChild(tableWrap);
+  box.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:0.6rem;" }, [
+    el("button", { class: "btn btn--ghost", text: "Descargar track record (PNG)", onclick: (e) => downloadRefTrackRecord(table, e.target) }),
+  ]));
+  return box;
+}
+
+// Descarga la tabla de track record como imagen (como el botón "Download" del simulador de
+// referencia). html2canvas se carga solo al pulsar el botón.
+function downloadRefTrackRecord(table, button) {
+  const load = () => new Promise((resolve, reject) => {
+    if (window.html2canvas) return resolve(window.html2canvas);
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    s.onload = () => resolve(window.html2canvas);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  const original = button.textContent;
+  button.textContent = "Generando imagen...";
+  load().then((h2c) => h2c(table, { useCORS: true, backgroundColor: "#141019" })).then((canvas) => {
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png");
+    a.download = "TrackRecord.png";
+    a.click();
+  }).catch(() => alert("No se pudo generar la imagen del track record."))
+    .finally(() => { button.textContent = original; });
+}
+
+function refSongCell(song) {
+  const k = song.indexOf(" by ");
+  const cell = el("td", { class: "ref-song" });
+  cell.appendChild(document.createTextNode(k < 0 ? song : song.slice(0, k)));
+  if (k >= 0) {
+    cell.appendChild(document.createElement("br"));
+    cell.appendChild(el("small", { text: song.slice(k + 1).replace(/^by /, "de ") }));
+  }
+  return cell;
+}
+
+function refLipsyncTables(block) {
+  const wrap = el("div", {});
+  // Todos los lip syncs de la temporada
+  const all = el("details", { class: "rel-overview" });
+  all.appendChild(el("summary", { text: "Lip syncs de la temporada" }));
+  const t1 = el("table", { class: "stats-table ref-lipsync-table" });
+  const h1 = el("tr");
+  ["#", "Episodio", "Ganadora del lip sync", "Perdedora del lip sync", "Canción"].forEach((t) => h1.appendChild(el("th", { text: t })));
+  t1.appendChild(el("thead", {}, [h1]));
+  const b1 = el("tbody");
+  if (!block.alots.length) {
+    b1.appendChild(el("tr", {}, [el("td", { colspan: "5", text: "No hubo lip syncs esta temporada." })]));
+  }
+  block.alots.forEach((l, i) => {
+    b1.appendChild(el("tr", {}, [
+      el("td", { text: String(i + 1) }), el("td", { text: String(l.episode) }),
+      el("td", { class: "ref-win", text: l.win.join(" & ") }), el("td", { class: "ref-lose", text: l.lose.join(" & ") }),
+      refSongCell(l.song),
+    ]));
+  });
+  t1.appendChild(b1);
+  all.appendChild(el("div", { class: "table-wrap" }, [t1]));
+  wrap.appendChild(all);
+
+  // Los más memorables (los mejores y los peores)
+  const mem = el("details", { class: "rel-overview" });
+  mem.appendChild(el("summary", { text: "Lip syncs memorables" }));
+  const t2 = el("table", { class: "stats-table ref-lipsync-table" });
+  const h2 = el("tr");
+  ["Episodio", "Lip sync", "Canción"].forEach((t) => h2.appendChild(el("th", { text: t })));
+  t2.appendChild(el("thead", {}, [h2]));
+  const b2 = el("tbody");
+  const blots = block.blots.slice().sort((a, b) => b.score - a.score);
+  if (!blots.length) b2.appendChild(el("tr", {}, [el("td", { colspan: "3", text: "No hubo lip syncs memorables esta temporada." })]));
+  blots.forEach((l) => {
+    const cls = l.score > 5 ? "ref-win" : "ref-lose";
+    b2.appendChild(el("tr", {}, [
+      el("td", { class: cls, text: String(l.episode) }), el("td", { class: cls, text: l.queens.join(" vs ") }), refSongCell(l.song),
+    ]));
+  });
+  t2.appendChild(b2);
+  mem.appendChild(el("div", { class: "table-wrap" }, [t2]));
+  wrap.appendChild(mem);
+  return wrap;
+}
+
+function renderRefBlocks(blocks) {
+  const wrap = el("div", { class: "ref-screen" });
+  blocks.forEach((b) => {
+    if (b.t === "p") wrap.appendChild(el("p", { class: "muted" + (b.cls === "italic" ? " ref-italic" : ""), text: b.text }));
+    else if (b.t === "b") wrap.appendChild(el("p", { class: "season-line", text: b.text }));
+    else if (b.t === "big") wrap.appendChild(el("h3", { class: "group-title", text: b.text }));
+    else if (b.t === "hr") wrap.appendChild(el("hr", { class: "ref-hr" }));
+    else if (b.t === "q") wrap.appendChild(refQueensRow(b));
+    else if (b.t === "tr") wrap.appendChild(refTrackRecord(b));
+    else if (b.t === "lipsyncs") wrap.appendChild(refLipsyncTables(b));
+    else if (b.t === "reveal") {
+      const d = el("details", { class: "rel-overview" });
+      d.appendChild(el("summary", { text: b.label }));
+      d.appendChild(renderRefBlocks(b.blocks));
+      wrap.appendChild(d);
+    }
+  });
+  return wrap;
 }
 
 function exitSeason() {

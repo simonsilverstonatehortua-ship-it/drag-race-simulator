@@ -186,3 +186,23 @@ usa cada reto desde la pestaña Retos.
 Este es un proyecto con muchas piezas (motor de reglas, simulación aleatoria, estadísticas,
 comparador). Para las siguientes fases, herramientas como **Claude Code** funcionan muy bien
 para iterar sobre un proyecto de archivos como este de forma continuada entre sesiones.
+
+## Simulador "estilo myrainboww" (copia paso a paso)
+
+Para **estreno normal + temporada regular + final Top 2 + sin regresos ni opciones**, la
+pestaña Simular usa `js/refsim.js`, una copia fiel (reglas, pantallas y aleatoriedad) del
+simulador de referencia [myrainboww.github.io/Drag-Race-Simulator](https://myrainboww.github.io/Drag-Race-Simulator/),
+con todos los textos traducidos al español (`js/data/refdata.js`, `js/data/refreads.js`,
+`js/data/refreads-queens.js`). Cada episodio recorre: mini reto → maxi reto (+ pasarela) →
+jurado → ganadora/tops/bottoms → lip sync (canción, eventos, resultado) → Untucked (con
+relaciones) → progreso de las concursantes (track record con PPE). Después: reunión (biblioteca
++ Miss Simpatía) y la gran final (pasarela, lip sync por la corona, ganadora). Al final se
+pueden ver todos los lip syncs de la temporada y los más memorables, y descargar el track
+record como imagen.
+
+Se copian también los equipos y parejas en los retos, la ventaja del mini reto, los eventos
+raros (nadie a salvo, doble shantay/sashay, abandono, descalificación, baja médica, sesión
+de "slayers", "floppers", lip sync de seis y LaLaPaRUza Smackdown) y las relaciones que cambian
+tras cada Untucked. Las puntuaciones salen de las 7 estadísticas básicas de cada reina
+(acting, comedy, dance, design, improv, runway, lipsync) con la misma fórmula que el original.
+Los demás formatos siguen usando `js/engine.js` hasta que se copien también.
