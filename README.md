@@ -300,3 +300,13 @@ que el Lip-Sync For The Crown, pero sin Rumix ni conversión a Top 5.
 - **Top 5 Jury Vote** (solo esopare): las cinco finalistas defienden su caso, las eliminadas votan,
   las dos más votadas hacen el lip sync por la corona (igual que en el Top 5) y las otras tres se
   van (3º-5º). Corregí un fallo del original en el desempate, que podía duplicar a una finalista.
+
+### Top 6 All Stars 11 (esopare)
+
+Con seis finalistas hay un cuadro de eliminatorias, todo a base de lip syncs: la ganadora del último
+episodio y la de mayor PPE pasan directas a la ronda 2; las otras cuatro hacen dos lip syncs en la
+ronda 1 (las perdedoras quedan 5º/6º, "PERDIÓ RONDA 1"). La ronda 2 son otros dos lip syncs: las
+dos ganadoras de la ronda 1 entre sí y las dos que pasaron directas entre sí (las perdedoras quedan
+3º/4º, "PERDIÓ RONDA 2"). Las dos que ganan hacen el lip sync por la corona (reputación + la mitad
+del lip sync, con un 5 % de sorpresa); la perdedora es "PERDIÓ RONDA 3" (2ª). No cuento los
+extras de All Stars 11 (cuadros por bandos, reinas comodín).

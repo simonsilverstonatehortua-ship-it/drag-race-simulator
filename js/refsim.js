@@ -454,13 +454,13 @@
       else if (this.total < 12 && !this.flag.snatch && (n === rnd(7, 9) || n === 7)) fn = "snatch";
       else if (!this.flag.snatch && n <= this.finaleSize + 3) fn = "snatch"; // el Snatch Game sale en todas las temporadas
       // Ball: con el Top 2, con 3 reinas (o muy pronto en repartos grandes); con el Top 3, con 4.
-      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale || this.opts.jury) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
+      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.finaleSize === 6 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale || this.opts.jury) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
       else if (!this.flag.ball && this.finaleSize <= 4 && !this.opts.teamsFinale && !this.opts.lftc && !this.opts.canFinale && !this.opts.jury && n === this.finaleSize + 1) fn = "ball";
       else if (!this.flag.ball && this.total < 12 && n === 8 && rnd(0, 100) <= 10) fn = "ball";
       else if (((this.total >= 12 && (n === 8 || n === 9)) || (this.total < 12 && n === 6)) && !this.flag.girlGroup && rnd(0, 100) >= 50) fn = "girlgroup";
       else if (((this.total >= 12 && (n === 11 || n === 9)) || (this.total < 12 && n === 7)) && !this.flag.rusical && rnd(0, 100) >= 50) fn = "rusical";
       // Transformación (con el Top 3, con 5 reinas)
-      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize >= 4 && n === 6)) && !this.flag.makeover) fn = "runway";
+      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize >= 4 && this.finaleSize <= 5 && n === 6) || (this.finaleSize === 6 && n === 7)) && !this.flag.makeover) fn = "runway";
       else fn = this.randomMaxi();
       this.maxi(fn);
     }
@@ -563,7 +563,7 @@
           break;
         }
         case "runway": {
-          const makeover = (cast.length === 6 || cast.length === 5) && !this.flag.makeover;
+          const makeover = (cast.length === 6 || cast.length === 5 || (this.finaleSize === 6 && cast.length === 7)) && !this.flag.makeover;
           if (makeover) {
             s.b("¡Es el reto de transformación! Las reinas convertirán en sus hermanas drag " + pick(D.makeoverPeople) + ".");
             this.episodeChallenges.push("Make Over");
@@ -1926,6 +1926,7 @@
         else if (q.rankP === 2) rank = "2º\n(Subcampeona)";
         else if (q.rankP === 32) rank = "3º\n(Subcampeona)";
         else if (q.rankP === 345) rank = "3º-5º";
+        else if (q.rankP === 56) rank = "5º/6º";
         else if (q.rankP === 34) rank = "3º/4º";
         else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
         else if (q.rankP === 432) rank = "3º/4º\n(Subcampeona)";
@@ -2020,7 +2021,7 @@
 
     // Lip sync por la corona entre las dos finalistas (Top 5 y Top 5 Jury Vote): su puntuación final
     // es la reputación más la mitad del lip sync.
-    crownDuel(finalLS) {
+    crownDuel(finalLS, opts = {}) {
       const [a, b] = finalLS;
       this.current = [];
 
@@ -2032,19 +2033,19 @@
       this.lipsyncEvent(e, finalLS);
       const rawLip = finalLS.map((q) => q.lipsyncScore); // el lip sync final no cuenta la reputación
       this.lipsyncGroups(e, finalLS, song);
-      this.crownWinner(finalLS, song, rawLip, true);
+      this.crownWinner(finalLS, song, rawLip, true, opts);
     }
 
     // Pantalla final entre dos finalistas: gana la de mayor puntuación final (si rawLip, se le suma
     // antes la mitad del lip sync); si empatan, un 50 % de que ganen las dos.
-    crownWinner(finalLS, song, rawLip, lipsyncFinal) {
+    crownWinner(finalLS, song, rawLip, lipsyncFinal, opts = {}) {
       const w = this.newScreen("El fin.", "Ver el track record");
       w.b("Chicas, he tomado mi decisión. La próxima Superestrella Drag es...");
       w.hr();
       if (rawLip) finalLS.forEach((q, i) => { q.finaleScore += rawLip[i] / 2; });
       finalLS.sort((x, y) => y.finaleScore - x.finaleScore);
-      const label = (q, win) => (q.mxcon ? (win ? "MSCONWIN" : "MSCONRUNUP") : (win ? "WINNER" : "RUNNER UP"));
-      if (finalLS[0].finaleScore === finalLS[1].finaleScore && rnd(0, 100) >= 50) {
+      const label = (q, win) => (q.mxcon ? (win ? "MSCONWIN" : "MSCONRUNUP") : (win ? "WINNER" : (opts.lostLabel || "RUNNER UP")));
+      if (!opts.noTie && finalLS[0].finaleScore === finalLS[1].finaleScore && rnd(0, 100) >= 50) {
         this.addSong(finalLS, [], song);
         w.b("Por PRIMERA VEZ en la herstory de Drag Race, sois las dos ganadoras, baby");
         w.q([finalLS[0].name, finalLS[1].name], "yellow", `¡¡${finalLS[0].name} y ${finalLS[1].name}!!`);
@@ -2410,7 +2411,81 @@
       this.crownDuel([ranked[0], ranked[1]]);
     }
 
+    // Un lip sync de eliminatoria entre dos reinas (sin contar la reputación, como el original):
+    // describe la actuación y el resultado; devuelve la ganadora, la perdedora y la pantalla del resultado.
+    duel(pair, title, text, button) {
+      const e = this.newScreen(title, "Ver el resultado");
+      pair.forEach((q) => q.getASLipsync());
+      e.q(pair.map((q) => q.name), "silver", text);
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, pair);
+      const raw = pair.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, pair, song);
+      pair.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      pair.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      const r = this.newScreen("He tomado mi decisión...", button);
+      const [win, lose] = pair;
+      this.addSong([win], [lose], song);
+      r.q([win.name], "silver", `${win.name}, shantay, te quedas.`);
+      r.q([lose.name], "sienna", `${lose.name}, sashay away.`);
+      this.exitLine(r, lose);
+      return { win, lose };
+    }
+
+    // "Top 6 All Stars 11" (solo esopare): la ganadora del último episodio y la de mayor PPE pasan
+    // directas a la ronda 2; las otras cuatro hacen dos lip syncs de la ronda 1 (pierde 5º/6º). En la
+    // ronda 2 hay dos lip syncs más (pierde 3º/4º) y las dos ganadoras hacen el lip sync por la corona.
+    finaleTop6() {
+      const cast = this.current;
+      const bye = cast.find((q) => q.trackRecord[q.trackRecord.length - 1] === "WIN")
+        || cast.slice().sort((a, b) => b.ppe - a.ppe)[0];
+      const ppeQueen = cast.filter((q) => q !== bye).sort((a, b) => b.ppe - a.ppe)[0];
+      const bracket = cast.filter((q) => q !== bye && q !== ppeQueen);
+      const first = [bracket[0], bracket[1]], second = [bracket[2], bracket[3]];
+
+      const s = this.newScreen("¡La gran final!", "Ir a la ronda 1");
+      s.q(cast.map((q) => q.name));
+      s.p(`¡${bye.name} ganó el reto de la semana pasada y pasa automáticamente a la ronda 2!`);
+      s.p(`¡${ppeQueen.name} es una de las mejor puntuadas y también pasa automáticamente a la ronda 2!`);
+      s.hr();
+      s.big("Ronda 1");
+      s.q(first.map((q) => q.name), "royalblue", `${first[0].name} vs. ${first[1].name}`);
+      s.p("vs");
+      s.q(second.map((q) => q.name), "darkred", `${second[0].name} vs. ${second[1].name}`);
+      this.episodeChallenges.push("Finale");
+
+      const out = (q, n, rank, r) => {
+        q.addTR(q.mxcon ? `MSCONL${n}R` : `LOST ${n === 1 ? "1ST" : "2ND"} ROUND`);
+        q.rankP = rank;
+        this.eliminated.unshift(q);
+      };
+      const round1 = (pair) => {
+        const { win, lose } = this.duel(pair, "Ronda 1", `${pair[0].name} y ${pair[1].name} harán lip sync por un puesto en la ronda 2!`, "Continuar");
+        out(lose, 1, 56);
+        return win;
+      };
+      const w1 = round1(first);
+      const w2 = round1(second);
+
+      const t = this.newScreen("Ronda 2", "Ir al primer lip sync");
+      t.big("1er lip sync");
+      t.q([w1.name, w2.name], "silver", `${w1.name} vs. ${w2.name}`);
+      t.hr();
+      t.big("2º lip sync");
+      t.q([bye.name, ppeQueen.name], "gold", `${bye.name} vs. ${ppeQueen.name}`);
+      const semi = (pair) => {
+        const { win, lose } = this.duel(pair, "Ronda 2", `${pair[0].name} y ${pair[1].name} harán lip sync por un puesto en el Top 2!`, "Continuar");
+        out(lose, 2, 34);
+        return win;
+      };
+      const f1 = semi([w1, w2]);
+      const f2 = semi([bye, ppeQueen]);
+      this.crownDuel([f1, f2], { noTie: true, lostLabel: "LOST 3RD ROUND" });
+    }
+
     finale() {
+      if (this.opts.top6 && this.current.length === 6) return this.finaleTop6();
       if (this.opts.jury && this.current.length === 4) return this.finaleJury4();
       if (this.opts.jury && this.current.length === 5) return this.finaleJury5();
       if (this.opts.canFinale && this.current.length === 4) this.lipsyncForTheFinale();
@@ -2582,7 +2657,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
-  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5 };
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
@@ -2607,6 +2682,7 @@
       teamsFinale: formatChoice.finale === "FINALE_TEAMS",
       lftc: formatChoice.finale === "FINALE_LIPSYNC_CROWN",
       canFinale: formatChoice.finale === "FINALE_LIPSYNC_FINALE",
+      top6: formatChoice.finale === "FINALE_TOP6_AS11",
       jury: formatChoice.finale === "FINALE_JURY_VOTE" || formatChoice.finale === "FINALE_JURY_TOP5",
     });
     sim.play();
