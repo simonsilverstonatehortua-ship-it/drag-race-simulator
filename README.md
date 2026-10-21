@@ -329,3 +329,9 @@ formatos largos.
   sync, con un 5 % de sorpresa; la perdedora es "PERDIÓ RONDA 3").
 - El **PPE** del track record ahora va **sobre 10** (la media de puntos por episodio, que antes iba
   de 0 a 5, multiplicada por 2).
+
+**Rate-A-Queen con relaciones:** cada finalista ordena a las demás por su último reto (o al azar, la
+mitad de las veces) corrigiendo ese puesto según la relación: una relación alta sube a la rival, las
+aliadas suben más y las enemigas bajan más. La pantalla avisa cuando alguien pone muy arriba a una
+aliada o relega a una enemiga. Con relaciones extremas (todas adoran a una reina y odian a otra) la
+querida acaba de media en el puesto 2 del cuadro y la odiada en el 7 de 8.

@@ -2498,9 +2498,25 @@
       const voters = shuffle(cast.slice());
       voters.forEach((v) => {
         const others = cast.filter((q) => q !== v);
-        const ranked = rnd(0, 100) <= 50 ? others.sort((a, b) => a.performanceScore - b.performanceScore) : shuffle(others);
+        // Las relaciones pesan: se puntúa a cada rival por su último reto (o al azar, la mitad de las
+        // veces) y se resta/suma según la relación; las aliadas suben y las enemigas bajan aún más.
+        const byPerformance = rnd(0, 100) <= 50;
+        const key = (q) => {
+          let k = byPerformance ? q.performanceScore : rnd(10, 40);
+          k -= this.rel(v, q) * 1.5;
+          if (v.allies.has(q)) k -= 5;
+          else if (v.friends.has(q)) k -= 2;
+          else if (v.enemies.has(q)) k += 5;
+          return k + rnd(-3, 3);
+        };
+        const scored = new Map(others.map((q) => [q, key(q)]));
+        const ranked = others.sort((a, b) => scored.get(a) - scored.get(b));
         r.q([v.name], undefined, `${v.name} ha ordenado:`);
         ranked.forEach((q, j) => { r.p(`${j + 1}. ${q.name}`); q.votes += j + 1; });
+        const ally = ranked.find((q) => v.allies.has(q) && ranked.indexOf(q) <= 1);
+        const enemy = ranked.find((q) => v.enemies.has(q) && ranked.indexOf(q) >= ranked.length - 2);
+        if (ally) r.q([v.name, ally.name], "blue", `${v.name} ha puesto muy arriba a su aliada ${ally.name}.`);
+        if (enemy) r.q([v.name, enemy.name], "red", `${v.name} ha relegado a su enemiga ${enemy.name} a los últimos puestos.`);
         r.hr();
       });
       cast.forEach((q) => { q.votes /= (cast.length - 1); });
