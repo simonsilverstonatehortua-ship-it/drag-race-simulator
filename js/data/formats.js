@@ -65,7 +65,7 @@ const DEFAULT_FORMATS = [
     description: "Rate-A-Queen entre las ocho finalistas y cuadro de eliminatorias solo de lip syncs (cuartos, semifinales y final)." },
   { id: "FINALE_TOP8_WILDCARD", group: "finale", label: "Top 8 Lip-Sync For The Crown (Wildcard)", custom: false,
     description: "Siete finalistas y una eliminada al azar regresa como comodín; Rate-A-Queen y cuadro de lip syncs." },
-  { id: "FINALE_RANDOM", group: "finale", label: "Random Finale", custom: false,
+  { id: "FINALE_RANDOM", group: "finale", label: "Final al azar (Random Finale)", custom: false,
     description: "El final se sortea al azar entre todos los formatos de final copiados del simulador de esopare." },
   { id: "FINALE_TOP6_AS11", group: "finale", label: "Top 6 All Stars 11", custom: false,
     description: "Seis finalistas: dos pasan directas a la ronda 2, las otras cuatro se juegan el pase en lip syncs; eliminatorias hasta la corona." },
