@@ -454,13 +454,13 @@
       else if (this.total < 12 && !this.flag.snatch && (n === rnd(7, 9) || n === 7)) fn = "snatch";
       else if (!this.flag.snatch && n <= this.finaleSize + 3) fn = "snatch"; // el Snatch Game sale en todas las temporadas
       // Ball: con el Top 2, con 3 reinas (o muy pronto en repartos grandes); con el Top 3, con 4.
-      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.finaleSize === 6 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale || this.opts.jury) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
+      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.finaleSize === 6 || this.finaleSize === 8 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale || this.opts.jury) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
       else if (!this.flag.ball && this.finaleSize <= 4 && !this.opts.teamsFinale && !this.opts.lftc && !this.opts.canFinale && !this.opts.jury && n === this.finaleSize + 1) fn = "ball";
       else if (!this.flag.ball && this.total < 12 && n === 8 && rnd(0, 100) <= 10) fn = "ball";
       else if (((this.total >= 12 && (n === 8 || n === 9)) || (this.total < 12 && n === 6)) && !this.flag.girlGroup && rnd(0, 100) >= 50) fn = "girlgroup";
       else if (((this.total >= 12 && (n === 11 || n === 9)) || (this.total < 12 && n === 7)) && !this.flag.rusical && rnd(0, 100) >= 50) fn = "rusical";
       // Transformación (con el Top 3, con 5 reinas)
-      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize >= 4 && this.finaleSize <= 5 && n === 6) || (this.finaleSize === 6 && n === 7)) && !this.flag.makeover) fn = "runway";
+      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize >= 4 && this.finaleSize <= 5 && n === 6) || (this.finaleSize === 6 && n === 7) || (this.finaleSize === 8 && n === 9)) && !this.flag.makeover) fn = "runway";
       else fn = this.randomMaxi();
       this.maxi(fn);
     }
@@ -563,7 +563,7 @@
           break;
         }
         case "runway": {
-          const makeover = (cast.length === 6 || cast.length === 5 || (this.finaleSize === 6 && cast.length === 7)) && !this.flag.makeover;
+          const makeover = (cast.length === 6 || cast.length === 5 || (this.finaleSize === 6 && cast.length === 7) || (this.finaleSize === 8 && cast.length === 9)) && !this.flag.makeover;
           if (makeover) {
             s.b("¡Es el reto de transformación! Las reinas convertirán en sus hermanas drag " + pick(D.makeoverPeople) + ".");
             this.episodeChallenges.push("Make Over");
@@ -1926,6 +1926,7 @@
         else if (q.rankP === 2) rank = "2º\n(Subcampeona)";
         else if (q.rankP === 32) rank = "3º\n(Subcampeona)";
         else if (q.rankP === 345) rank = "3º-5º";
+        else if (q.rankP === 38) rank = "3º-8º";
         else if (q.rankP === 56) rank = "5º/6º";
         else if (q.rankP === 34) rank = "3º/4º";
         else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
@@ -1988,7 +1989,7 @@
       const cast = this.current;
       const s = this.newScreen("¡La gran final!", "Ir a los minutos finales");
       s.q(cast.map((q) => q.name));
-      s.b("Las cinco finalistas harán actuaciones individuales de espectáculo.");
+      s.b(cast.length === 8 ? "Las ocho finalistas harán actuaciones individuales de espectáculo." : "Las cinco finalistas harán actuaciones individuales de espectáculo.");
       cast.forEach((q) => q.getASLipsync());
       s.hr();
       const by = (lo, hi) => cast.filter((q) => q.lipsyncScore >= lo && q.lipsyncScore < hi);
@@ -2012,7 +2013,7 @@
       j.q(out.map((q) => q.name), "sienna", `${list(out.map((q) => q.name))}, lo siento, queridas, pero no es vuestro momento. Debo pediros que hagáis sashay away...`);
       out.forEach((q) => {
         q.addTR(q.mxcon ? "MSCONELIMINATED" : "ELIMINATED");
-        q.rankP = 345;
+        q.rankP = cast.length === 8 ? 38 : 345;
         this.eliminated.unshift(q);
         this.exitLine(j, q);
       });
@@ -2491,7 +2492,7 @@
       if (this.opts.canFinale && this.current.length === 4) this.lipsyncForTheFinale();
       if (this.opts.lftc && this.current.length === 4) return this.finaleLFTC();
       if (this.opts.teamsFinale) return this.finaleTeams();
-      if (this.current.length === 5) return this.finaleTop5();
+      if (this.current.length === 5 || (this.opts.top8 && this.current.length === 8)) return this.finaleTop5();
       const cast = this.current;
       cast.forEach((q) => q.getFinale());
       const s = this.newScreen("¡La gran final!", "Ir a la pasarela");
@@ -2657,7 +2658,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
-  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6 };
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
@@ -2683,6 +2684,7 @@
       lftc: formatChoice.finale === "FINALE_LIPSYNC_CROWN",
       canFinale: formatChoice.finale === "FINALE_LIPSYNC_FINALE",
       top6: formatChoice.finale === "FINALE_TOP6_AS11",
+      top8: formatChoice.finale === "FINALE_TOP8",
       jury: formatChoice.finale === "FINALE_JURY_VOTE" || formatChoice.finale === "FINALE_JURY_TOP5",
     });
     sim.play();

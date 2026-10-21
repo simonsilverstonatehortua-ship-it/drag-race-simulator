@@ -310,3 +310,11 @@ dos ganadoras de la ronda 1 entre sí y las dos que pasaron directas entre sí (
 3º/4º, "PERDIÓ RONDA 2"). Las dos que ganan hacen el lip sync por la corona (reputación + la mitad
 del lip sync, con un 5 % de sorpresa); la perdedora es "PERDIÓ RONDA 3" (2ª). No cuento los
 extras de All Stars 11 (cuadros por bandos, reinas comodín).
+
+### Top 8 (esopare)
+
+Funciona como el Top 5 pero con ocho finalistas: cada una hace una actuación individual, las dos
+mejores (actuación + reputación) pasan al lip sync por la corona y las otras seis se van con su
+frase de salida (3º-8º). La ganadora y la subcampeona se deciden como en el Top 5. El calendario de
+retos deja la transformación con nueve reinas y el Snatch Game y el Ball como en los demás
+formatos largos.
