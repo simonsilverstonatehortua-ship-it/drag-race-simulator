@@ -59,8 +59,10 @@ const DEFAULT_FORMATS = [
     description: "Cuatro finalistas; las dos peor valoradas se van y las otras dos hacen lip sync por la corona." },
   { id: "FINALE_LIPSYNC_FINALE", group: "finale", label: "Lip Sync for the Finale", custom: false,
     description: "Cuatro finalistas en una batalla de lip syncs (dos parejas y una tercera ronda de las perdedoras): tres pasan a la final." },
-  { id: "FINALE_JURY_VOTE", group: "finale", label: "Voto del jurado", custom: false,
-    description: "Un jurado de eliminadas de la temporada vota a la ganadora." },
+  { id: "FINALE_JURY_VOTE", group: "finale", label: "Jury Vote (Top 4)", custom: false,
+    description: "Cuatro finalistas; las eliminadas votan y las dos más votadas hacen lip sync por la corona." },
+  { id: "FINALE_JURY_TOP5", group: "finale", label: "Top 5 Jury Vote", custom: false,
+    description: "Cinco finalistas defienden su caso; las eliminadas votan y las dos más votadas hacen lip sync por la corona." },
   { id: "FINALE_LIPSYNC_CROWN", group: "finale", label: "Lip-Sync For The Crown", custom: false,
     description: "Rondas sucesivas de lip sync eliminatorio hasta coronar a la ganadora." },
 ];

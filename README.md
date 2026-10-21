@@ -287,3 +287,16 @@ en estas rondas. Después se juega la final normal del Top 3 (pasarela, tercera 
 a tres) **sin columna de videoclip**: las eliminadas pasan a "Invitada" y el track record queda con
 las columnas "Lipsync For The Finale" y "Finale". En el reto de reparto se usa el mismo calendario
 que el Lip-Sync For The Crown, pero sin Rumix ni conversión a Top 5.
+
+### Jury Vote (Top 4) y Top 5 Jury Vote
+
+- **Jury Vote** (myrainboww) / **Top 4 Jury Vote** (esopare): el Top 4 hace la pasarela final y
+  las eliminadas de la temporada votan: cada una da 2 puntos a su primera opción y 1 a la segunda
+  (según su relación con las finalistas). Las dos más votadas son el Top 2; si hay empate por el
+  segundo puesto, las eliminadas votan de nuevo entre las empatadas. Las otras dos se van (3º/4º),
+  las dos finalistas hacen lip sync y gana la de mayor puntuación final (la reputación de la
+  temporada; puede haber dos ganadoras si empatan). El track record muestra los puntos del jurado
+  en la casilla de la final ("GANADORA (7 puntos)").
+- **Top 5 Jury Vote** (solo esopare): las cinco finalistas defienden su caso, las eliminadas votan,
+  las dos más votadas hacen el lip sync por la corona (igual que en el Top 5) y las otras tres se
+  van (3º-5º). Corregí un fallo del original en el desempate, que podía duplicar a una finalista.

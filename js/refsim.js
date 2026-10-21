@@ -454,8 +454,8 @@
       else if (this.total < 12 && !this.flag.snatch && (n === rnd(7, 9) || n === 7)) fn = "snatch";
       else if (!this.flag.snatch && n <= this.finaleSize + 3) fn = "snatch"; // el Snatch Game sale en todas las temporadas
       // Ball: con el Top 2, con 3 reinas (o muy pronto en repartos grandes); con el Top 3, con 4.
-      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
-      else if (!this.flag.ball && this.finaleSize <= 4 && !this.opts.teamsFinale && !this.opts.lftc && !this.opts.canFinale && n === this.finaleSize + 1) fn = "ball";
+      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5 || this.opts.teamsFinale || this.opts.lftc || this.opts.canFinale || this.opts.jury) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
+      else if (!this.flag.ball && this.finaleSize <= 4 && !this.opts.teamsFinale && !this.opts.lftc && !this.opts.canFinale && !this.opts.jury && n === this.finaleSize + 1) fn = "ball";
       else if (!this.flag.ball && this.total < 12 && n === 8 && rnd(0, 100) <= 10) fn = "ball";
       else if (((this.total >= 12 && (n === 8 || n === 9)) || (this.total < 12 && n === 6)) && !this.flag.girlGroup && rnd(0, 100) >= 50) fn = "girlgroup";
       else if (((this.total >= 12 && (n === 11 || n === 9)) || (this.total < 12 && n === 7)) && !this.flag.rusical && rnd(0, 100) >= 50) fn = "rusical";
@@ -1896,6 +1896,11 @@
       if (queen.miniEpisode.includes(col + 1)) {
         cell.sub = queen.tCaptain.includes(col + 1) ? "Capitana de equipo" : "Ganadora del mini reto";
       }
+      // Jury Vote: en la columna de la final se muestran los puntos del jurado.
+      if (this.opts.jury && queen.juryPoints !== undefined && col === this.episodeChallenges.length - 1
+        && /^(MSCON)?(WIN|RUNUP|ELIMINATED)|^(WINNER|RUNNER UP)$/.test(raw)) {
+        cell.sub = `(${queen.juryPoints} puntos)`;
+      }
       return cell;
     }
 
@@ -2010,7 +2015,13 @@
         this.eliminated.unshift(q);
         this.exitLine(j, q);
       });
-      const finalLS = [a, b];
+      this.crownDuel([a, b]);
+    }
+
+    // Lip sync por la corona entre las dos finalistas (Top 5 y Top 5 Jury Vote): su puntuación final
+    // es la reputación más la mitad del lip sync.
+    crownDuel(finalLS) {
+      const [a, b] = finalLS;
       this.current = [];
 
       const e = this.newScreen("El final...", "Ver a la ganadora");
@@ -2021,11 +2032,16 @@
       this.lipsyncEvent(e, finalLS);
       const rawLip = finalLS.map((q) => q.lipsyncScore); // el lip sync final no cuenta la reputación
       this.lipsyncGroups(e, finalLS, song);
+      this.crownWinner(finalLS, song, rawLip, true);
+    }
 
+    // Pantalla final entre dos finalistas: gana la de mayor puntuación final (si rawLip, se le suma
+    // antes la mitad del lip sync); si empatan, un 50 % de que ganen las dos.
+    crownWinner(finalLS, song, rawLip, lipsyncFinal) {
       const w = this.newScreen("El fin.", "Ver el track record");
       w.b("Chicas, he tomado mi decisión. La próxima Superestrella Drag es...");
       w.hr();
-      finalLS.forEach((q, i) => { q.finaleScore += rawLip[i] / 2; });
+      if (rawLip) finalLS.forEach((q, i) => { q.finaleScore += rawLip[i] / 2; });
       finalLS.sort((x, y) => y.finaleScore - x.finaleScore);
       const label = (q, win) => (q.mxcon ? (win ? "MSCONWIN" : "MSCONRUNUP") : (win ? "WINNER" : "RUNNER UP"));
       if (finalLS[0].finaleScore === finalLS[1].finaleScore && rnd(0, 100) >= 50) {
@@ -2037,8 +2053,8 @@
         finalLS[0].addTR(label(finalLS[0], true));
         finalLS[1].addTR(label(finalLS[1], true));
         finalLS[1].rankP = 1;
-        this.eliminated[0].rankP = 432;
-        if (this.eliminated[1]) this.eliminated[1].rankP = 432;
+        if (lipsyncFinal) this.eliminated[0].rankP = 432;
+        if (lipsyncFinal && this.eliminated[1]) this.eliminated[1].rankP = 432;
         this.eliminated.unshift(finalLS[1]);
         this.winnerName = finalLS[0].name;
         this.runnerUpName = finalLS[1].name;
@@ -2046,7 +2062,7 @@
       } else {
         let win = 0;
         this.addSong([finalLS[0]], [finalLS[1]], song);
-        if (rnd(0, 100) >= 95) { win = 1; this.alots.pop(); this.addSong([finalLS[1]], [finalLS[0]], song); }
+        if (lipsyncFinal && rnd(0, 100) >= 95) { win = 1; this.alots.pop(); this.addSong([finalLS[1]], [finalLS[0]], song); }
         const loser = finalLS[1 - win];
         w.q([finalLS[win].name], "yellow", `¡¡${finalLS[win].name}!!`);
         this.winSpeech(w, [finalLS[win]]);
@@ -2270,7 +2286,133 @@
       this.eliminated.forEach((q) => q.addTR(""));
     }
 
+    // Puntúa y describe la pasarela de la final ("el mejor drag").
+    finalRunway(r, cast) {
+      cast.forEach((q) => q.getRunway());
+      const by = (lo, hi) => cast.filter((q) => q.runwayScore >= lo && q.runwayScore < hi);
+      this.describeGroups(r, [
+        [by(-Infinity, 6), "darkblue", (l, pl) => `¡${l} ${pl ? "arrasaron" : "arrasó"} en la pasarela!`],
+        [by(6, 16), "royalblue", (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} una gran pasarela!`],
+        [by(16, 26), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una buena pasarela.`],
+        [by(26, Infinity), "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala pasarela...`],
+      ]);
+    }
+
+    // Votación del jurado de las eliminadas: cada una da 2 puntos a su primera opción y 1 a la
+    // segunda entre las finalistas. Devuelve las finalistas ordenadas por puntos (las dos primeras
+    // pasan a la final); si hay empate por el segundo puesto, las eliminadas votan de nuevo.
+    juryVote(s, finalists) {
+      const jury = this.eliminated.slice();
+      finalists.forEach((q) => { q.votes = 0; });
+      s.b("Tras las reuniones de las finalistas con las eliminadas... ¡las eliminadas votan!!");
+      jury.forEach((j) => {
+        const pool = finalists.slice();
+        const first = this.bestSister(j, pool);
+        first.votes += 2;
+        pool.splice(pool.indexOf(first), 1);
+        s.q([j.name, first.name], "yellow", `¡${j.name} votó a ${first.name}! Como primera opción.`);
+        const second = this.bestSister(j, pool);
+        second.votes += 1;
+        s.q([j.name, second.name], "silver", `¡${j.name} votó a ${second.name}! Como segunda opción.`);
+      });
+      s.hr();
+      s.b("¡Los resultados están aquí..!!");
+      finalists.sort((a, b) => b.votes - a.votes);
+      finalists.forEach((q) => s.b(`${q.name}: ${q.votes} puntos`));
+      s.hr();
+      if (finalists[1].votes === finalists[2].votes) {
+        const tied = [finalists[1], finalists[2]];
+        s.b(`Hay un empate: las eliminadas deben votar otra vez entre ${tied[0].name} y ${tied[1].name}!!`);
+        const og = tied[0].votes;
+        tied.forEach((q) => { q.votes = 0; });
+        jury.forEach((j) => {
+          const pick = this.bestSister(j, tied);
+          pick.votes++;
+          s.q([j.name, pick.name], "yellow", `¡${j.name} votó a ${pick.name}! Para estar en la final.`);
+        });
+        s.hr();
+        s.b("¡Los resultados están aquí..!");
+        tied.forEach((q) => s.b(`${q.name}: ${q.votes} puntos`));
+        tied.sort((a, b) => b.votes - a.votes);
+        s.b(`¡¡${tied[0].name} pasa a la final!!`);
+        tied.forEach((q) => { q.votes = og; });
+        finalists[1] = tied[0];
+        finalists[2] = tied[1];
+      }
+      finalists.forEach((q) => { q.juryPoints = q.votes; });
+      return finalists;
+    }
+
+    // "Jury Vote" (myrainboww) / "Top 4 Jury Vote" (esopare): el Top 4 hace pasarela, las eliminadas
+    // votan, las dos más votadas pasan al lip sync final y las otras dos se van (3º/4º). Gana la de
+    // mayor puntuación final (reputación de la temporada).
+    finaleJury4() {
+      const cast = this.current;
+      cast.forEach((q) => q.getFinale());
+      cast.sort((a, b) => b.finaleScore - a.finaleScore);
+      const s = this.newScreen("¡La gran final!", "Ir a la pasarela");
+      s.q(cast.map((q) => q.name));
+      s.p("¡Nuestro Top 4 creará versos y una coreografía para una nueva canción original!");
+      const r = this.newScreen("¡La gran final!", "Ir al jurado");
+      r.blocks = s.blocks.slice();
+      r.hr(); r.big("¡Pasarela!");
+      r.p("¡Las reinas desfilarán por la pasarela!");
+      r.p("La categoría es... ¡el mejor drag!");
+      this.finalRunway(r, cast);
+
+      const j = this.newScreen("¡El jurado!", "Ver a la ganadora");
+      j.p("¡Las eliminadas vuelven, vuelven, vuelven otra vez!");
+      j.hr();
+      j.q(cast.map((q) => q.name));
+      const ranked = this.juryVote(j, cast.slice());
+      const top2 = [ranked[0], ranked[1]];
+      j.b(`¡¡${top2[0].name} y ${top2[1].name} son el Top 2 de la temporada!!`);
+      ranked.slice(2).reverse().forEach((q) => {
+        q.addTR(q.mxcon ? "MSCONELIMINATED" : "ELIMINATED");
+        q.rankP = 34;
+        this.eliminated.unshift(q);
+      });
+      top2.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(j);
+      j.hr();
+      this.lipsyncEvent(j, top2);
+      this.lipsyncGroups(j, top2, song);
+      j.hr();
+      this.current = top2;
+      this.crownWinner(top2, song, null, false);
+      this.episodeChallenges.push("Finale");
+    }
+
+    // "Top 5 Jury Vote" (solo esopare): los cinco finalistas defienden su caso ante las eliminadas,
+    // que votan; las dos más votadas hacen lip sync por la corona y las otras tres se van (3º-5º).
+    finaleJury5() {
+      const cast = this.current;
+      const s = this.newScreen("¡La gran final!", "Ir al jurado");
+      s.q(cast.map((q) => q.name));
+      s.b("Las cinco finalistas defenderán su caso ante las eliminadas.");
+      s.p("Tras escucharlas, las eliminadas votarán a las dos reinas que creen que merecen pasar al lip sync final por la corona.");
+      this.episodeChallenges.push("Finale");
+
+      const j = this.newScreen("¡El jurado!", "Ir al lip sync final");
+      j.p("¡Las eliminadas vuelven, vuelven, vuelven otra vez!");
+      j.hr();
+      j.q(cast.map((q) => q.name));
+      const ranked = this.juryVote(j, cast.slice());
+      j.big("Las que pasan al lip sync final son...");
+      j.q([ranked[0].name, ranked[1].name], "silver", `${ranked[0].name} y ${ranked[1].name}, condragulations, ¡habéis recibido más votos del jurado!`);
+      const out = ranked.slice(2);
+      j.q(out.map((q) => q.name), "sienna", `${list(out.map((q) => q.name))}, lo siento, queridas, pero el jurado ha hablado. Ahora, sashay away...`);
+      out.reverse().forEach((q) => {
+        q.addTR(q.mxcon ? "MSCONELIMINATED" : "ELIMINATED");
+        q.rankP = 345;
+        this.eliminated.unshift(q);
+      });
+      this.crownDuel([ranked[0], ranked[1]]);
+    }
+
     finale() {
+      if (this.opts.jury && this.current.length === 4) return this.finaleJury4();
+      if (this.opts.jury && this.current.length === 5) return this.finaleJury5();
       if (this.opts.canFinale && this.current.length === 4) this.lipsyncForTheFinale();
       if (this.opts.lftc && this.current.length === 4) return this.finaleLFTC();
       if (this.opts.teamsFinale) return this.finaleTeams();
@@ -2289,14 +2431,7 @@
       r.hr(); r.big("¡Pasarela!");
       r.p("¡Las reinas desfilarán por la pasarela!");
       r.p("La categoría es... ¡el mejor drag!");
-      cast.forEach((q) => q.getRunway());
-      const by = (lo, hi) => cast.filter((q) => q.runwayScore >= lo && q.runwayScore < hi);
-      this.describeGroups(r, [
-        [by(-Infinity, 6), "darkblue", (l, pl) => `¡${l} ${pl ? "arrasaron" : "arrasó"} en la pasarela!`],
-        [by(6, 16), "royalblue", (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} una gran pasarela!`],
-        [by(16, 26), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una buena pasarela.`],
-        [by(26, Infinity), "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala pasarela...`],
-      ]);
+      this.finalRunway(r, cast);
       // los minutos finales
       // Con "Lip Sync for the Finale" no hay columna de videoclip: las eliminadas pasan a "Invitada".
       const canFinale = this.opts.canFinale;
@@ -2447,7 +2582,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
-  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4 };
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
@@ -2472,6 +2607,7 @@
       teamsFinale: formatChoice.finale === "FINALE_TEAMS",
       lftc: formatChoice.finale === "FINALE_LIPSYNC_CROWN",
       canFinale: formatChoice.finale === "FINALE_LIPSYNC_FINALE",
+      jury: formatChoice.finale === "FINALE_JURY_VOTE" || formatChoice.finale === "FINALE_JURY_TOP5",
     });
     sim.play();
     return {
