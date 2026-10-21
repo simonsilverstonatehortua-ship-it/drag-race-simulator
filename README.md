@@ -276,3 +276,14 @@ record. Los equipos de la temporada ("Teams") todavía no están copiados.
 - Los **nombres de los retos** del track record van siempre en inglés (Make Over, Improv, Snatch
   Game...). Las columnas usan `table-layout: fixed` con una anchura de 64 px, así que ninguna
   palabra larga puede ensanchar una columna: todas son rectángulos verticales idénticos.
+
+### Lip Sync for the Finale
+
+Es el final de la temporada 2 de Canadá en los dos simuladores (mismas pantallas en ambos). Tras la
+reunión, el Top 4 se reparte al azar en dos parejas ("batalla real de lip syncs"): la ganadora de
+cada pareja pasa a la final ("TOP 3 · Ganó ronda 1/2") y las dos perdedoras se enfrentan en una
+tercera ronda; la que gana pasa ("Ganó ronda 3") y la otra se va. No hay empates ni doble shantay
+en estas rondas. Después se juega la final normal del Top 3 (pasarela, tercera eliminada o lip sync
+a tres) **sin columna de videoclip**: las eliminadas pasan a "Invitada" y el track record queda con
+las columnas "Lipsync For The Finale" y "Finale". En el reto de reparto se usa el mismo calendario
+que el Lip-Sync For The Crown, pero sin Rumix ni conversión a Top 5.
