@@ -218,7 +218,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3 o Top 4 + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4 o Top 5 + sin regresos ni opciones.";
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -912,44 +912,47 @@ function refTextWithBreaks(node, text) {
 }
 
 function refTrackRecord(block) {
-  const tableWrap = el("div", { class: "table-wrap" });
-  const table = el("table", { class: "stats-table trackrecord-table" });
+  // Aspecto copiado de los simuladores de referencia: tabla clara y todas las casillas (y la
+  // foto) del mismo tamaño, en rectángulos verticales.
+  const tableWrap = el("div", { class: "table-wrap rtr-wrap" });
+  const table = el("table", { class: "rtr", id: "trackRecord" });
   const thead = el("thead");
   const head = el("tr");
-  ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2", class: "trackrecord-th--span" })));
+  ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2" })));
   block.columns.forEach((_, i) => head.appendChild(el("th", { text: `Ep. ${i + 1}` })));
-  head.appendChild(el("th", { text: "PPE", rowspan: "2", class: "trackrecord-th--span" }));
+  head.appendChild(el("th", { text: "PPE", rowspan: "2", class: "ppeTR" }));
   thead.appendChild(head);
-  const challengeRow = el("tr", { class: "trackrecord-challenge-row" });
-  block.columns.forEach((c) => challengeRow.appendChild(el("th", { text: c })));
+  const challengeRow = el("tr");
+  block.columns.forEach((c) => challengeRow.appendChild(el("th", { text: c, class: "episodeTR" })));
   thead.appendChild(challengeRow);
   table.appendChild(thead);
 
   const tbody = el("tbody");
   block.rows.forEach((row) => {
     const tr = el("tr");
-    const rank = el("td", { class: "ref-tr-rank" });
+    const rank = el("td", { class: "rtr-rank" });
     refTextWithBreaks(rank, row.rank);
     tr.appendChild(rank);
-    tr.appendChild(el("td", { class: "ref-tr-name", text: row.name }));
-    const photo = el("td", { class: "ref-tr-photo" });
-    const avatar = avatarImg(row.name, "avatar--tr");
-    if (avatar) photo.appendChild(avatar);
-    tr.appendChild(photo);
+    tr.appendChild(el("td", { class: "rtr-name", text: row.name }));
+    const src = contestantImage(row.name);
+    tr.appendChild(el("td", {
+      class: "placement rtr-photo",
+      style: src ? `background-image:url("${String(src).replace(/"/g, "%22")}");` : "",
+    }));
     row.cells.forEach((cell) => {
       let style = "";
       if (cell.bg) style += `background:${cell.bg};`;
       if (cell.fg) style += `color:${cell.fg};`;
-      if (cell.bold) style += "font-weight:800;";
-      const td = el("td", { class: "trackrecord-cell", style });
+      if (cell.bold) style += "font-weight:700;";
+      const td = el("td", { class: "placement", style });
       refTextWithBreaks(td, cell.text);
       if (cell.sub) {
         td.appendChild(document.createElement("br"));
-        td.appendChild(el("small", { class: "ref-tr-sub", text: cell.sub }));
+        td.appendChild(el("small", { class: "rtr-sub", text: cell.sub }));
       }
       tr.appendChild(td);
     });
-    tr.appendChild(el("td", { class: "trackrecord-cell", style: "background:lightgray;font-weight:800;", text: row.ppe }));
+    tr.appendChild(el("td", { class: "placement rtr-ppe", text: row.ppe }));
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);

@@ -691,3 +691,60 @@ footer {
 @media (max-width: 600px) {
   .marquee { padding: 1.8rem 1rem 1.2rem; }
 }
+
+/* Track record del simulador "estilo myrainboww + esopare": tabla clara, casillas iguales en
+   rectángulos verticales (como en los simuladores de referencia). */
+.rtr-wrap { background: #f5ebf5; }
+.rtr {
+  background: #f5ebf5;
+  color: #202122;
+  border: 1px solid #a2a9b1;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0 auto;
+}
+.rtr th {
+  background: #e9dfe9;
+  color: #202122;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: pre-line;
+  border: 1px solid #a2a9b1;
+  padding: 2px 3px;
+  line-height: 1.1;
+}
+.rtr th.episodeTR { font-size: 10.5px; padding: 1px 2px; line-height: 1.05; }
+.rtr td {
+  border: 1px solid #a2a9b1;
+  padding: 0.2em 0.4em;
+  text-align: center;
+  vertical-align: middle;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.rtr td.placement {
+  height: 110px;
+  width: 64px;
+  min-width: 64px;
+  max-width: 64px;
+  font-size: 11px;
+  line-height: 1.15;
+  padding: 0.2em 0.2em;
+  color: #202122;
+  overflow: hidden;
+}
+.rtr .rtr-rank { background: #f5ebf5; font-weight: 700; width: 96px; min-width: 96px; font-size: 0.72rem; }
+.rtr .rtr-name { background: #f5ebf5; font-weight: 700; font-size: 0.8rem; width: 96px; min-width: 96px; overflow-wrap: break-word; }
+.rtr .rtr-photo {
+  background-color: #d9d4dc;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.rtr .rtr-ppe { background: lightgray; font-weight: 700; }
+.rtr .rtr-sub { display: block; font-style: italic; font-size: 0.62rem; margin-top: 0.2rem; font-weight: 500; }

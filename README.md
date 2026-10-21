@@ -243,3 +243,14 @@ sync; si no, las cuatro hacen lip sync a la vez ("vamos a romper todas las regla
 que no ganan en el lip sync de cuatro comparten el 2º-4º puesto; si hay empate de ganadoras,
 las otras dos comparten el 3º/4º. En la fase previa, con 6 reinas se juega la transformación,
 con 5 el Ball, y un doble shantay con 4 reinas puede ampliar el Top 3 a Top 4.
+
+### Final Top 5 y aspecto del track record
+
+- **Top 5** (los dos simuladores): las cinco finalistas hacen una actuación individual ("actuación
+  final"); las dos mejores pasan al lip sync por la corona y las otras tres se van con su frase
+  de salida (3º-5º). La ganadora se decide con la reputación de la temporada más el lip sync
+  final, con un 5 % de que se invierta; la perdedora es 2ª. Solo
+  hay una columna "Final" en el track record.
+- **Track record** copiado estéticamente de los simuladores de referencia: tabla clara
+  (lavanda), cabecera con "Ep. N" y el reto debajo, y todas las casillas —y la foto de cada
+  reina— del mismo tamaño, en rectángulos verticales (64 × 110 px), con PPE al final.

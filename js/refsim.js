@@ -5,7 +5,7 @@
 // de jurado con críticas, Untucked de las reinas a salvo, frases de salida, discurso de la
 // ganadora...), con todos los textos traducidos al español.
 //
-// Por ahora cubre este formato: estreno normal + temporada regular + final Top 2, Top 3 o Top 4 + sin
+// Por ahora cubre este formato: estreno normal + temporada regular + final Top 2, Top 3, Top 4 o Top 5 + sin
 // regresos (ver RefSim.canRun). El resto de formatos sigue usando js/engine.js.
 //
 // No toca el DOM: devuelve una lista de pantallas { title, button, blocks }, que app.js pinta
@@ -155,9 +155,9 @@
     "ELIMINATED": { text: "ELIM", bg: "sienna", fg: "white", bold: true },
     "MSCONELIMINATED": { text: "MISS SIMPATÍA\n+\nELIM", bg: "#50a996", bold: true },
     "WINNER": { text: "GANADORA", bg: "yellow", bold: true },
-    "RUNNER UP": { text: "SUBCAMPEONA", bg: "silver", bold: true },
+    "RUNNER UP": { text: "SUB-\nCAMPEONA", bg: "silver", bold: true },
     "MSCONWIN": { text: "MISS SIMPATÍA\n+\nGANADORA", bg: "#80FF80", bold: true },
-    "MSCONRUNUP": { text: "MISS SIMPATÍA\n+\nSUBCAMPEONA", bg: "#9DCECB", bold: true },
+    "MSCONRUNUP": { text: "MISS SIMPATÍA\n+\nSUB-\nCAMPEONA", bg: "#9DCECB", bold: true },
     "GUEST": { text: "INVITADA", bg: "lightgrey" },
     "MISS CON": { text: "MISS SIMPATÍA", bg: "aqua", bold: true },
     "DISQ": { text: "DESCALIF.", bg: "black", fg: "white", bold: true },
@@ -444,13 +444,13 @@
       else if (this.total < 12 && !this.flag.snatch && (n === rnd(7, 9) || n === 7)) fn = "snatch";
       else if (!this.flag.snatch && n <= this.finaleSize + 3) fn = "snatch"; // el Snatch Game sale en todas las temporadas
       // Ball: con el Top 2, con 3 reinas (o muy pronto en repartos grandes); con el Top 3, con 4.
-      else if (!this.flag.ball && this.total >= 12 && this.finaleSize === 2 && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
-      else if (!this.flag.ball && n === this.finaleSize + 1) fn = "ball";
+      else if (!this.flag.ball && this.total >= 12 && (this.finaleSize === 2 || this.finaleSize === 5) && (n === this.total - 3 || n === this.total - 4)) fn = "ball";
+      else if (!this.flag.ball && this.finaleSize <= 4 && n === this.finaleSize + 1) fn = "ball";
       else if (!this.flag.ball && this.total < 12 && n === 8 && rnd(0, 100) <= 10) fn = "ball";
       else if (((this.total >= 12 && (n === 8 || n === 9)) || (this.total < 12 && n === 6)) && !this.flag.girlGroup && rnd(0, 100) >= 50) fn = "girlgroup";
       else if (((this.total >= 12 && (n === 11 || n === 9)) || (this.total < 12 && n === 7)) && !this.flag.rusical && rnd(0, 100) >= 50) fn = "rusical";
       // Transformación (con el Top 3, con 5 reinas)
-      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize === 4 && n === 6)) && !this.flag.makeover) fn = "runway";
+      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize >= 4 && n === 6)) && !this.flag.makeover) fn = "runway";
       else fn = this.randomMaxi();
       this.maxi(fn);
     }
@@ -1899,6 +1899,7 @@
         if (q.rankP === 1) rank = "1º\n(Ganadora)";
         else if (q.rankP === 2) rank = "2º\n(Subcampeona)";
         else if (q.rankP === 32) rank = "3º\n(Subcampeona)";
+        else if (q.rankP === 345) rank = "3º-5º";
         else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
         else if (q.rankP === 432) rank = "3º/4º\n(Subcampeona)";
         else if (q.rankP === 23) rank = "2º/3º\n(Subcampeona)";
@@ -1953,7 +1954,93 @@
       s.hr();
     }
 
+    // Final del Top 5 (los dos simuladores): cinco actuaciones individuales; las dos mejores
+    // pasan al lip sync final y las otras tres se van ("3º-5º").
+    finaleTop5() {
+      const cast = this.current;
+      const s = this.newScreen("¡La gran final!", "Ir a los minutos finales");
+      s.q(cast.map((q) => q.name));
+      s.b("Las cinco finalistas harán actuaciones individuales de espectáculo.");
+      cast.forEach((q) => q.getASLipsync());
+      s.hr();
+      const by = (lo, hi) => cast.filter((q) => q.lipsyncScore >= lo && q.lipsyncScore < hi);
+      this.describeGroups(s, [
+        [by(12, Infinity), "darkblue", (l, pl) => `¡¡${l} ${pl ? "arrasaron" : "arrasó"} en la actuación final!!`],
+        [by(8, 12), "royalblue", (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} una gran actuación final!`],
+        [by(4, 8), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una buena actuación final.`],
+        [by(2, 4), "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala actuación final...`],
+        [by(-Infinity, 2), "tomato", (l, pl) => `${l} ${pl ? "fracasaron" : "fracasó"} en la actuación final...`],
+      ]);
+      cast.forEach((q) => { q.lipsyncScore += (q.favoritism - q.unfavoritism) / 3; });
+      cast.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      this.episodeChallenges.push("Finale");
+
+      const j = this.newScreen("Los minutos finales...", "Ir al lip sync final");
+      j.hr();
+      j.big("Las que pasan al lip sync final son...");
+      const [a, b] = [cast[0], cast[1]];
+      j.q([a.name, b.name], "silver", `${a.name} y ${b.name}, condragulations, id a preparar vuestro lip sync final.`);
+      const out = cast.slice(2);
+      j.q(out.map((q) => q.name), "sienna", `${list(out.map((q) => q.name))}, lo siento, queridas, pero no es vuestro momento. Debo pediros que hagáis sashay away...`);
+      out.forEach((q) => {
+        q.addTR(q.mxcon ? "MSCONELIMINATED" : "ELIMINATED");
+        q.rankP = 345;
+        this.eliminated.unshift(q);
+        this.exitLine(j, q);
+      });
+      const finalLS = [a, b];
+      this.current = [];
+
+      const e = this.newScreen("El final...", "Ver a la ganadora");
+      finalLS.forEach((q) => { q.getASLipsync(); q.getFinale(); });
+      e.q(finalLS.map((q) => q.name), "silver", `${a.name} y ${b.name} harán lip sync por la corona...!`);
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, finalLS);
+      const rawLip = finalLS.map((q) => q.lipsyncScore); // el lip sync final no cuenta la reputación
+      this.lipsyncGroups(e, finalLS, song);
+
+      const w = this.newScreen("El fin.", "Ver el track record");
+      w.b("Chicas, he tomado mi decisión. La próxima Superestrella Drag es...");
+      w.hr();
+      finalLS.forEach((q, i) => { q.finaleScore += rawLip[i] / 2; });
+      finalLS.sort((x, y) => y.finaleScore - x.finaleScore);
+      const label = (q, win) => (q.mxcon ? (win ? "MSCONWIN" : "MSCONRUNUP") : (win ? "WINNER" : "RUNNER UP"));
+      if (finalLS[0].finaleScore === finalLS[1].finaleScore && rnd(0, 100) >= 50) {
+        this.addSong(finalLS, [], song);
+        w.b("Por PRIMERA VEZ en la herstory de Drag Race, sois las dos ganadoras, baby");
+        w.q([finalLS[0].name, finalLS[1].name], "yellow", `¡¡${finalLS[0].name} y ${finalLS[1].name}!!`);
+        this.winSpeech(w, finalLS);
+        w.b("¡Ahora a hacer prance, mis reinas!");
+        finalLS[0].addTR(label(finalLS[0], true));
+        finalLS[1].addTR(label(finalLS[1], true));
+        finalLS[1].rankP = 1;
+        this.eliminated[0].rankP = 432;
+        if (this.eliminated[1]) this.eliminated[1].rankP = 432;
+        this.eliminated.unshift(finalLS[1]);
+        this.winnerName = finalLS[0].name;
+        this.runnerUpName = finalLS[1].name;
+        this.current = [finalLS[0]];
+      } else {
+        let win = 0;
+        this.addSong([finalLS[0]], [finalLS[1]], song);
+        if (rnd(0, 100) >= 95) { win = 1; this.alots.pop(); this.addSong([finalLS[1]], [finalLS[0]], song); }
+        const loser = finalLS[1 - win];
+        w.q([finalLS[win].name], "yellow", `¡¡${finalLS[win].name}!!`);
+        this.winSpeech(w, [finalLS[win]]);
+        w.b("¡Ahora a hacer prance, mi reina!");
+        finalLS[win].addTR(label(finalLS[win], true));
+        loser.addTR(label(loser, false));
+        loser.rankP = 2;
+        this.eliminated.unshift(loser);
+        this.winnerName = finalLS[win].name;
+        this.runnerUpName = loser.name;
+        this.current = [finalLS[win]];
+      }
+    }
+
     finale() {
+      if (this.current.length === 5) return this.finaleTop5();
       const cast = this.current;
       cast.forEach((q) => q.getFinale());
       const s = this.newScreen("¡La gran final!", "Ir a la pasarela");
@@ -2117,7 +2204,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
-  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4 };
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
