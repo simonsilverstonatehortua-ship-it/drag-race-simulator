@@ -218,7 +218,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4, Top 5 o por equipos + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4, Top 5, por equipos o Lip-Sync For The Crown + sin regresos ni opciones.";
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -915,7 +915,14 @@ function refTrackRecord(block) {
   // Aspecto copiado de los simuladores de referencia: tabla clara y todas las casillas (y la
   // foto) del mismo tamaño, en rectángulos verticales.
   const tableWrap = el("div", { class: "table-wrap rtr-wrap" });
-  const table = el("table", { class: "rtr", id: "trackRecord" });
+  // Diseño fijo: cada columna de episodio mide siempre 64 px, sin importar lo larga que sea la
+  // palabra del reto (así todas son rectángulos verticales idénticos).
+  const colWidths = [108, 96, 64, ...block.columns.map(() => 64), 64];
+  const tableWidth = colWidths.reduce((a, b) => a + b, 0);
+  const table = el("table", { class: "rtr", id: "trackRecord", style: `width:${tableWidth}px;min-width:${tableWidth}px;` });
+  const colgroup = el("colgroup");
+  colWidths.forEach((w) => colgroup.appendChild(el("col", { style: `width:${w}px;` })));
+  table.appendChild(colgroup);
   const thead = el("thead");
   const head = el("tr");
   ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2" })));

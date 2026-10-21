@@ -66,14 +66,14 @@ window.REF_DATA = {
   ],
   // [descripción, nombre en el track record]
   improvShows: [
-    ["un debate político.", "Debate político"], ["una entrevista a una celebridad.", "Improvisación"],
-    ["un programa matinal moderno.", "Improvisación"], ["un programa nocturno de late-night.", "Improvisación"],
-    ["un nuevo episodio de Bossy Rossy.", "The Bossy Rossy Show"], ["un programa infantil sugerente.", "Improvisación"],
-    ["un programa tipo Bitchelor.", "The Bitchelor"], ["un programa tipo Jersey Justice.", "Improvisación"],
-    ["un talk show de adoración a las divas.", "Improvisación"], ["un concurso de talentos para gente con poco talento.", "Improvisación"],
-    ["una parodia drag del programa de cotilleo y drama televisivo.", "Improvisación"],
-    ["un certamen, el Miss Loose Jaw Pageant.", "Improvisación"], ["un programa de charla íntimo llamado Pink Table Talk.", "Improvisación"],
-    ["un programa One, Two, Drags!", "Improvisación"], ["un drama Forensic Queens.", "Improvisación"],
+    ["un debate político.", "Political Debate"], ["una entrevista a una celebridad.", "Improv"],
+    ["un programa matinal moderno.", "Improv"], ["un programa nocturno de late-night.", "Improv"],
+    ["un nuevo episodio de Bossy Rossy.", "The Bossy Rossy Show"], ["un programa infantil sugerente.", "Improv"],
+    ["un programa tipo Bitchelor.", "The Bitchelor"], ["un programa tipo Jersey Justice.", "Improv"],
+    ["un talk show de adoración a las divas.", "Improv"], ["un concurso de talentos para gente con poco talento.", "Improv"],
+    ["una parodia drag del programa de cotilleo y drama televisivo.", "Improv"],
+    ["un certamen, el Miss Loose Jaw Pageant.", "Improv"], ["un programa de charla íntimo llamado Pink Table Talk.", "Improv"],
+    ["un programa One, Two, Drags!", "Improv"], ["un drama Forensic Queens.", "Improv"],
   ],
   runwayCategories: [
     "Plumas.", "Tocado.", "Rosa.", "Morado.", "Caftán.", "Colas.", "Amarillo.", "Blanco.", "Negro.", "Vestido feo.", "Traviesa.",

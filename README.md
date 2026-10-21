@@ -263,3 +263,16 @@ ordenan por la reputación de la temporada (favoritismo menos desfavoritismo). L
 se van ("no es vuestro momento", puesto 3º/4º) y las dos primeras hacen lip sync por la corona;
 gana la mejor valorada, con posible empate de ganadoras. Solo hay una columna "Final" en el track
 record. Los equipos de la temporada ("Teams") todavía no están copiados.
+
+### Lip-Sync For The Crown y nombres de reto en inglés
+
+- **Lip-Sync For The Crown** (myrainboww) / **Top 4 Lip-Sync For The Crown** (esopare): con cuatro
+  finalistas, se sortean dos parejas; cada pareja hace un lip sync preliminar y la perdedora se va
+  ("PERDIÓ RONDA 1 / 2", puesto 3º/4º). Si una pareja empata con un lip sync bueno, pasan las dos
+  (final a tres y, si empatan las dos, a cuatro). Las que pasan hacen el lip sync final; la
+  ganadora sale de la reputación más la mitad del lip sync (5 % de sorpresa); las demás
+  "PERDIÓ RONDA 3". Con cinco reinas se juega el reto **Rumix**, y un doble shantay con cinco
+  reinas convierte el formato en Top 5.
+- Los **nombres de los retos** del track record van siempre en inglés (Make Over, Improv, Snatch
+  Game...). Las columnas usan `table-layout: fixed` con una anchura de 64 px, así que ninguna
+  palabra larga puede ensanchar una columna: todas son rectángulos verticales idénticos.

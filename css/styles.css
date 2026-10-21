@@ -703,8 +703,11 @@ footer {
   font-size: 0.7rem;
   text-align: center;
   margin: 0 auto;
+  table-layout: fixed;
 }
 .rtr th {
+  overflow: hidden;
+  overflow-wrap: anywhere;
   background: #e9dfe9;
   color: #202122;
   font-family: inherit;
@@ -718,7 +721,7 @@ footer {
   padding: 2px 3px;
   line-height: 1.1;
 }
-.rtr th.episodeTR { font-size: 10.5px; padding: 1px 2px; line-height: 1.05; }
+.rtr th.episodeTR { font-size: 9.5px; padding: 1px 1px; line-height: 1.05; }
 .rtr td {
   border: 1px solid #a2a9b1;
   padding: 0.2em 0.4em;
@@ -738,7 +741,7 @@ footer {
   color: #202122;
   overflow: hidden;
 }
-.rtr .rtr-rank { background: #f5ebf5; font-weight: 700; width: 96px; min-width: 96px; font-size: 0.72rem; }
+.rtr .rtr-rank { background: #f5ebf5; font-weight: 700; width: 108px; min-width: 108px; font-size: 0.68rem; padding: 0.2em 0.15em; }
 .rtr .rtr-name { background: #f5ebf5; font-weight: 700; font-size: 0.8rem; width: 96px; min-width: 96px; overflow-wrap: break-word; }
 .rtr .rtr-photo {
   background-color: #d9d4dc;
