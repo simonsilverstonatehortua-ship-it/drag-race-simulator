@@ -233,3 +233,13 @@ Donde esopare cambia una regla de myrainboww se sigue esopare, salvo en tres cos
 estaban pedidas: el Snatch Game sale en todas las temporadas, no se repite el mismo reto dos
 episodios seguidos y los episodios especiales raros (slayers, floppers, lip sync de seis,
 LaLaPaRUza) se mantienen, porque en esopare han quedado desactivados.
+
+### Final Top 4
+
+Los dos simuladores comparten la final Top 4 (esopare solo añade la frase de salida de la
+eliminada). Si la cuarta finalista va muy por detrás (diferencia de 10 o más con la primera
+y menos de 5 puntos de final), se va antes ("no es tu momento...") y las otras tres hacen lip
+sync; si no, las cuatro hacen lip sync a la vez ("vamos a romper todas las reglas"). Las tres
+que no ganan en el lip sync de cuatro comparten el 2º-4º puesto; si hay empate de ganadoras,
+las otras dos comparten el 3º/4º. En la fase previa, con 6 reinas se juega la transformación,
+con 5 el Ball, y un doble shantay con 4 reinas puede ampliar el Top 3 a Top 4.

@@ -5,7 +5,7 @@
 // de jurado con críticas, Untucked de las reinas a salvo, frases de salida, discurso de la
 // ganadora...), con todos los textos traducidos al español.
 //
-// Por ahora cubre este formato: estreno normal + temporada regular + final Top 2 o Top 3 + sin
+// Por ahora cubre este formato: estreno normal + temporada regular + final Top 2, Top 3 o Top 4 + sin
 // regresos (ver RefSim.canRun). El resto de formatos sigue usando js/engine.js.
 //
 // No toca el DOM: devuelve una lista de pantallas { title, button, blocks }, que app.js pinta
@@ -440,7 +440,7 @@
       let fn;
       if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
-      } else if (this.total >= 12 && n === 9 && !this.flag.snatch) fn = "snatch";
+      } else if (this.total >= 12 && !this.flag.snatch && (this.finaleSize >= 4 ? (n === 10 || n === 8) : n === 9)) fn = "snatch";
       else if (this.total < 12 && !this.flag.snatch && (n === rnd(7, 9) || n === 7)) fn = "snatch";
       else if (!this.flag.snatch && n <= this.finaleSize + 3) fn = "snatch"; // el Snatch Game sale en todas las temporadas
       // Ball: con el Top 2, con 3 reinas (o muy pronto en repartos grandes); con el Top 3, con 4.
@@ -450,7 +450,7 @@
       else if (((this.total >= 12 && (n === 8 || n === 9)) || (this.total < 12 && n === 6)) && !this.flag.girlGroup && rnd(0, 100) >= 50) fn = "girlgroup";
       else if (((this.total >= 12 && (n === 11 || n === 9)) || (this.total < 12 && n === 7)) && !this.flag.rusical && rnd(0, 100) >= 50) fn = "rusical";
       // Transformación (con el Top 3, con 5 reinas)
-      else if (this.finaleSize === 3 && n === 5 && !this.flag.makeover) fn = "runway";
+      else if (((this.finaleSize === 3 && n === 5) || (this.finaleSize === 4 && n === 6)) && !this.flag.makeover) fn = "runway";
       else fn = this.randomMaxi();
       this.maxi(fn);
     }
@@ -1691,11 +1691,10 @@
         return this.untucked();
       }
       // Con una reina más que las de la final, un doble shantay puede ampliar la final en una
-      // reina (Top 2 -> Top 3). El paso de Top 3 -> Top 4 aún no está copiado, así que ahí no
-      // hay doble shantay.
+      // reina (Top 2 -> Top 3 -> Top 4), como en los originales.
       const atFinaleEdge = this.current.length === this.finaleSize + 1;
-      if (score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay && !(atFinaleEdge && this.finaleSize >= 3)) {
-        if (atFinaleEdge && rnd(0, 10) >= 6) this.finaleSize++;
+      if (score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay) {
+        if (atFinaleEdge && this.finaleSize <= 3 && rnd(0, 10) >= 6) this.finaleSize++;
         let kandy = false;
         if (rnd(0, 100) >= 95) {
           s.q([bottom[0].name], "tomato", `${bottom[0].name}, shantay, te quedas.`);
@@ -1900,6 +1899,8 @@
         if (q.rankP === 1) rank = "1º\n(Ganadora)";
         else if (q.rankP === 2) rank = "2º\n(Subcampeona)";
         else if (q.rankP === 32) rank = "3º\n(Subcampeona)";
+        else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
+        else if (q.rankP === 432) rank = "3º/4º\n(Subcampeona)";
         else if (q.rankP === 23) rank = "2º/3º\n(Subcampeona)";
         else if (q.rankP === "tie1") rank = `${base + i}º/${base + 1 + i}º`;
         else if (q.rankP === "tie2") rank = `${base + 1 + i}º/${base + 2 + i}º`;
@@ -1979,13 +1980,36 @@
       this.episode++;
       this.episodeChallenges.push("Music Video");
       this.eliminated.forEach((q) => { q.trackRecord.splice(q.trackRecord.length - 1, 0, ""); });
-      cast.forEach((q) => q.addTR("TOP " + cast.length));
       const j = this.newScreen("Los minutos finales...", "Ver a la ganadora");
       j.b("Chicas, es hora de decidir a la próxima Superestrella Drag, y...");
       j.hr();
       const finalists = shuffle(cast.slice()).map((q) => q.name);
       this.threeWay = false;
-      if (cast.length === 3) {
+      this.fourWay = false;
+      if (cast.length === 4) {
+        // Top 4: si la cuarta va muy por detrás, se va antes y las tres restantes hacen lip sync;
+        // si no, las cuatro hacen lip sync por sus vidas.
+        if (cast[0].finaleScore - cast[3].finaleScore >= 10 && cast[3].finaleScore < 5) {
+          const fourth = cast[3];
+          j.q([fourth.name], "sienna", `${fourth.name}, lo siento, querida, pero no es tu momento. Debo pedirte que hagas sashay away...`);
+          fourth.addTR(fourth.mxcon ? "MSCONELIMINATED" : "ELIMINATED");
+          fourth.addTR("GUEST");
+          this.eliminated.unshift(fourth);
+          finalists.splice(finalists.indexOf(fourth.name), 1);
+          cast.splice(3, 1);
+          this.exitLine(j, fourth);
+          cast.forEach((q) => q.addTR("TOP " + cast.length));
+          j.q(finalists, "silver", `${list(finalists)}, esta es vuestra última oportunidad para demostrar lo que valéis. Es hora de que hagáis lip sync... ¡por la CORONA!`);
+          this.threeWay = true;
+        } else {
+          cast.forEach((q) => q.addTR("TOP " + cast.length));
+          j.b("¡Por primera vez en la herstory de Drag Race, vamos a romper todas las reglas!");
+          j.hr();
+          j.q(finalists, "silver", `${list(finalists)}, ¡las cuatro haréis lip sync por vuestras vidas!`);
+          this.fourWay = true;
+        }
+      } else if (cast.length === 3) {
+        cast.forEach((q) => q.addTR("TOP " + cast.length));
         // Top 3: si están igualadas, las tres hacen lip sync; si no, la tercera se va antes.
         if (cast[0].finaleScore - cast[2].finaleScore <= 10 && cast[2].finaleScore > 5) {
           j.q(finalists, "silver", `${list(finalists)}, ¡las tres haréis lip sync por vuestras vidas!`);
@@ -2001,6 +2025,7 @@
           j.q(two, "silver", `${two[0]} y ${two[1]}, ¡haréis lip sync por vuestras vidas!`);
         }
       } else {
+        cast.forEach((q) => q.addTR("TOP " + cast.length));
         j.q(finalists.slice(0, 2), "silver", `${finalists[0]}, ${finalists[1]}, esta es vuestra última oportunidad para demostrar lo que valéis. Es hora de que hagáis lip sync... ¡por la CORONA!`);
       }
       const song = this.pickSong(j);
@@ -2029,6 +2054,13 @@
           third.rankP = 32;
           this.eliminated.unshift(third);
           cast.splice(2, 1);
+        } else if (this.fourWay) {
+          [cast[2], cast[3]].forEach((q) => {
+            q.addTR(q.mxcon ? "MSCONRUNUP" : "RUNNER UP");
+            q.rankP = 432;
+            this.eliminated.unshift(q);
+          });
+          cast.splice(2, 2);
         }
         cast[1].rankP = 1;
         cast[0].addTR(label(cast[0], true));
@@ -2044,6 +2076,19 @@
         this.winSpeech(s, [cast[0]]);
         s.b("¡Ahora a hacer prance, mi reina!");
         cast[0].addTR(label(cast[0], true));
+        if (this.fourWay) {
+          // con cuatro finalistas, las tres que no ganan comparten el 2º-4º puesto
+          [cast[1], cast[2], cast[3]].forEach((q) => {
+            q.addTR(label(q, false));
+            q.rankP = 234;
+            this.eliminated.unshift(q);
+          });
+          cast.splice(1, 3);
+          this.winnerName = cast[0].name;
+          this.runnerUpName = this.eliminated[0].name;
+          this.episodeChallenges.push("Finale");
+          return;
+        }
         cast[1].addTR(label(cast[1], false));
         // con tres finalistas, las dos que no ganan comparten el 2º/3º puesto
         cast[1].rankP = this.threeWay ? 23 : 2;
@@ -2072,6 +2117,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
@@ -2079,7 +2125,7 @@
   function canRun(formatChoice) {
     return formatChoice.premiere === "PREMIERE_NORMAL"
       && formatChoice.season === "SEASON_REGULAR"
-      && (formatChoice.finale === "FINALE_TOP2" || formatChoice.finale === "FINALE_TOP3")
+      && FINALE_SIZE[formatChoice.finale]
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
   }
@@ -2092,7 +2138,7 @@
     };
     const sim = new Sim(names, statsByName, relNumeric, {
       opening: formatChoice.openingChallenge,
-      finaleSize: formatChoice.finale === "FINALE_TOP3" ? 3 : 2,
+      finaleSize: FINALE_SIZE[formatChoice.finale] || 2,
     });
     sim.play();
     return {
