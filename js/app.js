@@ -218,7 +218,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4, Top 5, por equipos, Lip-Sync For The Crown, Lip Sync for the Finale, Jury Vote (Top 4 o Top 5), Top 6 All Stars 11 o Top 8 + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4, Top 5, por equipos, Lip-Sync For The Crown, Lip Sync for the Finale, Jury Vote (Top 4 o Top 5), Top 6 All Stars 11, Top 8 o Top 8 Lip-Sync For The Crown + sin regresos ni opciones.";
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -927,7 +927,7 @@ function refTrackRecord(block) {
   const head = el("tr");
   ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2" })));
   block.columns.forEach((_, i) => head.appendChild(el("th", { text: `Ep. ${i + 1}` })));
-  head.appendChild(el("th", { text: "PPE", rowspan: "2", class: "ppeTR" }));
+  head.appendChild(el("th", { text: "PPE\n(/10)", rowspan: "2", class: "ppeTR" }));
   thead.appendChild(head);
   const challengeRow = el("tr");
   block.columns.forEach((c) => challengeRow.appendChild(el("th", { text: c, class: "episodeTR" })));

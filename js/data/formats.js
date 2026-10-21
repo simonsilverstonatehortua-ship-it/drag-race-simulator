@@ -61,6 +61,8 @@ const DEFAULT_FORMATS = [
     description: "Cuatro finalistas en una batalla de lip syncs (dos parejas y una tercera ronda de las perdedoras): tres pasan a la final." },
   { id: "FINALE_TOP8", group: "finale", label: "Top 8", custom: false,
     description: "Ocho finalistas hacen actuaciones individuales; las dos mejores hacen lip sync por la corona." },
+  { id: "FINALE_TOP8_LFTC", group: "finale", label: "Top 8 Lip-Sync For The Crown", custom: false,
+    description: "Rate-A-Queen entre las ocho finalistas y cuadro de eliminatorias solo de lip syncs (cuartos, semifinales y final)." },
   { id: "FINALE_TOP6_AS11", group: "finale", label: "Top 6 All Stars 11", custom: false,
     description: "Seis finalistas: dos pasan directas a la ronda 2, las otras cuatro se juegan el pase en lip syncs; eliminatorias hasta la corona." },
   { id: "FINALE_JURY_VOTE", group: "finale", label: "Jury Vote (Top 4)", custom: false,

@@ -318,3 +318,14 @@ mejores (actuación + reputación) pasan al lip sync por la corona y las otras s
 frase de salida (3º-8º). La ganadora y la subcampeona se deciden como en el Top 5. El calendario de
 retos deja la transformación con nueve reinas y el Snatch Game y el Ball como en los demás
 formatos largos.
+
+### Top 8 Lip-Sync For The Crown (esopare) y PPE sobre 10
+
+- **Top 8 Lip-Sync For The Crown**: antes de la final hay un **Rate-A-Queen**: cada una de las ocho
+  finalistas ordena a las otras siete (la mitad de las veces según su último reto, si no al azar) y
+  la media de puestos decide el cabeza de serie. Después, un cuadro solo de lip syncs: cuartos (1º
+  vs 8º, 2º vs 7º, 3º vs 6º, 4º vs 5º; los perdedores quedan 5º-8º, "PERDIÓ RONDA 1"), semifinales
+  (los perdedores quedan 3º/4º, "PERDIÓ RONDA 2") y el lip sync final (reputación + mitad del lip
+  sync, con un 5 % de sorpresa; la perdedora es "PERDIÓ RONDA 3").
+- El **PPE** del track record ahora va **sobre 10** (la media de puntos por episodio, que antes iba
+  de 0 a 5, multiplicada por 2).

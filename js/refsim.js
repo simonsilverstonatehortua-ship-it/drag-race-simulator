@@ -1909,7 +1909,7 @@
       const mkRow = (queen, rankHtml) => {
         const cells = [];
         for (let i = 0; i < columns.length; i++) cells.push(this.cellFor(queen.trackRecord[i] !== undefined ? queen.trackRecord[i] : "", queen, i));
-        return { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn).toFixed(2) : "0.00" };
+        return { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn * 2).toFixed(2) : "0.00" };
       };
       const rows = [];
       const cur = this.current;
@@ -1927,6 +1927,7 @@
         else if (q.rankP === 32) rank = "3º\n(Subcampeona)";
         else if (q.rankP === 345) rank = "3º-5º";
         else if (q.rankP === 38) rank = "3º-8º";
+        else if (q.rankP === 5678) rank = "5º-8º";
         else if (q.rankP === 56) rank = "5º/6º";
         else if (q.rankP === 34) rank = "3º/4º";
         else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
@@ -2485,7 +2486,60 @@
       this.crownDuel([f1, f2], { noTie: true, lostLabel: "LOST 3RD ROUND" });
     }
 
+    // "Top 8 Lip-Sync For The Crown" (solo esopare): primero se hace el Rate-A-Queen (cada finalista
+    // ordena a las demás y la media decide el cabeza de serie) y luego un cuadro de eliminatorias solo
+    // de lip syncs: cuartos (1º-8º, 2º-7º, 3º-6º, 4º-5º), semifinales y lip sync final por la corona.
+    finaleTop8LFTC() {
+      const cast = this.current;
+      const r = this.newScreen("Rate-A-Queen", "Ir a la gran final");
+      r.b("Antes del Lip-Sync Smackdown por la corona, las finalistas se han puntuado entre sí.");
+      r.hr();
+      cast.forEach((q) => { q.votes = 0; });
+      const voters = shuffle(cast.slice());
+      voters.forEach((v) => {
+        const others = cast.filter((q) => q !== v);
+        const ranked = rnd(0, 100) <= 50 ? others.sort((a, b) => a.performanceScore - b.performanceScore) : shuffle(others);
+        r.q([v.name], undefined, `${v.name} ha ordenado:`);
+        ranked.forEach((q, j) => { r.p(`${j + 1}. ${q.name}`); q.votes += j + 1; });
+        r.hr();
+      });
+      cast.forEach((q) => { q.votes /= (cast.length - 1); });
+      const seeds = cast.slice().sort((a, b) => a.votes - b.votes);
+      r.big("La clasificación final");
+      seeds.forEach((q, i) => r.q([q.name], undefined, `${i + 1}. ${q.name}`));
+      cast.forEach((q) => { q.votes = 0; });
+
+      const s = this.newScreen("¡La gran final!", "Ir a los cuartos de final");
+      s.q(seeds.map((q) => q.name), "royalblue");
+      s.p("¡Nuestro Top 8 participará en un Lip-Sync Smackdown por la corona!");
+      s.hr();
+      const matches = [[seeds[0], seeds[7]], [seeds[1], seeds[6]], [seeds[2], seeds[5]], [seeds[3], seeds[4]]];
+      s.big("El cuadro de cuartos de final");
+      const colors = ["darkblue", "darkred", "purple", "green"];
+      matches.forEach((m, i) => {
+        if (i) s.p("vs");
+        s.q(m.map((q) => q.name), colors[i], `${m[0].name} vs. ${m[1].name}`);
+      });
+      this.episodeChallenges.push("Finale");
+
+      const out = (q, n, rank) => {
+        q.addTR(q.mxcon ? `MSCONL${n}R` : `LOST ${n === 1 ? "1ST" : "2ND"} ROUND`);
+        q.rankP = rank;
+        this.eliminated.unshift(q);
+      };
+      const stage = (pair, title, text, n, rank) => {
+        const { win, lose } = this.duel(pair, title, text, "Continuar");
+        out(lose, n, rank);
+        return win;
+      };
+      const quarters = matches.map((m) => stage(m, "Cuartos de final", `${m[0].name} y ${m[1].name} harán lip sync por un puesto en el Top 4!`, 1, 5678));
+      const semis = [[quarters[0], quarters[1]], [quarters[2], quarters[3]]].map((m) =>
+        stage(m, "Semifinales", `${m[0].name} y ${m[1].name} harán lip sync por un puesto en la gran final!`, 2, 34));
+      this.crownDuel(semis, { noTie: true, lostLabel: "LOST 3RD ROUND" });
+    }
+
     finale() {
+      if (this.opts.top8lftc && this.current.length === 8) return this.finaleTop8LFTC();
       if (this.opts.top6 && this.current.length === 6) return this.finaleTop6();
       if (this.opts.jury && this.current.length === 4) return this.finaleJury4();
       if (this.opts.jury && this.current.length === 5) return this.finaleJury5();
@@ -2658,7 +2712,7 @@
   // ======================================================================================
   // API
   // ======================================================================================
-  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8 };
+  const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8, FINALE_TOP8_LFTC: 8 };
   const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
@@ -2685,6 +2739,7 @@
       canFinale: formatChoice.finale === "FINALE_LIPSYNC_FINALE",
       top6: formatChoice.finale === "FINALE_TOP6_AS11",
       top8: formatChoice.finale === "FINALE_TOP8",
+      top8lftc: formatChoice.finale === "FINALE_TOP8_LFTC",
       jury: formatChoice.finale === "FINALE_JURY_VOTE" || formatChoice.finale === "FINALE_JURY_TOP5",
     });
     sim.play();
