@@ -343,3 +343,14 @@ myrainboww/esopare (Slay!! 10 · Great! 5 · Good 3 · Neutral 0 · Bad.. −5 �
 llevan de maravilla / muy bien / bien / normal / mal / fatal. Al editar una pareja se cambia en los
 dos sentidos, y el generador al azar tira una sola vez por pareja (la Estrategia media de las dos
 sigue marcando cuánto se polarizan).
+
+### Top 8 Lip-Sync For The Crown (Wildcard) y Random Finale (esopare)
+
+- **Wildcard**: con 7 finalistas, una eliminada al azar regresa como comodín y son 8. Después se
+  juega igual que el Top 8 Lip-Sync For The Crown (Rate-A-Queen y cuadro de lip syncs). Su casilla
+  del track record lleva el prefijo "REGRESO +" ("REGRESO + PERDIÓ RONDA 1", "REGRESO + GANADORA"...).
+  Si un doble sashay deja la temporada en 6 en vez de 7 finalistas, no hay comodín y se juega un
+  final normal (el original da error en ese caso).
+- **Random Finale**: el final se sortea entre los 13 formatos de esopare (Top 2, 3, 4, 5, 8, Teams,
+  Lip-Sync For The Crown, Top 8 LFTC, Wildcard, Lip Sync for the Finale, Jury Vote Top 4 y Top 5,
+  Top 6 All Stars 11), descartando los que no caben en el reparto. La reunión avisa de cuál ha tocado.
