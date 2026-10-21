@@ -353,7 +353,7 @@ function renderRelationshipSetup() {
 
   const wrap = el("div", { class: "section season-screen" });
   wrap.appendChild(el("h2", { class: "season-screen__title", text: "¡Conoce a las concursantes!" }));
-  wrap.appendChild(el("p", { class: "muted", text: "Elige qué opina cada concursante de las demás, o déjalo al azar. Las relaciones influyen en Untucked (pelas, alianzas y enemistades), en los equipos de los retos, en a quién votan para irse a casa, en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
+  wrap.appendChild(el("p", { class: "muted", text: "Elige cómo se lleva cada concursante con las demás (la relación es mutua, en 6 estados), o déjalo al azar. Las relaciones influyen en Untucked (pelas, alianzas y enemistades), en los equipos de los retos, en a quién votan para irse a casa, en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
 
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
     el("button", { class: "btn btn--ghost", text: "🎲 Randomizar todo", onclick: () => {
@@ -378,11 +378,11 @@ function renderRelationshipSetup() {
   });
   wrap.appendChild(picker);
 
-  wrap.appendChild(el("h3", { class: "group-title", text: `Qué opina ${setup.selected} de las demás` }));
+  wrap.appendChild(el("h3", { class: "group-title", text: `Cómo se lleva ${setup.selected} con las demás` }));
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
     el("button", { class: "btn btn--ghost", text: `🎲 Solo ${setup.selected} al azar`, onclick: () => {
       const generated = window.SimEngine.generateRelationships(setup.names, buildStatsByName());
-      setup.relationships[setup.selected] = generated[setup.selected];
+      others.forEach((o) => { setup.relationships[setup.selected][o] = generated[setup.selected][o]; setup.relationships[o][setup.selected] = generated[setup.selected][o]; });
       refresh();
     } }),
   ]));
@@ -404,14 +404,14 @@ function renderRelationshipSetup() {
         title: level,
         style: active ? `background:${style.color};border-color:${style.color};` : "",
         text: style.symbol,
-        onclick: () => { setup.relationships[setup.selected][other] = level; refresh(); },
+        onclick: () => { setup.relationships[setup.selected][other] = level; setup.relationships[other][setup.selected] = level; refresh(); },
       }));
     });
     row.appendChild(options);
     wrap.appendChild(row);
   });
 
-  wrap.appendChild(el("p", { class: "muted small", text: "++ le cae muy bien · + le cae bien · • normal · − le cae mal · −− le cae muy mal" }));
+  wrap.appendChild(el("p", { class: "muted small", text: "+++ se llevan de maravilla · ++ muy bien · + bien · • normal · − mal · −− fatal" }));
 
   const overview = el("details", { class: "rel-overview" });
   overview.appendChild(el("summary", { text: "Ver la tabla completa de relaciones" }));
@@ -485,11 +485,12 @@ const TRACKRECORD_CELL_TEXT_OVERRIDES = { WIN_TIE: "WIN", MISS_CONGENIALITY: "MI
 const IMMUNITY_BORDER_COLOR = "#FE4EDA";
 
 const RELATIONSHIP_STYLE = {
-  "le cae muy bien": { symbol: "++", color: "#3FA796" },
-  "le cae bien": { symbol: "+", color: "#4FD1C5" },
+  "se llevan de maravilla": { symbol: "+++", color: "#2F8F7E" },
+  "se llevan muy bien": { symbol: "++", color: "#3FA796" },
+  "se llevan bien": { symbol: "+", color: "#4FD1C5" },
   "normal": { symbol: "•", color: "#7C8CA6" },
-  "le cae mal": { symbol: "−", color: "#E08A3E" },
-  "le cae muy mal": { symbol: "−−", color: "#C24E4E" },
+  "se llevan mal": { symbol: "−", color: "#E08A3E" },
+  "se llevan fatal": { symbol: "−−", color: "#C24E4E" },
 };
 
 function relationshipsTable(names, relationships) {
@@ -497,7 +498,7 @@ function relationshipsTable(names, relationships) {
   const table = el("table", { class: "stats-table trackrecord-table relationships-table" });
   const thead = el("thead");
   const headRow = el("tr");
-  headRow.appendChild(el("th", { text: "¿Quién opina?" }));
+  headRow.appendChild(el("th", { text: "Relación" }));
   names.forEach((name) => headRow.appendChild(el("th", { text: name })));
   thead.appendChild(headRow);
   table.appendChild(thead);
@@ -522,7 +523,7 @@ function relationshipsTable(names, relationships) {
   table.appendChild(tbody);
   tableWrap.appendChild(table);
 
-  const legend = el("p", { class: "muted small", text: "++ le cae muy bien · + le cae bien · • normal · − le cae mal · −− le cae muy mal" });
+  const legend = el("p", { class: "muted small", text: "+++ se llevan de maravilla · ++ muy bien · + bien · • normal · − mal · −− fatal" });
   const wrapAll = el("div", {});
   wrapAll.appendChild(tableWrap);
   wrapAll.appendChild(legend);

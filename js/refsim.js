@@ -2729,7 +2729,7 @@
   // API
   // ======================================================================================
   const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8, FINALE_TOP8_LFTC: 8 };
-  const LEVEL_VALUE = { "le cae muy bien": 10, "le cae bien": 5, "normal": 0, "le cae mal": -5, "le cae muy mal": -10 };
+  const LEVEL_VALUE = { "se llevan de maravilla": 10, "se llevan muy bien": 5, "se llevan bien": 3, "normal": 0, "se llevan mal": -5, "se llevan fatal": -10 };
 
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.

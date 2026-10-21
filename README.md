@@ -335,3 +335,11 @@ mitad de las veces) corrigiendo ese puesto según la relación: una relación al
 aliadas suben más y las enemigas bajan más. La pantalla avisa cuando alguien pone muy arriba a una
 aliada o relega a una enemiga. Con relaciones extremas (todas adoran a una reina y odian a otra) la
 querida acaba de media en el puesto 2 del cuadro y la odiada en el 7 de 8.
+
+### Relaciones en 6 estados (como los simuladores de referencia)
+
+Cómo se llevan dos concursantes ahora es **mutuo** y tiene los mismos 6 estados que
+myrainboww/esopare (Slay!! 10 · Great! 5 · Good 3 · Neutral 0 · Bad.. −5 · Flopped... −10): se
+llevan de maravilla / muy bien / bien / normal / mal / fatal. Al editar una pareja se cambia en los
+dos sentidos, y el generador al azar tira una sola vez por pareja (la Estrategia media de las dos
+sigue marcando cuánto se polarizan).

@@ -43,7 +43,9 @@ const FINALE_SIZE = {
 
 const ALL_STAT_KEYS = ["acting", "comedy", "dance", "design", "improv", "runway", "lipsync", "makeup", "singing", "verses"];
 
-const RELATIONSHIP_LEVELS = ["le cae muy bien", "le cae bien", "normal", "le cae mal", "le cae muy mal"];
+// Los 6 estados de cómo se llevan dos concursantes (los mismos que los simuladores de referencia:
+// Slay!! 10 · Great! 5 · Good 3 · Neutral 0 · Bad.. -5 · Flopped... -10). La relación es mutua.
+const RELATIONSHIP_LEVELS = ["se llevan de maravilla", "se llevan muy bien", "se llevan bien", "normal", "se llevan mal", "se llevan fatal"];
 
 // Retos que puede forzar el selector de "reto de estreno" en la UI; si se deja en "Al
 // azar" (sin elegir ninguno), el estreno sortea entre estos 4 en vez de entre todo el
@@ -258,21 +260,23 @@ function describeTiedPlacements(entries) {
   return `${joinList(entries.map((e) => e.name))} quedaron en ${joinList(entries.map((e) => e.placement))}, respectivamente.`;
 }
 
-// Genera las relaciones (direccionales) entre todas las concursantes antes de empezar la
-// temporada: qué opina cada una de cada una de las demás, en 5 niveles. Cuanta más
+// Genera las relaciones entre todas las concursantes antes de empezar la temporada: cómo se llevan
+// cada dos (mutuas, en 6 niveles). Cuanta más
 // Estrategia tenga una concursante, más marcadas (menos "normal") son sus opiniones —
 // juega sus alianzas y rivalidades de forma más calculada.
 function generateRelationships(names, statsByName) {
   const relationships = {};
-  names.forEach((a) => {
-    relationships[a] = {};
-    const strategyA = statsByName[a] && typeof statsByName[a].strategy === "number" ? statsByName[a].strategy : 7.5;
-    const polarization = Math.max(0, Math.min(1, strategyA / 15));
-    const baseWeights = [15, 25, 30, 20, 10];
-    const weights = baseWeights.map((w, i) => (i === 2 ? w * (1 - polarization) : w * (1 + polarization * 0.6)));
-    names.forEach((b) => {
-      if (a === b) return;
-      relationships[a][b] = weightedPick(RELATIONSHIP_LEVELS.map((lvl, i) => ({ value: lvl, weight: weights[i] })));
+  names.forEach((a) => { relationships[a] = {}; });
+  const strategyOf = (n) => (statsByName[n] && typeof statsByName[n].strategy === "number" ? statsByName[n].strategy : 7.5);
+  names.forEach((a, i) => {
+    names.slice(i + 1).forEach((b) => {
+      // la relación es mutua: una sola tirada por pareja, con la polarización media de las dos
+      const polarization = Math.max(0, Math.min(1, (strategyOf(a) + strategyOf(b)) / 30));
+      const baseWeights = [8, 17, 22, 30, 15, 8];
+      const weights = baseWeights.map((w, k) => (k === 3 ? w * (1 - polarization) : w * (1 + polarization * 0.6)));
+      const level = weightedPick(RELATIONSHIP_LEVELS.map((lvl, k) => ({ value: lvl, weight: weights[k] })));
+      relationships[a][b] = level;
+      relationships[b][a] = level;
     });
   });
   return relationships;
@@ -280,7 +284,7 @@ function generateRelationships(names, statsByName) {
 
 // Puntuación numérica de cada nivel de relación, para calcular medias (misma escala que
 // los símbolos ++/+/•/−/−− de la tabla de relaciones en la UI).
-const RELATIONSHIP_SCORE = { "le cae muy bien": 2, "le cae bien": 1, "normal": 0, "le cae mal": -1, "le cae muy mal": -2 };
+const RELATIONSHIP_SCORE = { "se llevan de maravilla": 2, "se llevan muy bien": 1, "se llevan bien": 0.6, "normal": 0, "se llevan mal": -1, "se llevan fatal": -2 };
 
 // Miss Simpatía: de entre las candidatas (solo eliminadas durante la temporada; nunca una
 // finalista), se elige a quien mejor se lleva con el resto según la tabla de relaciones —
@@ -713,7 +717,7 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships =
   let target, targetReason;
   if (playsStrategically) {
     const rel = relationships[assassin] || {};
-    const relBonus = (name) => (rel[name] === "le cae muy mal" ? 6 : rel[name] === "le cae mal" ? 3 : rel[name] === "le cae muy bien" ? -3 : 0);
+    const relBonus = (name) => (rel[name] === "se llevan fatal" ? 6 : rel[name] === "se llevan mal" ? 3 : rel[name] === "se llevan de maravilla" ? -3 : 0);
     const threatOf = (c) => {
       const stats = statsByName[c.name];
       const base = stats ? average(ALL_STAT_KEYS.map((k) => stats[k] ?? 7.5)) : c.score;
@@ -721,8 +725,8 @@ function runLipsyncAssassinEpisode(activeNames, db, statsByName, relationships =
     };
     const sorted = [...candidates].sort((a, b) => threatOf(b) - threatOf(a) || Math.random() - 0.5);
     target = sorted[0].name;
-    targetReason = rel[target] === "le cae mal" || rel[target] === "le cae muy mal"
-      ? "en una jugada estratégica y personal, apunta a alguien que le cae mal y que además ve como una amenaza"
+    targetReason = rel[target] === "se llevan mal" || rel[target] === "se llevan fatal"
+      ? "en una jugada estratégica y personal, apunta a alguien con quien se lleva mal y que además ve como una amenaza"
       : "en una jugada estratégica, apunta a su mayor amenaza en la competencia";
   } else {
     const weights = candidates.map((c) => 11 - c.score);
