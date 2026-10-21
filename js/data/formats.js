@@ -55,6 +55,8 @@ const DEFAULT_FORMATS = [
     description: "Cuatro finalistas compiten en la gran final." },
   { id: "FINALE_TOP5", group: "finale", label: "Top 5", custom: false,
     description: "Cinco finalistas hacen actuaciones individuales; las dos mejores hacen lip sync por la corona." },
+  { id: "FINALE_TEAMS", group: "finale", label: "Final por equipos (Top 4 a Top 2)", custom: false,
+    description: "Cuatro finalistas; las dos peor valoradas se van y las otras dos hacen lip sync por la corona." },
   { id: "FINALE_JURY_VOTE", group: "finale", label: "Voto del jurado", custom: false,
     description: "Un jurado de eliminadas de la temporada vota a la ganadora." },
   { id: "FINALE_LIPSYNC_CROWN", group: "finale", label: "Lip Sync For The Crown (rondas)", custom: false,

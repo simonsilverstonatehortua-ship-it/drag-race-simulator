@@ -218,7 +218,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4 o Top 5 + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal + temporada regular + final Top 2, Top 3, Top 4, Top 5 o por equipos + sin regresos ni opciones.";
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {

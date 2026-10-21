@@ -254,3 +254,12 @@ con 5 el Ball, y un doble shantay con 4 reinas puede ampliar el Top 3 a Top 4.
 - **Track record** copiado estéticamente de los simuladores de referencia: tabla clara
   (lavanda), cabecera con "Ep. N" y el reto debajo, y todas las casillas —y la foto de cada
   reina— del mismo tamaño, en rectángulos verticales (64 × 110 px), con PPE al final.
+
+### Final por equipos ("Teams Finale / Top 4 to Top 2")
+
+Es el mismo formato en myrainboww ("Teams Finale/Top4 to Top2") y en esopare ("Teams Finale"):
+con una temporada normal, quedan cuatro finalistas que ni hacen pasarela ni actuaciones; se
+ordenan por la reputación de la temporada (favoritismo menos desfavoritismo). Las dos últimas
+se van ("no es vuestro momento", puesto 3º/4º) y las dos primeras hacen lip sync por la corona;
+gana la mejor valorada, con posible empate de ganadoras. Solo hay una columna "Final" en el track
+record. Los equipos de la temporada ("Teams") todavía no están copiados.
