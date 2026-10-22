@@ -396,3 +396,11 @@ Igual que el doble estreno (dos mitades al azar, con 10 o más reinas), pero cad
 **Girl Group**, y el jurado deja 2 reinas arriba, 2 HIGH, 2 LOW y el resto SAFE; el Top 2 hace lip sync
 por la victoria (WIN y TOP2) y **nadie se va** en ninguno de los dos episodios. Después el Girl Group
 vuelve a poder salir durante la temporada.
+
+### Double Premiere (Talent Show) / (Fake Elimination)
+
+Igual que el doble estreno (dos mitades con 10 o más reinas), pero cada mitad hace un **Show de
+talentos** y se juzga y elimina normalmente. Al llegar el episodio 3, **las eliminadas de los dos
+estrenos vuelven** a la competición ("Las eliminaciones de los estrenos no eran definitivas"): su
+casilla queda como "ELIM (falsa)" y en el rango aparece "(Elim. falsa)". El Show de talentos no
+vuelve a salir en esa temporada. Sin cambios de la mecánica de chocolate del original (no está copiada).

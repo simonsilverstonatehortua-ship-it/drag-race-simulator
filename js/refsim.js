@@ -144,6 +144,7 @@
     "BTM": { bg: "tomato" },
     " BTM2": { text: "BTM2", bg: "hotpink" },
     "ELIM": { bg: "red", bold: true },
+    " ELIM": { text: "ELIM\n(falsa)", bg: "orange", bold: true },
     " ELIM ": { text: "ELIM", bg: "darkred", fg: "white", bold: true },
     "TOP2": { bg: "deepskyblue" },
     "TOP 2": { bg: "lightgreen", bold: true },
@@ -289,7 +290,7 @@
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
-      if ((this.opts.doublePremiere || this.opts.doubleNoElim) && this.current.length >= 10) {
+      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent) && this.current.length >= 10) {
         const all = shuffle(this.current.slice());
         const first = all.slice(0, Math.floor(all.length / 2));
         const second = all.slice(first.length);
@@ -307,6 +308,24 @@
         if (this.opts.doubleNoElim) { this.flag.girlGroup = false; this.flag.isTeam = false; this.flag.isPair = false; }
         this.current = [...firstLeft, ...this.current];
         this.trackRecordScreen(false);
+        if (this.opts.doubleTalent) {
+          // "Eliminación falsa": las eliminadas de los dos estrenos vuelven a la competición.
+          const s = this.newScreen("¡Vuelven a la competición!", "Continuar");
+          const back = this.eliminated.slice();
+          back.forEach((q) => {
+            q.trackRecord.pop();
+            const i = q.trackRecord.findIndex((c) => c === "ELIM" || c === " ELIM ");
+            if (i >= 0) q.trackRecord[i] = " ELIM";
+            q.rankP = 0;
+            q.minqdd = "(Elim. falsa)";
+            this.current.push(q);
+          });
+          this.eliminated = [];
+          if (back.length) {
+            s.q(back.map((q) => q.name), "orange", `¡${list(back.map((q) => q.name))} ${back.length > 1 ? "vuelven" : "vuelve"} a la competición!`);
+            s.p("¡Las eliminaciones de los estrenos no eran definitivas!");
+          }
+        }
       }
       while (this.current.length > this.finaleSize) {
         this.playEpisode();
@@ -472,7 +491,7 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.premiereHalf) fn = this.opts.doubleNoElim ? "girlgroup" : this.randomMaxi();
+      if (this.premiereHalf) fn = this.opts.doubleNoElim ? "girlgroup" : this.opts.doubleTalent ? "talent" : this.randomMaxi();
       else if (this.lateNow()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
@@ -2957,7 +2976,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2995,6 +3014,7 @@
       lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
       doubleNoElim: formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM",
+      doubleTalent: formatChoice.premiere === "PREMIERE_DOUBLE_TALENT",
     });
     sim.play();
     return {

@@ -15,6 +15,8 @@ const DEFAULT_FORMATS = [
     description: "El grupo se divide en dos; cada mitad hace su propio reto y eliminación." },
   { id: "PREMIERE_DOUBLE_NOELIM", group: "premiere", label: "Doble estreno (sin eliminación)", custom: false,
     description: "Doble estreno sin que nadie sea eliminada." },
+  { id: "PREMIERE_DOUBLE_TALENT", group: "premiere", label: "Doble estreno (Talent Show / eliminación falsa)", custom: false,
+    description: "Dos mitades hacen un Show de talentos y eliminan a una cada una, pero las eliminadas vuelven en el episodio 3." },
   { id: "PREMIERE_LATE_ENTRY", group: "premiere", label: "Entrada tardía", custom: false,
     description: "Una concursante adicional se incorpora tras el primer reto." },
   { id: "PREMIERE_PORKCHOP", group: "premiere", label: "Reto Porkchop", custom: false,
