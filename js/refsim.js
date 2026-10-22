@@ -88,6 +88,8 @@
       this.queenDisqOrDept = false;
       this.miniWinner = false;
       this.adv = undefined;
+      this.immPotion = false;
+      this.immuneCols = [];
       this.lipstick = null;
     }
     calc(min, max, stat = 0) { return rnd(min, max) - stat; }
@@ -1530,11 +1532,97 @@
       top.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
       const r = this.newScreen("He tomado mi decisión.", "Continuar");
       this.addSong([top[0]], [top[1]], song);
-      r.q([top[0].name], "royalblue", `${top[0].name}, ¡eres una ganadora, baby!`);
+      if (this.episode <= 2) { top[0].immPotion = true; r.q([top[0].name], "royalblue", `${top[0].name}, ¡eres una ganadora, baby! ¡Has ganado inmunidad contra una futura eliminación!`); }
+      else r.q([top[0].name], "royalblue", `${top[0].name}, ¡eres una ganadora, baby!`);
       r.q([top[1].name], "deepskyblue", `${top[1].name}, estás a salvo.`);
       top[0].addTR("WIN"); top[0].favoritism += 5; top[0].ppe += 2;
       top[1].addTR("TOP2"); top[1].favoritism += 2; top[1].ppe += 1.5;
       this.topQueens = []; this.bottomQueens = [];
+    }
+
+    // ---- Pociones de inmunidad (temporada 16 / Rate-A-Queen): copia de drinkornot, usePotion y potionChoice ----
+    stills16() {
+      const t = this.total, n = this.current.length;
+      return (t <= 10 && t > 7 && n >= 6) || (t > 10 && n >= 7);
+    }
+
+    usePotion(q) {
+      const sorted = this.current.slice().sort((a, b) => a.performanceScore - b.performanceScore);
+      const t = this.total, n = sorted.length;
+      const idx = sorted.indexOf(q), position = n - idx;
+      if (((t <= 10 && t > 7 && n === 6) || (t > 10 && n === 7)) && rnd(0, 100) >= 5) return true;
+      if (position <= 3 && rnd(0, 100) >= 5) return true;
+      if (position > 3 && idx <= 3 && rnd(0, 100) <= 5) return false;
+      if (position > 3 && position < 6 && idx > 2 && rnd(0, 100) <= 15) return true;
+      return false;
+    }
+
+    potionChoice(q) {
+      const sorted = this.current.slice().sort((a, b) => a.performanceScore - b.performanceScore);
+      const t = this.total, n = sorted.length;
+      const idx = sorted.indexOf(q), position = n - idx;
+      if (position <= 3 || (position > 3 && position < 6 && idx > 2)) return q;
+      const friends = [...q.friends].filter((x) => this.current.includes(x));
+      if (((t <= 10 && t > 7 && n === 6) || (t > 10 && n === 7 && !friends.length)) || !friends.length) return this.bestSister(q, this.current);
+      return this.bestSister(q, friends.length > 1 ? friends : [q, friends[0]]);
+    }
+
+    // Una reina con poción puede usarla en el jurado para salvarse a sí misma o regalársela a otra.
+    drinkOrNot(s) {
+      if (!this.stills16()) return;
+      const top = this.topQueens, bottom = this.bottomQueens;
+      const col = this.episode - 1;
+      const removeFromJudged = (q) => {
+        q.immPotion = false;
+        q.immuneCols.push(col);
+        if (top.includes(q)) top.splice(top.indexOf(q), 1);
+        else if (bottom.includes(q)) {
+          bottom.splice(bottom.indexOf(q), 1);
+          if (bottom.length < 2) {
+            const sorted = this.current.slice().sort((a, b) => a.performanceScore - b.performanceScore);
+            for (let y = sorted.length - 1; y >= 0; y--) {
+              if (!(sorted[y].immuneCols.includes(col) || bottom.includes(sorted[y]))) { bottom.push(sorted[y]); break; }
+            }
+          }
+        }
+      };
+      this.current.slice().forEach((q) => {
+        if (!q.immPotion || this.current.length < 6) return;
+        s.hr();
+        const t = this.total;
+        const last = (t <= 10 && t > 7 && this.episode > 2 && this.current.length === 6) || (t > 10 && this.current.length === 7);
+        s.q([q.name], "magenta", last
+          ? `${q.name}, esta es tu última oportunidad antes de que caduque. ¿Quieres usar tu poción de inmunidad esta semana?`
+          : `${q.name}, ¿quieres usar tu poción de inmunidad esta semana?`);
+        if (!this.usePotion(q)) { s.p(`${q.name} dijo que no.`); s.hr(); return; }
+        s.p(`${q.name} dijo que sí.`);
+        s.hr();
+        s.b(`${q.name}, ¿quieres salvarte a ti misma o a una de tus competidoras?`);
+        const target = this.potionChoice(q);
+        if (target === q) {
+          s.p(`${q.name} quiere salvarse a sí misma.`);
+          s.hr();
+          s.q([q.name], "black", `${q.name}, estás a salvo para brillar otro día.`);
+          s.hr();
+          removeFromJudged(q);
+        } else {
+          s.q([q.name, target.name], "magenta", `${q.name} quiere salvar a ${target.name}.`);
+          this.modRelation(2, [q, target]);
+          s.hr();
+          s.b(`${target.name}, ¿aceptas el regalo de inmunidad de ${q.name}?`);
+          if (this.usePotion(q)) {
+            s.p(`${target.name} dijo que sí.`);
+            s.hr();
+            s.q([target.name], undefined, `${target.name}, estás a salvo para brillar otro día.`);
+            s.hr();
+            q.immPotion = false;
+            removeFromJudged(target);
+          } else {
+            s.p(`${target.name} dijo que no.`);
+            s.hr();
+          }
+        }
+      });
     }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
@@ -1573,6 +1661,7 @@
         f.isNoTeam = false;
       }
       s.b("Basándonos en las actuaciones de esta noche...");
+      if (this.opts.raq) this.drinkOrNot(s);
       shuffle(this.bottomQueens);
       shuffle(this.topQueens);
       const judged = shuffle([...this.topQueens, ...this.bottomQueens]).map((q) => q.name);
@@ -2303,6 +2392,7 @@
       const style = CELL_STYLE[wild ? raw.slice(7) : raw] || { text: raw };
       const baseText = style.text !== undefined ? style.text : (wild ? raw.slice(7) : raw);
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg: style.bg, fg: style.fg, bold: style.bold };
+      if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
         cell.sub = queen.tCaptain.includes(col + 1) ? "Capitana de equipo" : "Ganadora del mini reto";
       }

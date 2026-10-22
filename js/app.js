@@ -952,6 +952,7 @@ function refTrackRecord(block) {
       if (cell.bg) style += `background:${cell.bg};`;
       if (cell.fg) style += `color:${cell.fg};`;
       if (cell.bold) style += "font-weight:700;";
+      if (cell.immune) style += `box-shadow:inset 0 0 0 3px ${IMMUNITY_BORDER_COLOR};`;
       const td = el("td", { class: "placement", style });
       refTextWithBreaks(td, cell.text);
       if (cell.sub) {

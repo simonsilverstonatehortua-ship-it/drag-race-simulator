@@ -431,8 +431,8 @@ Doble estreno (dos mitades con 10 o más reinas): cada mitad hace un **Show de t
 se **puntúan entre sí** (cada una ordena a las demás por su último reto o al azar, corregido por las
 relaciones y alianzas), las dos mejor valoradas hacen lip sync por la victoria (WIN y TOP2), el resto
 es SAFE y nadie se va. En el **episodio 3** (todas juntas) hay otra ronda de Rate-A-Queen y los 3 de
-arriba y los 3 de abajo salen de ese ranking en vez de las puntuaciones del reto. No he copiado las
-pociones de inmunidad de la temporada 16.
+arriba y los 3 de abajo salen de ese ranking en vez de las puntuaciones del reto. Las
+pociones de inmunidad de la temporada 16 están copiadas (ver abajo).
 
 ### UK3 Premiere / Normal Premiere (Top 2 & Bottom 2)
 
@@ -440,3 +440,13 @@ Episodio 1 con una pasarela de dos looks: 3 reinas arriba y 3 abajo. La tercera 
 las dos primeras hacen lip sync por la victoria (WIN y TOP2). De las tres de abajo, la mejor se salva
 (LOW) y las otras dos hacen lip sync por su vida, con eliminación normal. Desde el episodio 2 la
 temporada es normal.
+
+### Pociones de inmunidad (Rate-A-Queen / T16)
+
+En la Rate A Queen Premiere, la ganadora de cada estreno obtiene una **poción de inmunidad**. En el
+jurado de las semanas siguientes (mientras queden 7 reinas, o 6 en repartos de 8 a 10) cada reina con
+poción decide si la usa: lo hace casi siempre si está entre las 3 peores del reto, y rara vez si está
+arriba; en la última semana la usa casi seguro. Si la usa, decide si **se salva ella** (lo hace si está
+entre las peores) o **se la regala a una amiga** (que puede aceptar o rechazar, y sube la relación entre
+ambas). La salvada sale de arriba/abajo y, si el bottom queda con menos de 2, entra la siguiente peor no
+inmune. En el track record, su casilla lleva un borde rosa.
