@@ -293,7 +293,7 @@
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
-      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent || this.opts.doubleGG || this.opts.porkchop) && this.current.length >= 10) {
+      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent || this.opts.doubleGG || this.opts.porkchop || this.opts.raq) && this.current.length >= 10) {
         let all = shuffle(this.current.slice());
         let first, second;
         if (this.opts.porkchop) {
@@ -502,7 +502,7 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent ? "talent" : this.randomMaxi();
+      if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent || this.opts.raq ? "talent" : this.randomMaxi();
       else if (this.lateNow()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
@@ -1110,9 +1110,20 @@
       const n = cast.length;
       if (f.isTeam && rnd(0, 100) >= 85) { f.isTeam = false; f.isNoTeam = true; }
       const top = this.topQueens, bottom = this.bottomQueens;
-      const byPerf = () => cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      // Rate-A-Queen (T16), episodio 3: los de arriba y los de abajo salen del ranking entre las reinas.
+      let raqOrder = null;
+      if (this.opts.raq && this.episode === 3 && n > 6) {
+        const rs = this.newScreen("Rate-A-Queen", "Ir al jurado");
+        rs.b("Esta semana, vuestro destino está en manos de vuestras competidoras: os toca puntuar a vuestras compañeras.");
+        rs.hr();
+        raqOrder = this.raqRanking(rs, cast);
+      }
+      const byPerf = () => (raqOrder
+        ? cast.sort((a, b) => raqOrder.indexOf(a) - raqOrder.indexOf(b))
+        : cast.sort((a, b) => a.performanceScore - b.performanceScore));
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
+      if (this.premiereHalf && this.opts.raq) return this.raqPremiereJudging();
       if (this.premiereHalf && this.opts.doubleNoElim) return this.doubleNoElimJudging();
       if (this.lateNow()) return this.lateJudging();
       if (this.slayNow()) {
@@ -1419,6 +1430,63 @@
       second.splice(second.indexOf(chosen), 1);
       second.forEach((q) => { q.votes = 0; });
       this.porkGroups = { first, second };
+    }
+
+    // Rate-A-Queen: cada reina ordena a las demás (por su último reto o al azar, corregido por las
+    // relaciones) y la media de puestos decide el orden (la media más baja es la mejor).
+    raqRanking(s, cast) {
+      cast.forEach((q) => { q.votes = 0; });
+      shuffle(cast.slice()).forEach((v) => {
+        const others = cast.filter((q) => q !== v);
+        const byPerformance = rnd(0, 100) <= 50;
+        const key = (q) => {
+          let k = byPerformance ? q.performanceScore : rnd(10, 40);
+          k -= this.rel(v, q) * 1.5;
+          if (v.allies.has(q)) k -= 5; else if (v.friends.has(q)) k -= 2; else if (v.enemies.has(q)) k += 5;
+          return k + rnd(-3, 3);
+        };
+        const scored = new Map(others.map((q) => [q, key(q)]));
+        const ranked = others.sort((a, b) => scored.get(a) - scored.get(b));
+        s.q([v.name], undefined, `${v.name} ha ordenado:`);
+        ranked.forEach((q, j) => { s.p(`${j + 1}: ${q.name}`); q.votes += j + 1; });
+        s.hr();
+      });
+      cast.forEach((q) => { q.votes /= (cast.length - 1); });
+      const order = cast.slice().sort((a, b) => a.votes - b.votes);
+      s.b("Y ese es... el chisme.");
+      cast.forEach((q) => { q.votes = 0; });
+      return order;
+    }
+
+    // Premiere Rate-A-Queen (T16): en los dos estrenos las reinas se puntúan entre sí y las dos mejor
+    // valoradas hacen lip sync por la victoria; el resto SAFE. Nadie se va.
+    raqPremiereJudging() {
+      const cast = this.current;
+      const s = this.newScreen("Rate-A-Queen", "Ir al lip sync");
+      s.b("Esta semana, vuestro destino está en manos de vuestras competidoras: os toca puntuar a vuestras compañeras.");
+      s.hr();
+      s.b("Los puestos ya están aquí...");
+      const order = this.raqRanking(s, cast);
+      const top = [order[0], order[1]];
+      cast.forEach((q) => { q.ppe += 3; if (!top.includes(q)) q.addTR("SAFE"); });
+      s.hr();
+      s.q(top.map((q) => q.name), "cyan", `${top[0].name}, ${top[1].name}, condragulations, ¡sois el Top 2 de la semana! ¡Nadie se va a casa esta noche!`);
+      const e = this.newScreen("¡El Top 2 hará lip sync por la victoria!", "Ver el resultado");
+      top.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, top);
+      const raw = top.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, top, song);
+      top.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      top.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      const r = this.newScreen("He tomado mi decisión.", "Continuar");
+      this.addSong([top[0]], [top[1]], song);
+      r.q([top[0].name], "royalblue", `${top[0].name}, ¡eres una ganadora, baby!`);
+      r.q([top[1].name], "deepskyblue", `${top[1].name}, estás a salvo.`);
+      top[0].addTR("WIN"); top[0].favoritism += 5; top[0].ppe += 2;
+      top[1].addTR("TOP2"); top[1].favoritism += 2; top[1].ppe += 1.5;
+      this.topQueens = []; this.bottomQueens = [];
     }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
@@ -3059,7 +3127,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -3100,6 +3168,7 @@
       porkchop: formatChoice.premiere === "PREMIERE_PORKCHOP",
       doubleTalent: formatChoice.premiere === "PREMIERE_DOUBLE_TALENT",
       doubleGG: formatChoice.premiere === "PREMIERE_DOUBLE_GG",
+      raq: formatChoice.premiere === "PREMIERE_RATE_A_QUEEN",
     });
     sim.play();
     return {

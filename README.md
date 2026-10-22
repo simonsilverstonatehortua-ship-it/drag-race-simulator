@@ -424,3 +424,12 @@ vuelve a salir en esa temporada. Sin cambios de la mecánica de chocolate del or
   estreno sin eliminación) y la temporada sigue con todas; el Girl Group no vuelve a salir.
 - **Miss Simpatía** admite **empates**: si varias eliminadas reciben los mismos votos máximos, todas
   son Miss Simpatía y la reunión lo anuncia.
+
+### Rate A Queen Premiere (esopare: "Rate-A-Queen (S16)")
+
+Doble estreno (dos mitades con 10 o más reinas): cada mitad hace un **Show de talentos**, las reinas
+se **puntúan entre sí** (cada una ordena a las demás por su último reto o al azar, corregido por las
+relaciones y alianzas), las dos mejor valoradas hacen lip sync por la victoria (WIN y TOP2), el resto
+es SAFE y nadie se va. En el **episodio 3** (todas juntas) hay otra ronda de Rate-A-Queen y los 3 de
+arriba y los 3 de abajo salen de ese ranking en vez de las puntuaciones del reto. No he copiado las
+pociones de inmunidad de la temporada 16.
