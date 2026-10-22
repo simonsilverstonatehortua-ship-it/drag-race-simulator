@@ -354,3 +354,12 @@ sigue marcando cuánto se polarizan).
 - **Random Finale**: el final se sortea entre los 13 formatos de esopare (Top 2, 3, 4, 5, 8, Teams,
   Lip-Sync For The Crown, Top 8 LFTC, Wildcard, Lip Sync for the Finale, Jury Vote Top 4 y Top 5,
   Top 6 All Stars 11), descartando los que no caben en el reparto. La reunión avisa de cuál ha tocado.
+
+### Normal Premiere (No Elimination)
+
+Está en los dos simuladores. En el episodio 1 siempre hay 3 reinas arriba (una gana, dos quedan
+HIGH) y 3 abajo (la mejor de las tres se salva con LOW); las dos peores hacen lip sync y **se
+quedan las dos** ("Shantay, las dos os quedáis", casilla BTM2 y menos reputación). Si las dos
+hacen un lip sync muy flojo, el jurado lo comenta y les da una segunda oportunidad. A partir del
+episodio 2 la temporada sigue normal y con eliminación; el episodio 1 no admite la tercera reina
+en peligro ("nadie está a salvo") para que no se vaya nadie.

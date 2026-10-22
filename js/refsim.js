@@ -1051,6 +1051,12 @@
       const top = this.topQueens, bottom = this.bottomQueens;
       const byPerf = () => cast.sort((a, b) => a.performanceScore - b.performanceScore);
 
+      // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
+      if (this.noElimNow()) {
+        byPerf();
+        for (let i = 0; i < 3; i++) { top.push(cast[i]); bottom.push(cast[n - (i + 1)]); }
+        return this.judgingScreen();
+      }
       if (f.isPair && n === 10 && this.teams.length === 5) {
         const arr = this.teams.map((pairQueens) => ({
           queens: pairQueens,
@@ -1150,6 +1156,9 @@
       bottom.push(cast[1], cast[2]);
       return this.winAndBtm2();
     }
+
+    // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
+    noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
 
     // Quien no está arriba ni abajo recibe SAFE (sin mostrar la pantalla del jurado).
     markSafeOnly() {
@@ -1327,7 +1336,7 @@
       };
       if (bottom.length === 5) lowSafe(3);
       else if (bottom.length === 4) lowSafe(2);
-      else if (bottom.length === 3 && bottom[0].performanceScore >= 30 && this.current.length > 5) {
+      else if (bottom.length === 3 && bottom[0].performanceScore >= 30 && this.current.length > 5 && !this.noElimNow()) {
         f.thirdqueen = true;
         s.b("... nadie está a salvo.");
       } else if (bottom.length === 3) lowSafe(1);
@@ -1689,6 +1698,18 @@
         this.exitLine(s, q);
       };
       const stay = (q, label = "BTM2") => { q.addTR(label); q.unfavoritism += 3; q.ppe += 1; };
+      if (this.noElimNow()) {
+        // Estreno sin eliminación: las dos de abajo se quedan siempre.
+        if (bottom[0].lipsyncScore <= 3 && bottom[1].lipsyncScore <= 3) {
+          s.b(`${bottom[0].name}, ${bottom[1].name}. Este lip sync no estuvo al nivel de Drag Race...`);
+          s.hr();
+          s.p("Os voy a dar una segunda oportunidad... a las dos...");
+        }
+        s.q([bottom[0].name, bottom[1].name], "hotpink", "Shantay, las dos os quedáis...");
+        stay(bottom[0], " BTM2"); stay(bottom[1], " BTM2");
+        this.addSong(bottom, [], song);
+        return this.untucked();
+      }
       if (f.thirdqueen && this.current.length > 5) {
         f.thirdqueen = false;
         if (score1 > 3 && score2 > 3 && rnd(0, 100) <= 90) {
@@ -2763,7 +2784,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return formatChoice.premiere === "PREMIERE_NORMAL"
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2796,6 +2817,7 @@
       top8return: finale === "FINALE_TOP8_WILDCARD",
       jury: finale === "FINALE_JURY_VOTE" || finale === "FINALE_JURY_TOP5",
       randomLabel,
+      premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
     });
     sim.play();
     return {
