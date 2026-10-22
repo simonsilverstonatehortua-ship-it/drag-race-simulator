@@ -290,7 +290,7 @@
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
-      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent) && this.current.length >= 10) {
+      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent || this.opts.doubleGG) && this.current.length >= 10) {
         const all = shuffle(this.current.slice());
         const first = all.slice(0, Math.floor(all.length / 2));
         const second = all.slice(first.length);
@@ -299,13 +299,14 @@
         this.current = first;
         this.playEpisode();
         this.trackRecordScreen(false);
-        if (this.opts.doubleNoElim) { this.flag.isTeam = false; this.flag.isPair = false; }
+        if (this.opts.doubleNoElim || this.opts.doubleGG) { this.flag.isTeam = false; this.flag.isPair = false; }
         const firstLeft = this.current;
         firstLeft.forEach((q) => q.addTR(""));
         this.current = second;
         this.playEpisode();
         this.premiereHalf = false;
-        if (this.opts.doubleNoElim) { this.flag.girlGroup = false; this.flag.isTeam = false; this.flag.isPair = false; }
+        if (this.opts.doubleNoElim) this.flag.girlGroup = false;
+        this.flag.isTeam = false; this.flag.isPair = false;
         this.current = [...firstLeft, ...this.current];
         this.trackRecordScreen(false);
         if (this.opts.doubleTalent) {
@@ -491,7 +492,7 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.premiereHalf) fn = this.opts.doubleNoElim ? "girlgroup" : this.opts.doubleTalent ? "talent" : this.randomMaxi();
+      if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent ? "talent" : this.randomMaxi();
       else if (this.lateNow()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
@@ -2181,18 +2182,19 @@
     }
 
     missCongeniality(s) {
-      s.big("¡Las concursantes votarán a Miss Simpatía!");
+      s.big("¡Las concursantes votarán a Miss Simpatía! (solo se puede votar a las eliminadas)");
       const whole = shuffle([...this.current, ...this.eliminated]);
       this.eliminated.forEach((q) => { q.votes = 0; q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
       this.current.forEach((q) => { q.votes = 0; });
       whole.forEach((q) => {
-        q.lipstick = this.bestSister(q, whole);
+        const options = this.eliminated.filter((e) => e !== q);
+        q.lipstick = this.bestSister(q, options.length ? options : whole);
         s.q([q.name, q.lipstick.name], "aqua", `¡${q.name} votó a ${q.lipstick.name} como Miss Simpatía!`);
         q.lipstick.votes++;
       });
       s.hr();
       whole.sort((a, b) => b.votes - a.votes);
-      const winner = whole[0];
+      const winner = whole.filter((q) => this.eliminated.includes(q))[0] || whole[0];
       s.q([winner.name], "aqua", `La ganadora de Miss Simpatía de esta temporada es... ¡${winner.name}!`);
       if (this.current.includes(winner)) winner.mxcon = true;
       else winner.trackRecord[winner.trackRecord.length - 1] = "MISS CON";
@@ -2976,7 +2978,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -3015,6 +3017,7 @@
       doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
       doubleNoElim: formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM",
       doubleTalent: formatChoice.premiere === "PREMIERE_DOUBLE_TALENT",
+      doubleGG: formatChoice.premiere === "PREMIERE_DOUBLE_GG",
     });
     sim.play();
     return {

@@ -17,6 +17,8 @@ const DEFAULT_FORMATS = [
     description: "Doble estreno sin que nadie sea eliminada." },
   { id: "PREMIERE_DOUBLE_TALENT", group: "premiere", label: "Doble estreno (Talent Show / eliminación falsa)", custom: false,
     description: "Dos mitades hacen un Show de talentos y eliminan a una cada una, pero las eliminadas vuelven en el episodio 3." },
+  { id: "PREMIERE_DOUBLE_GG", group: "premiere", label: "Doble estreno (Girl Groups)", custom: false,
+    description: "Dos mitades hacen un reto de Girl Group, con su jurado y eliminación normales." },
   { id: "PREMIERE_LATE_ENTRY", group: "premiere", label: "Entrada tardía", custom: false,
     description: "Una concursante adicional se incorpora tras el primer reto." },
   { id: "PREMIERE_PORKCHOP", group: "premiere", label: "Reto Porkchop", custom: false,

@@ -404,3 +404,12 @@ talentos** y se juzga y elimina normalmente. Al llegar el episodio 3, **las elim
 estrenos vuelven** a la competición ("Las eliminaciones de los estrenos no eran definitivas"): su
 casilla queda como "ELIM (falsa)" y en el rango aparece "(Elim. falsa)". El Show de talentos no
 vuelve a salir en esa temporada. Sin cambios de la mecánica de chocolate del original (no está copiada).
+
+### Double Premiere (Girl Groups) y Miss Simpatía solo entre eliminadas
+
+- **Double Premiere (Girl Groups)**: doble estreno (dos mitades con 10 o más reinas) en el que cada
+  mitad hace un reto de Girl Group, con su jurado, lip sync y eliminación normales. El Girl Group no
+  vuelve a salir en la temporada.
+- **Miss Simpatía**: ahora todas las concursantes votan, pero **solo se puede votar a las
+  eliminadas**; las finalistas no pueden ser Miss Simpatía (ya no aparece la marca "MISS SIMPATÍA +
+  GANADORA/SUBCAMPEONA" en las finalistas).
