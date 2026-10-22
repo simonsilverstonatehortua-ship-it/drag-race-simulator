@@ -287,6 +287,25 @@
         this.late = pick(this.current);
         this.current = this.current.filter((q) => q !== this.late);
       }
+      // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
+      // grupo con su eliminación; después sigue la temporada con todas las que quedan.
+      if (this.opts.doublePremiere && this.current.length >= 10) {
+        const all = shuffle(this.current.slice());
+        const first = all.slice(0, Math.floor(all.length / 2));
+        const second = all.slice(first.length);
+        this.premiereHalf = true;
+        second.forEach((q) => q.addTR(""));
+        this.current = first;
+        this.playEpisode();
+        this.trackRecordScreen(false);
+        const firstLeft = this.current;
+        firstLeft.forEach((q) => q.addTR(""));
+        this.current = second;
+        this.playEpisode();
+        this.premiereHalf = false;
+        this.current = [...firstLeft, ...this.current];
+        this.trackRecordScreen(false);
+      }
       while (this.current.length > this.finaleSize) {
         this.playEpisode();
         this.trackRecordScreen(false);
@@ -451,7 +470,8 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.lateNow()) fn = "runway";
+      if (this.premiereHalf) fn = this.randomMaxi();
+      else if (this.lateNow()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
       } else if (this.opts.lftc && n === 5 && !this.flag.rumix) fn = "rumix"; // Lip-Sync For The Crown: Rumix con 5 reinas
@@ -1840,7 +1860,7 @@
       }
       // Con una reina más que las de la final, un doble shantay puede ampliar la final en una
       // reina (Top 2 -> Top 3 -> Top 4), como en los originales.
-      const atFinaleEdge = this.current.length === this.finaleSize + 1;
+      const atFinaleEdge = !this.premiereHalf && this.current.length === this.finaleSize + 1;
       if (score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay) {
         if (atFinaleEdge && (this.finaleSize <= 3 || this.opts.lftc) && rnd(0, 10) >= 6) {
           this.finaleSize++;
@@ -2893,7 +2913,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2929,6 +2949,7 @@
       premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
       lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
+      doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
     });
     sim.play();
     return {

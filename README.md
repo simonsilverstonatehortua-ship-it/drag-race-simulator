@@ -380,3 +380,12 @@ reinas arriba (una gana, las otras HIGH), el resto SAFE, y nadie se va ("por pri
 herstory de Drag Race"). Al acabar, RuPaul presenta a la reina tardía, que entra en la carrera con
 una casilla vacía en el episodio 1. Desde el episodio 2 la temporada es normal. (La reina tardía
 se elige al azar; en el original se elige a mano.)
+
+### Double Premiere
+
+Con 10 o más reinas, el reparto se divide al azar en dos mitades. La primera hace el episodio 1
+(con su mini reto, maxi reto, jurado y eliminación) mientras la segunda espera con una casilla
+vacía; luego la segunda mitad hace el episodio 2 y la primera espera. Desde el episodio 3 sigue la
+temporada con todas las que quedan. En los episodios de estreno el reto sale de la reserva aleatoria
+(sin las reglas de calendario de la temporada) y no se puede ampliar el final. Con menos de 10
+reinas se juega un estreno normal (el original avisa de que no se puede).
