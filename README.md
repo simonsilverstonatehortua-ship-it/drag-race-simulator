@@ -433,3 +433,10 @@ relaciones y alianzas), las dos mejor valoradas hacen lip sync por la victoria (
 es SAFE y nadie se va. En el **episodio 3** (todas juntas) hay otra ronda de Rate-A-Queen y los 3 de
 arriba y los 3 de abajo salen de ese ranking en vez de las puntuaciones del reto. No he copiado las
 pociones de inmunidad de la temporada 16.
+
+### UK3 Premiere / Normal Premiere (Top 2 & Bottom 2)
+
+Episodio 1 con una pasarela de dos looks: 3 reinas arriba y 3 abajo. La tercera de arriba es HIGH;
+las dos primeras hacen lip sync por la victoria (WIN y TOP2). De las tres de abajo, la mejor se salva
+(LOW) y las otras dos hacen lip sync por su vida, con eliminación normal. Desde el episodio 2 la
+temporada es normal.

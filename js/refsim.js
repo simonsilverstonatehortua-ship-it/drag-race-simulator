@@ -503,7 +503,7 @@
       const opening = this.opts.opening;
       let fn;
       if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent || this.opts.raq ? "talent" : this.randomMaxi();
-      else if (this.lateNow()) fn = "runway";
+      else if (this.lateNow() || this.uk3Now()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
       } else if (this.opts.lftc && n === 5 && !this.flag.rumix) fn = "rumix"; // Lip-Sync For The Crown: Rumix con 5 reinas
@@ -621,7 +621,7 @@
         }
         case "runway": {
           const makeover = (cast.length === 6 || cast.length === 5 || (this.finaleSize >= 6 && cast.length === this.finaleSize + 1)) && !this.flag.makeover;
-          if (this.lateNow()) {
+          if (this.lateNow() || this.uk3Now()) {
             s.b("¡Las reinas desfilarán por la pasarela y presentarán no uno, sino dos looks!");
             this.episodeChallenges.push("Runway");
             this.flag.runway = true;
@@ -1126,6 +1126,11 @@
       if (this.premiereHalf && this.opts.raq) return this.raqPremiereJudging();
       if (this.premiereHalf && this.opts.doubleNoElim) return this.doubleNoElimJudging();
       if (this.lateNow()) return this.lateJudging();
+      if (this.uk3Now()) {
+        byPerf();
+        for (let i = 0; i < 3; i++) { top.push(cast[i]); bottom.push(cast[n - (i + 1)]); }
+        return this.judgingScreen();
+      }
       if (this.slayNow()) {
         byPerf();
         if (cast[n - 3].performanceScore > 25) {
@@ -1238,6 +1243,49 @@
       top.push(cast[0]);
       bottom.push(cast[1], cast[2]);
       return this.winAndBtm2();
+    }
+
+    // UK3 Premiere / Normal Premiere (Top 2 & Bottom 2): reto de pasarela con dos looks; 3 arriba y 3
+    // abajo. La tercera de arriba es HIGH, las dos primeras hacen lip sync por la victoria (WIN / TOP2);
+    // de las tres de abajo la mejor se salva (LOW) y las otras dos hacen lip sync por su vida.
+    uk3Judging() {
+      const top = this.topQueens.sort((a, b) => a.performanceScore - b.performanceScore);
+      const bottom = this.bottomQueens;
+      const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
+      s.b("Chicas, he tomado algunas decisiones...");
+      const high = top[2];
+      high.addTR("HIGH"); high.favoritism += 1; high.ppe += 4;
+      s.q([high.name], "lightblue", `${high.name}, buen trabajo esta semana, estás a salvo.`);
+      const two = [top[0], top[1]];
+      s.q(two.map((q) => q.name), "cyan", `${two[0].name}, ${two[1].name}, condragulations, ¡sois el Top 2 de la semana!`);
+      s.hr();
+      s.b("¡El Top 2 hará ahora lip sync... por la victoria!");
+      two.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(s);
+      s.hr();
+      this.lipsyncEvent(s, two);
+      const raw = two.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(s, two, song);
+      two.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      two.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+
+      const r = this.newScreen("He tomado mi decisión.", "Continuar");
+      this.addSong([two[0]], [two[1]], song);
+      r.q([two[0].name], "royalblue", `${two[0].name}, ¡eres una ganadora, baby!`);
+      r.q([two[1].name], "deepskyblue", `${two[1].name}, estás a salvo.`);
+      two[0].addTR("WIN"); two[0].favoritism += 5; two[0].ppe += 5;
+      two[1].addTR("TOP2"); two[1].favoritism += 2; two[1].ppe += 4.5;
+      r.hr();
+      r.b("Ahora...");
+      r.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, sois las peores de la semana...`);
+      bottom.forEach((q) => { q.performanceScore -= q.runwayScore; });
+      bottom.sort((a, b) => a.performanceScore - b.performanceScore);
+      const safe = bottom.shift();
+      safe.addTR("LOW"); safe.unfavoritism += 1; safe.ppe += 2;
+      r.q([safe.name], "pink", `${safe.name}... estás a salvo.`);
+      r.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, lo siento, queridas, pero estáis en riesgo de eliminación.`);
+      this.topQueens = [];
+      return this.lipsyncDesc();
     }
 
     // Normal Premiere (Slayers / Top 2): en el episodio 1 nadie se va. Con 3 reinas flojas abajo hay
@@ -1492,6 +1540,7 @@
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
     slayNow() { return !!this.opts.premiereSlayers && this.episode === 1; }
+    uk3Now() { return !!this.opts.uk3 && this.episode === 1; }
 
     // Quien no está arriba ni abajo recibe SAFE (sin mostrar la pantalla del jurado).
     markSafeOnly() {
@@ -1542,7 +1591,7 @@
       }
       this.safeUntucked();
       this.judgingCritiques();
-      return this.slayNow() ? this.slayersJudging() : this.winAndBtm2();
+      return this.uk3Now() ? this.uk3Judging() : this.slayNow() ? this.slayersJudging() : this.winAndBtm2();
     }
 
     // Las reinas a salvo se van entre bambalinas mientras el jurado delibera (esopare).
@@ -3127,7 +3176,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -3162,6 +3211,7 @@
       randomLabel,
       premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
+      uk3: formatChoice.premiere === "PREMIERE_UK3",
       lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
       doubleNoElim: formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_PORKCHOP",

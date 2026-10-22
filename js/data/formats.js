@@ -11,6 +11,8 @@ const DEFAULT_FORMATS = [
     description: "Todas compiten pero nadie es eliminada esta semana." },
   { id: "PREMIERE_SLAYERS", group: "premiere", label: "Estreno normal (Slayers / Top 2)", custom: false,
     description: "Nadie se va: el Top 2 hace lip sync por la victoria y las peores se salvan." },
+  { id: "PREMIERE_UK3", group: "premiere", label: "Estreno UK3 (Top 2 y Bottom 2)", custom: false,
+    description: "Pasarela con dos looks; el Top 2 hace lip sync por la victoria y las dos de abajo por su vida." },
   { id: "PREMIERE_DOUBLE", group: "premiere", label: "Doble estreno", custom: false,
     description: "El grupo se divide en dos; cada mitad hace su propio reto y eliminación." },
   { id: "PREMIERE_DOUBLE_NOELIM", group: "premiere", label: "Doble estreno (sin eliminación)", custom: false,
