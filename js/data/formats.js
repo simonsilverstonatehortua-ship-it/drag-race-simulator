@@ -9,6 +9,8 @@ const DEFAULT_FORMATS = [
     description: "Todas compiten en un único reto; una es eliminada." },
   { id: "PREMIERE_NORMAL_NOELIM", group: "premiere", label: "Estreno normal (sin eliminación)", custom: false,
     description: "Todas compiten pero nadie es eliminada esta semana." },
+  { id: "PREMIERE_SLAYERS", group: "premiere", label: "Estreno normal (Slayers / Top 2)", custom: false,
+    description: "Nadie se va: el Top 2 hace lip sync por la victoria y las peores se salvan." },
   { id: "PREMIERE_DOUBLE", group: "premiere", label: "Doble estreno", custom: false,
     description: "El grupo se divide en dos; cada mitad hace su propio reto y eliminación." },
   { id: "PREMIERE_DOUBLE_NOELIM", group: "premiere", label: "Doble estreno (sin eliminación)", custom: false,

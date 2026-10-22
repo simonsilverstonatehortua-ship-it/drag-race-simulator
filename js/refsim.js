@@ -1052,6 +1052,15 @@
       const byPerf = () => cast.sort((a, b) => a.performanceScore - b.performanceScore);
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
+      if (this.slayNow()) {
+        byPerf();
+        if (cast[n - 3].performanceScore > 25) {
+          for (let i = 0; i < 3; i++) { top.push(cast[i]); bottom.push(cast[n - (i + 1)]); }
+        } else {
+          for (let i = 0; i < n / 2; i++) top.push(cast[i]);
+        }
+        return this.judgingScreen();
+      }
       if (this.noElimNow()) {
         byPerf();
         for (let i = 0; i < 3; i++) { top.push(cast[i]); bottom.push(cast[n - (i + 1)]); }
@@ -1157,8 +1166,50 @@
       return this.winAndBtm2();
     }
 
+    // Normal Premiere (Slayers / Top 2): en el episodio 1 nadie se va. Con 3 reinas flojas abajo hay
+    // 3 arriba y 3 abajo (las de abajo se salvan con LOW); si no, la mitad mejor está arriba. Las dos
+    // mejores hacen lip sync por la victoria (WIN / TOP2) y el resto de las de arriba son HIGH.
+    slayersJudging() {
+      const top = this.topQueens.sort((a, b) => a.performanceScore - b.performanceScore);
+      const bottom = this.bottomQueens;
+      const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
+      s.b("Chicas, he tomado algunas decisiones...");
+      const highs = bottom.length ? [top[2]] : top.slice(2);
+      highs.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
+      if (highs.length) s.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, buen trabajo esta semana, estáis a salvo.`);
+      s.hr();
+      if (bottom.length) {
+        bottom.forEach((q) => { q.addTR("LOW"); q.unfavoritism += 1; q.ppe += 2; });
+        s.q(bottom.map((q) => q.name), "pink", `${list(bottom.map((q) => q.name))}, sois las peores de la semana... pero estáis a salvo.`);
+        s.hr();
+      }
+      const two = [top[0], top[1]];
+      s.q(two.map((q) => q.name), "cyan", `${two[0].name}, ${two[1].name}, condragulations, ¡sois el Top 2 de la semana! Haréis lip sync por la victoria.`);
+
+      const e = this.newScreen("Ha llegado la hora...", "Ver el resultado");
+      e.b("Para que hagáis lip sync... ¡por la VICTORIA! Buena suerte, y no la caguéis.");
+      two.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, two);
+      const raw = two.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, two, song);
+      two.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      two.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+
+      const r = this.newScreen("He tomado mi decisión.", "Continuar");
+      this.addSong([two[0]], [two[1]], song);
+      r.q([two[0].name], "royalblue", `${two[0].name}, ¡eres una ganadora, baby!`);
+      r.q([two[1].name], "deepskyblue", `${two[1].name}, estás a salvo.`);
+      two[0].addTR("WIN"); two[0].favoritism += 5; two[0].ppe += 5;
+      two[1].addTR("TOP2"); two[1].favoritism += 2; two[1].ppe += 4.5;
+      this.topQueens = []; this.bottomQueens = [];
+      return this.untucked();
+    }
+
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
+    slayNow() { return !!this.opts.premiereSlayers && this.episode === 1; }
 
     // Quien no está arriba ni abajo recibe SAFE (sin mostrar la pantalla del jurado).
     markSafeOnly() {
@@ -1194,7 +1245,9 @@
       shuffle(this.bottomQueens);
       shuffle(this.topQueens);
       const judged = shuffle([...this.topQueens, ...this.bottomQueens]).map((q) => q.name);
-      s.q(judged, "cyan", `${list(judged)}, representáis los tops y bottoms de la semana.`);
+      const slay1 = this.slayNow();
+      s.q(judged, "cyan", `${list(judged)}, representáis los tops${slay1 && !this.bottomQueens.length ? "" : " y bottoms"} de la semana.`);
+      if (slay1) s.b("¡Nadie se va a casa esta semana!");
       s.hr();
       const safe = this.current.filter((q) => !this.topQueens.includes(q) && !this.bottomQueens.includes(q));
       safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
@@ -1207,7 +1260,7 @@
       }
       this.safeUntucked();
       this.judgingCritiques();
-      return this.winAndBtm2();
+      return this.slayNow() ? this.slayersJudging() : this.winAndBtm2();
     }
 
     // Las reinas a salvo se van entre bambalinas mientras el jurado delibera (esopare).
@@ -1394,7 +1447,9 @@
       s.b("Basándonos en las actuaciones de esta noche...");
       const judged = [];
       top.forEach((q, i) => judged.push(q.name, bottom[i * 2].name, bottom[i * 2 + 1].name));
-      s.q(judged, "cyan", `${list(judged)}, representáis los tops y bottoms de la semana.`);
+      const slay1 = this.slayNow();
+      s.q(judged, "cyan", `${list(judged)}, representáis los tops${slay1 && !this.bottomQueens.length ? "" : " y bottoms"} de la semana.`);
+      if (slay1) s.b("¡Nadie se va a casa esta semana!");
       s.hr();
       const safe = this.current.filter((q) => !top.includes(q) && !bottom.includes(q));
       safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
@@ -2784,7 +2839,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2818,6 +2873,7 @@
       jury: finale === "FINALE_JURY_VOTE" || finale === "FINALE_JURY_TOP5",
       randomLabel,
       premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
+      premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
     });
     sim.play();
     return {

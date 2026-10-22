@@ -218,7 +218,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal (con o sin eliminación) + temporada regular + final Top 2, Top 3, Top 4, Top 5, por equipos, Lip-Sync For The Crown, Lip Sync for the Finale, Jury Vote (Top 4 o Top 5), Top 6 All Stars 11, Top 8, Top 8 Lip-Sync For The Crown (con o sin Wildcard) o Random Finale + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal (con o sin eliminación, o Slayers/Top 2) + temporada regular + final Top 2, Top 3, Top 4, Top 5, por equipos, Lip-Sync For The Crown, Lip Sync for the Finale, Jury Vote (Top 4 o Top 5), Top 6 All Stars 11, Top 8, Top 8 Lip-Sync For The Crown (con o sin Wildcard) o Random Finale + sin regresos ni opciones.";
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -1092,6 +1092,7 @@ function renderSeasonScreen() {
   const actions = el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1.2rem;" });
   actions.appendChild(el("button", { class: "btn btn--accent", text: screen.button, onclick: isLast ? exitSeason : () => go(index + 1) }));
   if (!isLast) {
+    actions.appendChild(el("span", { class: "muted small", text: "Tip: usa las flechas ← → del teclado" }));
     actions.appendChild(el("button", { class: "btn btn--ghost", text: "Saltar al final", onclick: () => go(screens.length - 1) }));
     actions.appendChild(el("button", { class: "btn btn--ghost", text: "Salir", onclick: exitSeason }));
   }
@@ -1681,4 +1682,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal-overlay").addEventListener("click", (e) => {
     if (e.target.id === "modal-overlay") closeModal();
   });
+});
+
+// Flechas del teclado para pasar de pantalla en una temporada (como en los simuladores de
+// referencia): → avanza, ← retrocede. Solo actúan mientras se está viendo una temporada.
+document.addEventListener("keydown", (e) => {
+  if (!seasonPlayer || e.altKey || e.ctrlKey || e.metaKey) return;
+  const tag = (e.target && e.target.tagName) || "";
+  if (/^(INPUT|SELECT|TEXTAREA)$/.test(tag)) return;
+  const { screens, index } = seasonPlayer;
+  if (e.key === "ArrowRight" && index < screens.length - 1) {
+    seasonPlayer.index = index + 1;
+  } else if (e.key === "ArrowLeft" && index > 0) {
+    seasonPlayer.index = index - 1;
+  } else return;
+  e.preventDefault();
+  render();
+  window.scrollTo(0, 0);
 });

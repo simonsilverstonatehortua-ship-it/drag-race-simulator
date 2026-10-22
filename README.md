@@ -363,3 +363,12 @@ quedan las dos** ("Shantay, las dos os quedáis", casilla BTM2 y menos reputaci�
 hacen un lip sync muy flojo, el jurado lo comenta y les da una segunda oportunidad. A partir del
 episodio 2 la temporada sigue normal y con eliminación; el episodio 1 no admite la tercera reina
 en peligro ("nadie está a salvo") para que no se vaya nadie.
+
+### Normal Premiere (Slayers / Top 2) y navegación con flechas
+
+- **Normal Premiere (Slayers)** en myrainboww = **Normal Premiere (Top 2)** en esopare: en el episodio
+  1 nadie se va. Si la tercera peor reina rinde mal, hay 3 arriba y 3 abajo (las de abajo se
+  salvan con LOW); si no, la mitad mejor está arriba. Las dos mejores hacen lip sync por la victoria
+  (WIN y TOP2) y las demás de arriba quedan HIGH.
+- Las temporadas del simulador se pueden recorrer con **→** (siguiente pantalla) y **←** (anterior),
+  igual que en los simuladores de referencia, sin tener que pulsar el botón de cada pantalla.
