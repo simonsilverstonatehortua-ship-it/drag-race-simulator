@@ -389,3 +389,10 @@ vacía; luego la segunda mitad hace el episodio 2 y la primera espera. Desde el 
 temporada con todas las que quedan. En los episodios de estreno el reto sale de la reserva aleatoria
 (sin las reglas de calendario de la temporada) y no se puede ampliar el final. Con menos de 10
 reinas se juega un estreno normal (el original avisa de que no se puede).
+
+### Double Premiere (No Elimination) (esopare: "Double Premiere (Top 2)")
+
+Igual que el doble estreno (dos mitades al azar, con 10 o más reinas), pero cada mitad hace un reto de
+**Girl Group**, y el jurado deja 2 reinas arriba, 2 HIGH, 2 LOW y el resto SAFE; el Top 2 hace lip sync
+por la victoria (WIN y TOP2) y **nadie se va** en ninguno de los dos episodios. Después el Girl Group
+vuelve a poder salir durante la temporada.

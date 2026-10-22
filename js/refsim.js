@@ -289,7 +289,7 @@
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
-      if (this.opts.doublePremiere && this.current.length >= 10) {
+      if ((this.opts.doublePremiere || this.opts.doubleNoElim) && this.current.length >= 10) {
         const all = shuffle(this.current.slice());
         const first = all.slice(0, Math.floor(all.length / 2));
         const second = all.slice(first.length);
@@ -298,11 +298,13 @@
         this.current = first;
         this.playEpisode();
         this.trackRecordScreen(false);
+        if (this.opts.doubleNoElim) { this.flag.isTeam = false; this.flag.isPair = false; }
         const firstLeft = this.current;
         firstLeft.forEach((q) => q.addTR(""));
         this.current = second;
         this.playEpisode();
         this.premiereHalf = false;
+        if (this.opts.doubleNoElim) { this.flag.girlGroup = false; this.flag.isTeam = false; this.flag.isPair = false; }
         this.current = [...firstLeft, ...this.current];
         this.trackRecordScreen(false);
       }
@@ -470,7 +472,7 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.premiereHalf) fn = this.randomMaxi();
+      if (this.premiereHalf) fn = this.opts.doubleNoElim ? "girlgroup" : this.randomMaxi();
       else if (this.lateNow()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
@@ -1081,6 +1083,7 @@
       const byPerf = () => cast.sort((a, b) => a.performanceScore - b.performanceScore);
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
+      if (this.premiereHalf && this.opts.doubleNoElim) return this.doubleNoElimJudging();
       if (this.lateNow()) return this.lateJudging();
       if (this.slayNow()) {
         byPerf();
@@ -1280,6 +1283,47 @@
     }
 
     lateNow() { return !!this.late && !this.lateDone && this.episode === 1; }
+
+    // Double Premiere (No Elimination) / (Top 2): cada mitad hace un reto de Girl Group; 2 reinas arriba
+    // (lip sync por la victoria), 2 HIGH, 2 LOW y el resto SAFE. Nadie se va.
+    doubleNoElimJudging() {
+      const cast = this.current;
+      const n = cast.length;
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      const top = [cast[0], cast[1]];
+      let highs = [], lows = [];
+      if (n >= 6) { highs = [cast[2], cast[3]]; lows = [cast[n - 2], cast[n - 1]]; }
+      const safe = cast.filter((q) => !top.includes(q) && !highs.includes(q) && !lows.includes(q));
+      highs.forEach((q) => { q.addTR("HIGH"); q.ppe += 4; });
+      lows.forEach((q) => { q.addTR("LOW"); q.ppe += 2; });
+      safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
+      top.forEach((q) => { q.ppe += 3; });
+      const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
+      s.b("Chicas, he tomado algunas decisiones...");
+      s.q(top.map((q) => q.name), "cyan", `${top[0].name}, ${top[1].name}, condragulations, ¡sois el Top 2 de la semana!`);
+      s.p("¡Nadie se va a casa esta noche!");
+      s.hr();
+      if (highs.length) s.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, buen trabajo, estáis a salvo.`);
+      if (lows.length) s.q(lows.map((q) => q.name), "pink", `${list(lows.map((q) => q.name))}, no fue vuestra mejor semana, pero estáis a salvo.`);
+      if (safe.length) s.q(safe.map((q) => q.name), undefined, `${list(safe.map((q) => q.name))}, ${safe.length > 1 ? "estáis" : "estás"} a salvo.`);
+      s.hr();
+      const e = this.newScreen("¡El Top 2 hará lip sync por la victoria!", "Ver el resultado");
+      top.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, top);
+      const raw = top.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, top, song);
+      top.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      top.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      const r = this.newScreen("He tomado mi decisión.", "Continuar");
+      this.addSong([top[0]], [top[1]], song);
+      r.q([top[0].name], "royalblue", `${top[0].name}, ¡eres una ganadora, baby!`);
+      r.q([top[1].name], "deepskyblue", `${top[1].name}, estás a salvo.`);
+      top[0].addTR("WIN"); top[0].favoritism += 5; top[0].ppe += 2;
+      top[1].addTR("TOP2"); top[1].favoritism += 2; top[1].ppe += 1.5;
+      this.topQueens = []; this.bottomQueens = [];
+    }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
@@ -2913,7 +2957,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2950,6 +2994,7 @@
       premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
       lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
+      doubleNoElim: formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM",
     });
     sim.play();
     return {
