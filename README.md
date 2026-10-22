@@ -413,3 +413,14 @@ vuelve a salir en esa temporada. Sin cambios de la mecánica de chocolate del or
 - **Miss Simpatía**: ahora todas las concursantes votan, pero **solo se puede votar a las
   eliminadas**; las finalistas no pueden ser Miss Simpatía (ya no aparece la marca "MISS SIMPATÍA +
   GANADORA/SUBCAMPEONA" en las finalistas).
+
+### Porkchop Premiere y empates en Miss Simpatía
+
+- **Porkchop Premiere** (10 o más reinas): el episodio 1 son solo lip syncs ("Lipsync"). Todas se
+  emparejan al azar (un trío si el reparto es impar); la ganadora de cada lip sync pasa al primer
+  grupo (WIN) y la perdedora "se lleva la chuleta" (LOSS) y pasa al segundo. Las del segundo grupo
+  votan a una de las suyas (con revotación si hay empate) y esa reina se cambia al primer grupo
+  (LOSS en naranja). Después, cada grupo hace un episodio de Girl Group sin eliminación (como el doble
+  estreno sin eliminación) y la temporada sigue con todas; el Girl Group no vuelve a salir.
+- **Miss Simpatía** admite **empates**: si varias eliminadas reciben los mismos votos máximos, todas
+  son Miss Simpatía y la reunión lo anuncia.
