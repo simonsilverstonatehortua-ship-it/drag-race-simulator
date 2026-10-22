@@ -372,3 +372,11 @@ en peligro ("nadie está a salvo") para que no se vaya nadie.
   (WIN y TOP2) y las demás de arriba quedan HIGH.
 - Las temporadas del simulador se pueden recorrer con **→** (siguiente pantalla) y **←** (anterior),
   igual que en los simuladores de referencia, sin tener que pulsar el botón de cada pantalla.
+
+### Normal Premiere (Late Entry)
+
+En el episodio 1 falta una reina elegida al azar. El reto es una pasarela con dos looks; hay 3
+reinas arriba (una gana, las otras HIGH), el resto SAFE, y nadie se va ("por primera vez en la
+herstory de Drag Race"). Al acabar, RuPaul presenta a la reina tardía, que entra en la carrera con
+una casilla vacía en el episodio 1. Desde el episodio 2 la temporada es normal. (La reina tardía
+se elige al azar; en el original se elige a mano.)

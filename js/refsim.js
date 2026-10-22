@@ -283,6 +283,10 @@
     // TEMPORADA
     // ======================================================================================
     play() {
+      if (this.opts.lateEntry && this.current.length > 5) {
+        this.late = pick(this.current);
+        this.current = this.current.filter((q) => q !== this.late);
+      }
       while (this.current.length > this.finaleSize) {
         this.playEpisode();
         this.trackRecordScreen(false);
@@ -447,7 +451,8 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.episode === 1) {
+      if (this.lateNow()) fn = "runway";
+      else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
       } else if (this.opts.lftc && n === 5 && !this.flag.rumix) fn = "rumix"; // Lip-Sync For The Crown: Rumix con 5 reinas
       else if (this.total >= 12 && !this.flag.snatch && (this.finaleSize >= 4 ? (n === 10 || n === 8) : n === 9)) fn = "snatch";
@@ -564,7 +569,11 @@
         }
         case "runway": {
           const makeover = (cast.length === 6 || cast.length === 5 || (this.finaleSize >= 6 && cast.length === this.finaleSize + 1)) && !this.flag.makeover;
-          if (makeover) {
+          if (this.lateNow()) {
+            s.b("¡Las reinas desfilarán por la pasarela y presentarán no uno, sino dos looks!");
+            this.episodeChallenges.push("Runway");
+            this.flag.runway = true;
+          } else if (makeover) {
             s.b("¡Es el reto de transformación! Las reinas convertirán en sus hermanas drag " + pick(D.makeoverPeople) + ".");
             this.episodeChallenges.push("Make Over");
             this.flag.makeover = true;
@@ -1052,6 +1061,7 @@
       const byPerf = () => cast.sort((a, b) => a.performanceScore - b.performanceScore);
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
+      if (this.lateNow()) return this.lateJudging();
       if (this.slayNow()) {
         byPerf();
         if (cast[n - 3].performanceScore > 25) {
@@ -1206,6 +1216,50 @@
       this.topQueens = []; this.bottomQueens = [];
       return this.untucked();
     }
+
+    // Normal Premiere (Late Entry): en el episodio 1 falta una reina (elegida al azar). Hay un reto de
+    // pasarela con dos looks, 3 reinas arriba, nadie abajo y nadie se va; luego la reina tardía entra.
+    lateJudging() {
+      const cast = this.current;
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      const top = cast.slice(0, 3);
+      const s = this.newScreen("¡El jurado!", "Continuar");
+      s.p("En este estreno, por primera vez en la herstory de Drag Race... ¡nadie se va a casa esta noche!");
+      s.b("Ahora, basándonos en las actuaciones de esta noche...");
+      s.hr();
+      s.q(top.map((q) => q.name), "cyan", `${list(top.map((q) => q.name))}, representáis los tops de la semana.`);
+      s.hr();
+      const safe = cast.filter((q) => !top.includes(q));
+      safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
+      if (safe.length) s.q(safe.map((q) => q.name), undefined, `${list(safe.map((q) => q.name))}, ${safe.length > 1 ? "estáis" : "estás"} a salvo...`);
+      s.hr();
+      top.forEach((q) => { q.performanceScore -= (q.runwayScore - q.favoritism); });
+      top.sort((a, b) => a.performanceScore - b.performanceScore);
+      let rest = top;
+      if (top[0].performanceScore === top[1].performanceScore && rnd(0, 100) < 60) {
+        top.slice(0, 2).forEach((q) => { q.addTR(" WIN"); q.favoritism += 5; q.ppe += 5; });
+        s.q([top[0].name, top[1].name], "darkblue", `${top[0].name}, ${top[1].name}, condragulations, ¡sois las ganadoras del reto de hoy!`);
+        rest = top.slice(2);
+      } else {
+        top[0].addTR("WIN"); top[0].favoritism += 5; top[0].ppe += 5;
+        s.q([top[0].name], "royalblue", `${top[0].name}, condragulations, ¡eres la ganadora del reto de hoy!`);
+        rest = top.slice(1);
+      }
+      rest.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
+      if (rest.length) s.q(rest.map((q) => q.name), "lightblue", `${list(rest.map((q) => q.name))}, buen trabajo esta semana, estáis a salvo.`);
+
+      const w = this.newScreen("¡Esperad un momento, esperad un momento!", "Continuar");
+      w.big("¡Tengo un último anuncio!");
+      w.b("La verdadera competición está a punto de empezar... ¡voy a presentar a una nueva reina en la carrera!");
+      w.b(`Por favor, dad la bienvenida a la carrera a... ¡¡${this.late.name}!!`);
+      w.q([this.late.name], "royalblue");
+      this.late.addTR("");
+      this.current.push(this.late);
+      this.lateDone = true;
+      this.topQueens = []; this.bottomQueens = [];
+    }
+
+    lateNow() { return !!this.late && !this.lateDone && this.episode === 1; }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
@@ -2839,7 +2893,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_LATE_ENTRY")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -2874,6 +2928,7 @@
       randomLabel,
       premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
+      lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
     });
     sim.play();
     return {
