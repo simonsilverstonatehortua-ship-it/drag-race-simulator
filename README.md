@@ -524,3 +524,18 @@ decide). Si el lip sync empata con un buen resultado, ganan las dos y se van las
 demás del bottom que no se van quedan BTM2-BTM5. Con 4 reinas o menos solo una está arriba. Las finales
 y los estrenos funcionan como en la temporada regular. No está copiado el estreno "Lip-Sync Assassin
 Premiere" ni el 0,5 % de que la ganadora se retire.
+
+### Formato de temporada All Winners (por estrellas)
+
+**Nadie se elimina durante la temporada**: se juegan 11 episodios (14 con más de 10 reinas) y las reinas
+juntan **estrellas**. Los retos están marcados: Rumix (ep. 1), Snatch Game (2), Ball (3), Girl Group
+(6) y, en el último episodio, un Show de talentos; el resto sale de la reserva aleatoria. Cada semana
+las 4 mejores reinas (5 con más de 10) están arriba y el resto SAFE; el Top 2 (WIN y "WIN" azul claro)
+recibe una **estrella** cada una y hace lip sync por su legado. La ganadora da el **desatascador de
+platino** a una reina que queda **bloqueada** la semana siguiente (no recibe estrella aunque llegue al
+Top 2); en los dos últimos episodios no se bloquea a nadie. En la semana 5 (y un 2 % de las demás) el
+Top 2 regala su estrella a una compañera, y en el Show de talentos final el Top 2 recibe 3 estrellas. Al
+terminar, las 4 reinas con más estrellas (si hay empate, la primera elige) pasan a la **gran final**
+(Lip-Sync For The Crown), mientras que las clasificadas 5ª-8ª juegan **She Done Already Done Had
+Herses**, un cuadro de lip syncs de consolación cuya ganadora se queda como "Reina de SDADHH". Las
+demás reinas son eliminadas al final. Sin reunión ni Miss Simpatía, y sin estrenos ni finales aparte.
