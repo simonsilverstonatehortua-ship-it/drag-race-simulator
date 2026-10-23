@@ -93,6 +93,8 @@
       this.immPotion = false;
       this.immuneCols = [];
       this.stars = 0;
+      this.starLog = []; // puntos MVQ / estrellas ganados en cada columna del track record
+      this.bracket = 0;
       this.blocked = false;
       this.lipstick = null;
     }
@@ -2260,7 +2262,7 @@
       }
       w.hr();
       // estrellas del Top 2 (las bloqueadas de la semana pasada no reciben)
-      const star = (q, n) => { q.stars += n; };
+      const star = (q, n) => this.addStars(q, n);
       const free = two.filter((q) => !q.blocked);
       const blockedTop = two.filter((q) => q.blocked);
       if (blockedTop.length === 2) {
@@ -2318,7 +2320,7 @@
         two.forEach((q) => {
           const g = this.bestSister(q, blockQueens);
           r.q([q.name, g.name], "gold", `¡${q.name} ha dado su estrella a... ${g.name}!`);
-          g.stars++;
+          this.addStars(g, 1);
           if (rnd(0, 100) >= 80) { this.modRelation(2, [q, g]); r.p(`${g.name} se sintió muy agradecida.`); }
           else { this.modRelation(1, [q, g]); r.p(`${g.name} dio las gracias.`); }
         });
@@ -2527,7 +2529,7 @@
         const losers = [];
         const wildCands = [];
         bracketList.forEach((group, gi) => {
-          group.forEach((q) => { q.stars = 0; });
+          group.forEach((q) => { q.stars = 0; if (ri === 0) q.bracket = gi + 1; });
           const passers = Math.max(1, Math.min(rc.passers, group.length - 1));
           for (let e = 0; e < rc.episodes; e++) {
             this.tourAlive.filter((q) => !group.includes(q)).forEach((q) => q.addTR(""));
@@ -2567,23 +2569,25 @@
             r.q([q.name], "red", `${q.name}, tienes ${q.stars} ${q.stars === 1 ? "punto" : "puntos"}. Lo siento, querida, no avanzas... sashay away.`);
             losers.push(q);
           });
-          if (rc.s11 && out.length) wildCands.push(out.slice().sort((a, b) => b.ppe - a.ppe)[0]); // la mejor PPE de cada grupo
+          if (ri === 0 && cfg.wildcards > 0 && out.length) wildCands.push(out.slice().sort((a, b) => b.ppe - a.ppe)[0]); // la mejor PPE de cada grupo
           advancers.push(...adv);
         });
-        // Tournament of All Stars (S11): una eliminada (la de mejor PPE de cada grupo) vuelve como comodín
-        if (rc.s11 && wildCands.length) {
+        // Comodines: de cada grupo se elige a la eliminada con mejor PPE y se sortean los comodines que vuelven
+        if (ri === 0 && cfg.wildcards > 0 && wildCands.length) {
           const w = this.newScreen("El comodín", "Continuar");
           w.b("De cada grupo se ha elegido a una reina eliminada según su rendimiento general.");
           wildCands.forEach((q) => w.q([q.name], "gold", q.name));
           w.hr();
-          w.b("Girando la lotería del comodín...");
-          const wild = pick(wildCands);
-          w.q([wild.name], "royalblue", `${wild.name}, condragulations, ¡eres el comodín y vuelves a la competición!`);
-          losers.splice(losers.indexOf(wild), 1);
-          advancers.push(wild);
-          for (let i = wild.trackRecord.length - 1; i >= 0; i--) {
-            if (/\+ELIM$/.test(wild.trackRecord[i])) { wild.trackRecord[i] = wild.trackRecord[i].replace(/\+ELIM$/, "+WILD"); break; }
-          }
+          w.b(cfg.wildcards > 1 ? "Girando la lotería de los comodines..." : "Girando la lotería del comodín...");
+          const winners = shuffle(wildCands.slice()).slice(0, Math.min(cfg.wildcards, wildCands.length));
+          winners.forEach((wild) => {
+            w.q([wild.name], "royalblue", `${wild.name}, condragulations, ¡eres comodín y vuelves a la competición!`);
+            losers.splice(losers.indexOf(wild), 1);
+            advancers.push(wild);
+            for (let i = wild.trackRecord.length - 1; i >= 0; i--) {
+              if (/\+ELIM$/.test(wild.trackRecord[i])) { wild.trackRecord[i] = wild.trackRecord[i].replace(/\+ELIM$/, "+WILD"); break; }
+            }
+          });
         }
         // las eliminadas de esta ronda: puestos compartidos
         const lo = advancers.length + 1, hi = entering.length;
@@ -2593,19 +2597,26 @@
         queens = advancers.slice();
       });
       this.tourAlive = null;
-      this.raqMerge = !!cfg.s11;
+      this.raqMerge = cfg.merge === "raq";
       this.current = queens;
       this.total = queens.length;
     }
 
     // añade un marcador a la última casilla del grupo ("WIN" -> "WIN+ADV")
+    // suma puntos MVQ / estrellas a una reina y los anota en la columna actual del track record
+    addStars(q, n) {
+      q.stars += n;
+      const col = Math.max(0, this.episodeChallenges.length - 1);
+      q.starLog[col] = (q.starLog[col] || 0) + n;
+    }
+
     tourMark(q, mark) {
       if (q.trackRecord.length) q.trackRecord[q.trackRecord.length - 1] += mark;
     }
 
     tournamentChallenge() {
       const cfg = this.opts.tournament;
-      if (cfg && cfg.s11) return this.tourEpisodes < 3 ? ["rumix", "design", "marketing"][this.tourEpisodes] : this.randomMaxi();
+      if (cfg && cfg.seq === "s11") return this.tourEpisodes < 3 ? ["rumix", "design", "marketing"][this.tourEpisodes] : this.randomMaxi();
       const seq = ["rumix", "improv", "runway", "design", "comedy", "rusical", "design", "girlgroup", "improv"];
       return seq[this.tourEpisodes % seq.length];
     }
@@ -2628,7 +2639,7 @@
       const highs = top.slice(two.length);
       const w = this.newScreen("¡Las dos mejores!", "Ir al lip sync");
       w.q(two.map((q) => q.name), "cyan", `${list(two.map((q) => q.name))}, condragulations, habéis ganado 2 puntos MVQ cada una.`);
-      two.forEach((q) => { q.stars += 2; q.favoritism += 5; });
+      two.forEach((q) => { this.addStars(q, 2); q.favoritism += 5; });
       highs.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
       if (highs.length) w.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, podéis retiraros al fondo del escenario.`);
 
@@ -2648,10 +2659,10 @@
       if (two.length === 2 && two[0].lipsyncScore === two[1].lipsyncScore && two[0].lipsyncScore > 7 && cast.length > 5) {
         this.addSong(two, [], song);
         r.q(two.map((q) => q.name), "royalblue", "Condragulations, ¡sois las dos ganadoras, baby!");
-        two.forEach((q) => { q.stars++; q.addTR(" WIN"); q.favoritism += 5; q.ppe += 5; });
+        two.forEach((q) => { this.addStars(q, 1); q.addTR(" WIN"); q.favoritism += 5; q.ppe += 5; });
       } else {
         this.addSong([two[0]], two.slice(1), song);
-        two[0].stars++;
+        this.addStars(two[0], 1);
         r.q([two[0].name], "royalblue", `${two[0].name}, ¡eres una ganadora, baby! Has ganado un punto extra, así que tienes ${two[0].stars} puntos.`);
         two[0].addTR("WIN"); two[0].favoritism += 5; two[0].ppe += 5;
         if (two[1]) {
@@ -2666,7 +2677,7 @@
       cast.filter((q) => !two.includes(q)).forEach((v) => {
         const choices = cast.filter((q) => q !== v);
         const chosen = this.bestSister(v, choices) || pick(choices);
-        chosen.stars++;
+        this.addStars(chosen, 1);
         g.q([v.name, chosen.name], "gold", `${v.name} da su punto MVQ a ${chosen.name}.`);
         this.modRelation(1, [v, chosen]);
       });
@@ -3477,6 +3488,7 @@
       if (blockedCell) baseText += "\n+\nBLOQUEADA";
       if (tourMark) baseText += "\n+\n" + (tourMark === "ADV" ? "PASA" : tourMark === "WILD" ? "COMODÍN" : "ELIM");
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg: style.bg, fg: style.fg, bold: style.bold };
+      if (queen.starLog[col]) cell.sub = (cell.sub ? cell.sub + " · " : "") + `+${queen.starLog[col]} MVQ`;
       if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
         cell.sub = queen.tCaptain.includes(col + 1) ? "Capitana de equipo" : "Ganadora del mini reto";
@@ -3490,11 +3502,18 @@
     }
 
     trData(finale) {
+      const mvq = !!(this.opts.winners || this.opts.tournament || this.hadTournament);
       const columns = this.episodeChallenges.map((c) => TR_LABEL[c] || c);
       const mkRow = (queen, rankHtml) => {
         const cells = [];
         for (let i = 0; i < columns.length; i++) cells.push(this.cellFor(queen.trackRecord[i] !== undefined ? queen.trackRecord[i] : "", queen, i));
-        return { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn * 2).toFixed(2) : "0.00" };
+        const row = { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn * 2).toFixed(2) : "0.00" };
+        if (mvq) row.mvq = queen.starLog.reduce((a, b) => a + (b || 0), 0);
+        if (this.opts.tournament && queen.bracket) {
+          row.bracket = queen.bracket;
+          row.bracketColor = (this.opts.tournament.colors || [])[queen.bracket - 1] || TOUR_COLORS[(queen.bracket - 1) % TOUR_COLORS.length];
+        }
+        return row;
       };
       const rows = [];
       const cur = this.tourAlive ? this.tourAlive.slice() : this.teamsFlat();
@@ -3526,7 +3545,7 @@
         if (q.minqdd) rank += "\n" + q.minqdd;
         rows.push(mkRow(q, rank));
       });
-      return { t: "tr", columns, rows };
+      return { t: "tr", columns, rows, mvq };
     }
 
     trackRecordScreen(finale) {
@@ -4350,6 +4369,8 @@
     ["PREMIERE_PORKCHOP", 10, "Reto Porkchop"], ["PREMIERE_PORKCHOP_ELIM", 10, "Reto Porkchop (con eliminación)"],
     ["PREMIERE_RATE_A_QUEEN", 10, "Rate A Queen"], ["PREMIERE_TRIPLE", 12, "Triple estreno"],
   ];
+  // Colores por defecto de los grupos del torneo (se pueden cambiar en los ajustes).
+  const TOUR_COLORS = ["#ffd1dc", "#c1e1c1", "#bde0fe", "#fde68a", "#e9d5ff", "#fecaca", "#bfdbfe", "#d9f99d"];
   const RANDOM_FINALES = ["FINALE_TOP5", "FINALE_TOP4", "FINALE_TOP3", "FINALE_TEAMS", "FINALE_LIPSYNC_CROWN",
     "FINALE_LIPSYNC_FINALE", "FINALE_JURY_VOTE", "FINALE_TOP2", "FINALE_TOP8", "FINALE_TOP8_LFTC", "FINALE_JURY_TOP5",
     "FINALE_TOP8_WILDCARD", "FINALE_TOP6_AS11"];
@@ -4365,7 +4386,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT" || formatChoice.season === "SEASON_TOURNAMENT_S11")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -4375,7 +4396,7 @@
   function tournamentCfg(t) {
     const num = (v, d, min) => Math.max(min, Math.floor(Number(v)) || d);
     const base = t || {};
-    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null, s11: !!base.s11 };
+    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null, wildcards: Math.max(0, Math.floor(Number(base.wildcards)) || 0), merge: base.merge === "raq" ? "raq" : "regular", seq: base.seq === "s11" ? "s11" : "default", colors: Array.isArray(base.colors) ? base.colors : [] };
     if (base.second && base.second.groups) cfg.second = { groups: num(base.second.groups, 2, 2), episodes: num(base.second.episodes, 3, 1), passers: num(base.second.passers, 2, 1) };
     return cfg;
   }
@@ -4395,7 +4416,7 @@
       randomLabel = FINALE_NAME[finale];
     }
     // Estreno al azar: se sortea entre los estrenos copiados que caben en el reparto.
-    let premiere = (formatChoice.season === "SEASON_TOURNAMENT" || formatChoice.season === "SEASON_TOURNAMENT_S11") ? "PREMIERE_NORMAL" : formatChoice.premiere;
+    let premiere = formatChoice.season === "SEASON_TOURNAMENT" ? "PREMIERE_NORMAL" : formatChoice.premiere;
     let randomPremiereLabel = null;
     if (premiere === "PREMIERE_RANDOM") {
       const options = RANDOM_PREMIERES.filter(([, min]) => names.length >= min);
@@ -4425,7 +4446,7 @@
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
-      tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : formatChoice.season === "SEASON_TOURNAMENT_S11" ? tournamentCfg({ groups: 3, episodes: 3, passers: 2, s11: true }) : null,
+      tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
       uk3: premiere === "PREMIERE_UK3",
       lateEntry: premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: premiere === "PREMIERE_DOUBLE",

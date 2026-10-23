@@ -226,10 +226,13 @@ function renderSimulate() {
   refreshTour = () => {
     tourBox.innerHTML = "";
     if (formatChoice.season !== "SEASON_TOURNAMENT") return;
-    const t = formatChoice.tournament = formatChoice.tournament || { groups: 3, episodes: 3, passers: 3, second: null };
+    let savedColors = [];
+    try { savedColors = JSON.parse(localStorage.getItem("tourColors")) || []; } catch (e) { savedColors = []; }
+    const t = formatChoice.tournament = formatChoice.tournament || { groups: 3, episodes: 3, passers: 3, second: null, wildcards: 0, merge: "regular", seq: "default", colors: savedColors };
+    if (!Array.isArray(t.colors)) t.colors = savedColors;
     const numField = (label, obj, key, min) => {
       const input = el("input", { type: "number", min: String(min), value: String(obj[key]), style: "max-width:90px;" });
-      input.addEventListener("change", () => { obj[key] = Math.max(min, parseInt(input.value, 10) || min); input.value = obj[key]; });
+      input.addEventListener("change", () => { obj[key] = Math.max(min, parseInt(input.value, 10) || min); input.value = obj[key]; if (key === "groups" && obj === t) refreshTour(); });
       return el("label", { class: "form-row" }, [el("span", { text: label }), input]);
     };
     tourBox.appendChild(el("h4", { text: "Ajustes del torneo" }));
@@ -250,6 +253,35 @@ function renderSimulate() {
       row2.appendChild(numField("Pasan por grupo (2ª ronda)", t.second, "passers", 1));
       tourBox.appendChild(row2);
     }
+    // comodín y formato tras la ronda de grupos
+    const row3 = el("div", { class: "grid grid--formats" });
+    row3.appendChild(numField("Comodines que vuelven (0 = ninguno)", t, "wildcards", 0));
+    const mergeSel = el("select", { onchange: (e) => { t.merge = e.target.value; } });
+    [["regular", "Regular (eliminación normal)"], ["raq", "Rate-A-Queen (S11: se puntúan entre ellas)"]].forEach(([v, label]) => {
+      const o = el("option", { value: v, text: label });
+      if (t.merge === v) o.setAttribute("selected", "selected");
+      mergeSel.appendChild(o);
+    });
+    row3.appendChild(el("label", { class: "form-row" }, [el("span", { text: "Formato tras la ronda de grupos (merge)" }), mergeSel]));
+    tourBox.appendChild(row3);
+    tourBox.appendChild(el("button", { type: "button", class: "btn btn--ghost", text: "Cargar los ajustes de la temporada 11", onclick: () => {
+      formatChoice.tournament = { groups: 3, episodes: 3, passers: 2, second: null, wildcards: 1, merge: "raq", seq: "s11", colors: t.colors };
+      refreshTour();
+    } }));
+    // colores de los grupos (el nombre de cada reina se pinta con el de su grupo en el track record)
+    tourBox.appendChild(el("p", { class: "muted small", text: "Colores de los grupos:" }));
+    const colorRow = el("div", { class: "chip-list" });
+    for (let i = 0; i < t.groups; i++) {
+      const fallback = ["#ffd1dc", "#c1e1c1", "#bde0fe", "#fde68a", "#e9d5ff", "#fecaca", "#bfdbfe", "#d9f99d"][i % 8];
+      t.colors[i] = t.colors[i] || fallback;
+      const picker = el("input", { type: "color", value: t.colors[i] });
+      picker.addEventListener("input", () => {
+        t.colors[i] = picker.value;
+        try { localStorage.setItem("tourColors", JSON.stringify(t.colors)); } catch (e) { /* sin almacenamiento */ }
+      });
+      colorRow.appendChild(el("label", { class: "form-row form-row--checkbox" }, [picker, el("span", { text: `Grupo ${i + 1}` })]));
+    }
+    tourBox.appendChild(colorRow);
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
@@ -951,7 +983,7 @@ function refTrackRecord(block) {
   const tableWrap = el("div", { class: "table-wrap rtr-wrap" });
   // Diseño fijo: cada columna de episodio mide siempre 64 px, sin importar lo larga que sea la
   // palabra del reto (así todas son rectángulos verticales idénticos).
-  const colWidths = [108, 96, 64, ...block.columns.map(() => 64), 64];
+  const colWidths = [108, 96, 64, ...block.columns.map(() => 64), ...(block.mvq ? [64] : []), 64];
   const tableWidth = colWidths.reduce((a, b) => a + b, 0);
   const table = el("table", { class: "rtr", id: "trackRecord", style: `width:${tableWidth}px;min-width:${tableWidth}px;` });
   const colgroup = el("colgroup");
@@ -961,6 +993,7 @@ function refTrackRecord(block) {
   const head = el("tr");
   ["Rank", "Concursante", "Foto"].forEach((t) => head.appendChild(el("th", { text: t, rowspan: "2" })));
   block.columns.forEach((_, i) => head.appendChild(el("th", { text: `Ep. ${i + 1}` })));
+  if (block.mvq) head.appendChild(el("th", { text: "MVQ\n(pts)", rowspan: "2", class: "ppeTR" }));
   head.appendChild(el("th", { text: "PPE\n(/10)", rowspan: "2", class: "ppeTR" }));
   thead.appendChild(head);
   const challengeRow = el("tr");
@@ -974,7 +1007,15 @@ function refTrackRecord(block) {
     const rank = el("td", { class: "rtr-rank" });
     refTextWithBreaks(rank, row.rank);
     tr.appendChild(rank);
-    tr.appendChild(el("td", { class: "rtr-name", text: row.name }));
+    const nameTd = el("td", { class: "rtr-name", text: row.name });
+    if (row.bracket) {
+      // Torneo: el nombre lleva el color de su grupo y "(Grupo N)" debajo, como en esopare
+      nameTd.style.background = row.bracketColor;
+      nameTd.style.color = readableTextColor(row.bracketColor) || "#202122";
+      nameTd.appendChild(document.createElement("br"));
+      nameTd.appendChild(el("small", { class: "rtr-sub", text: `(Grupo ${row.bracket})` }));
+    }
+    tr.appendChild(nameTd);
     const src = contestantImage(row.name);
     tr.appendChild(el("td", {
       class: "placement rtr-photo",
@@ -994,6 +1035,7 @@ function refTrackRecord(block) {
       }
       tr.appendChild(td);
     });
+    if (block.mvq) tr.appendChild(el("td", { class: "placement rtr-ppe", text: String(row.mvq || 0), style: "font-size:15px;font-weight:700;" }));
     tr.appendChild(el("td", { class: "placement rtr-ppe", text: row.ppe }));
     tbody.appendChild(tr);
   });
