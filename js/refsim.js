@@ -195,6 +195,8 @@
     "LOST 1ST ROUND ": { text: "PERDIÓ\nRONDA 1", bg: "#75975E", bold: true },
     "LOST 3RD ROUND ": { text: "PERDIÓ\nRONDA 3", bg: "#A3C585", bold: true },
     "WINNER ": { text: "REINA\nSDADHH", bg: "#C7DDB5", bold: true },
+    "TOP3": { text: "TOP 3", bg: "lightgreen", bold: true },
+    "BEAV": { text: "GOLDEN\nBALUT", bg: "gold", bold: true },
     "TOP2": { bg: "deepskyblue" },
     "TOP 2": { bg: "lightgreen", bold: true },
     "SAFE<br>R1": { text: "SAFE\n(Ronda 1)", bg: "lightcoral", fg: "white" },
@@ -510,7 +512,7 @@
       let text;
       this.miniType = null;
       const readingNow = (cast.length === 6 && this.total >= 9 && this.episode > 2 ||
-        cast.length === 7 && this.total >= 30 && this.episode > 3 || (this.opts.legacy || this.opts.assassin) && this.episode === 1) && !this.flag.reading && !this.opts.winners;
+        cast.length === 7 && this.total >= 30 && this.episode > 3 || (this.opts.legacy || this.opts.assassin || this.opts.slaysian) && this.episode === 1) && !this.flag.reading && !this.opts.winners;
       if (readingNow) {
         text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas se leerán entre ellas.";
         this.miniType = "comedy";
@@ -612,13 +614,14 @@
       this.current.forEach((q) => { q.episodesOn++; });
       const cast = this.current;
       const n = cast.length;
+      if (this.opts.slaysian && n === 6 && !this.flag.slaysianDone) return this.slaysianLalaparuza();
       const opening = this.opts.opening;
       let fn;
       if (this.opts.winners) fn = this.winnersChallenge();
       else if (this.opts.teams) fn = this.teamChallenge();
       else if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG || this.opts.porkchop ? "girlgroup" : this.opts.doubleTalent || this.opts.raq || this.opts.globalAS ? "talent" : this.randomMaxi();
       else if (this.lateNow() || this.uk3Now()) fn = "runway";
-      else if ((this.opts.legacy || this.opts.assassin) && this.episode === 1) fn = "talent";
+      else if ((this.opts.legacy || this.opts.assassin || this.opts.slaysian) && this.episode === 1) fn = "talent";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
       } else if (this.opts.lftc && n === 5 && !this.flag.rumix) fn = "rumix"; // Lip-Sync For The Crown: Rumix con 5 reinas
@@ -2405,6 +2408,85 @@
       this.finaleLFTC();
     }
 
+    // ---- Slaysian Royale (solo esopare): como el Legacy hasta que quedan 6 reinas; entonces se juega el
+    // "Top 6 Lip Sync LaLaPaRUza" tipo torneo: tres lip syncs en los que la reina elegida escoge a su rival,
+    // un lip sync a tres entre las ganadoras y, con el Golden Balut, la ganadora salva a una de las tres
+    // perdedoras; las otras dos hacen lip sync por su vida. ----
+    slaysianLalaparuza() {
+      this.flag.slaysianDone = true;
+      this.episodeChallenges.push("Lip Sync");
+      const cast = this.current;
+      const s = this.newScreen("¡Top 6 Lip Sync LaLaPaRUza!", "Empezar");
+      s.q(cast.map((q) => q.name), "cyan", cast.map((q) => q.name).join(" • "));
+      s.hr();
+      s.b("Reinas, ¡bienvenidas al Lip Sync LaLaPaRUza Slaysian Smackdown!");
+      s.b("Este reto es un torneo de lip syncs. Se sacará una reina al azar de un tambiolo con los nombres de todas las que quedan; la primera elegida tendrá el poder de escoger a su rival entre sus compañeras.");
+      s.b("Las perdedoras de cada lip sync vuelven al taller y la ganadora se queda en el escenario.");
+      s.b("¡Que comience el Lip Sync LaLaPaRUza Smackdown!");
+      let remaining = shuffle(cast.slice());
+      const winners = [], losers = [];
+      const fight = (chooser, opp, label) => {
+        const r = this.newScreen(label, "Continuar");
+        r.q([chooser.name, opp.name], undefined, `${chooser.name} elige a ${opp.name}!`);
+        r.b("Ha llegado la hora de que hagáis lip sync... ¡Buena suerte, y no la caguéis!");
+        const pair = [chooser, opp];
+        pair.forEach((q) => q.getASLipsync());
+        const song = this.pickSong(r);
+        r.hr();
+        this.lipsyncEvent(r, pair);
+        const raw = pair.map((q) => q.lipsyncScore);
+        this.lipsyncGroups(r, pair, song);
+        pair.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+        pair.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+        this.addSong([pair[0]], [pair[1]], song);
+        r.hr();
+        r.q([pair[0].name], "royalblue", `${pair[0].name}, shantay, te quedas. Eres libre para brillar otro día.`);
+        r.q([pair[1].name], "darkred", `${pair[1].name}, no te preocupes, tendrás una oportunidad más para redimirte. Pero de momento, vuelve al taller.`);
+        winners.push(pair[0]); losers.push(pair[1]);
+      };
+      for (let i = 0; i < 2; i++) {
+        const chooser = remaining[rnd(0, remaining.length - 1)];
+        const options = remaining.filter((q) => q !== chooser);
+        const opp = this.worstSister(chooser, options) || pick(options);
+        fight(chooser, opp, `Ronda 1 (lip sync ${i + 1})`);
+        remaining = remaining.filter((q) => q !== chooser && q !== opp);
+      }
+      fight(remaining[0], remaining[1], "Ronda 1 (lip sync 3)");
+
+      const t = this.newScreen("Lip sync del Top 3", "Ir al lip sync");
+      t.b("Reinas, condragulations por ganar vuestros lip syncs del LaLaPaRUza.");
+      t.b("Ahora toca el lip sync por la VICTORIA: decidirá quién es la ganadora del Slaysian Lip Sync LaLaPaRUza.");
+      t.q(winners.map((q) => q.name), "cyan");
+      t.b("La ganadora tendrá el poder del GOLDEN BALUT: podrá salvar a una de las perdedoras de lip sync por su vida.");
+      const f = this.newScreen("Lip sync del Top 3", "Ir al Golden Balut");
+      winners.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(f);
+      f.hr();
+      this.lipsyncEvent(f, winners);
+      const raw = winners.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(f, winners, song);
+      winners.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      winners.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      const champ = winners[0];
+      this.addSong([champ], winners.slice(1), song);
+      f.hr();
+      f.q([champ.name], "royalblue", `${champ.name}, condragulations, ¡eres la ganadora del Slaysian Lip Sync LaLaPaRUza!`);
+
+      const g = this.newScreen("Golden Balut", "Continuar");
+      g.q([champ.name], "royalblue", `${champ.name}, pesada es la mano que sostiene el Golden Balut: ¿a qué reina salvas de hacer lip sync por su vida?`);
+      g.q(losers.map((q) => q.name));
+      const saved = this.bestSister(champ, losers);
+      g.hr();
+      g.q([champ.name, saved.name], "gold", `¡${champ.name} decide darle el Golden Balut a ${saved.name}!`);
+      champ.addTR("WIN"); champ.favoritism += 5; champ.ppe += 5;
+      winners.slice(1).forEach((q) => { q.addTR("TOP3"); q.favoritism += 4; q.ppe += 4; });
+      saved.addTR("BEAV");
+      const bottom = losers.filter((q) => q !== saved);
+      g.q(bottom.map((q) => q.name), "tomato", `${bottom[0].name} y ${bottom[1].name}, eso significa que las dos estáis en riesgo de eliminación.`);
+      this.bottomQueens = bottom;
+      return this.lipsyncDesc();
+    }
+
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
     slayNow() { return !!this.opts.premiereSlayers && this.episode === 1; }
@@ -2541,7 +2623,7 @@
     // ---------- "¡Que vuelvan mis chicas!": ganadora, tops y bottoms ----------
     winAndBtm2() {
       if (this.opts.assassin) return this.assassinJudging();
-      if (this.opts.legacy) return this.legacyJudging();
+      if (this.opts.legacy || (this.opts.slaysian && this.current.length > 6)) return this.legacyJudging();
       const f = this.flag;
       const s = this.newScreen("¡Que vuelvan mis chicas!", "Lip sync por la vida");
       s.b("Chicas, he tomado algunas decisiones...");
@@ -4065,7 +4147,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -4114,6 +4196,7 @@
       teams: formatChoice.season === "SEASON_TEAMS",
       legacy: formatChoice.season === "SEASON_LIPSYNC_LEGACY",
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
+      slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
       uk3: premiere === "PREMIERE_UK3",
       lateEntry: premiere === "PREMIERE_LATE_ENTRY",

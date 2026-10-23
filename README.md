@@ -539,3 +539,14 @@ terminar, las 4 reinas con más estrellas (si hay empate, la primera elige) pasa
 (Lip-Sync For The Crown), mientras que las clasificadas 5ª-8ª juegan **She Done Already Done Had
 Herses**, un cuadro de lip syncs de consolación cuya ganadora se queda como "Reina de SDADHH". Las
 demás reinas son eliminadas al final. Sin reunión ni Miss Simpatía, y sin estrenos ni finales aparte.
+
+### Formato de temporada Slaysian Royale (solo esopare)
+
+Hasta que quedan **6 reinas** es como el Lipsync For Your Legacy (Show de talentos y biblioteca en el
+episodio 1; Top 2 con pintalabios y lip sync por el legado). Con 6 reinas se juega el **Top 6 Lip Sync
+LaLaPaRUza**, un torneo: se saca una reina al azar que escoge a su rival (la que peor se lleva con
+ella); hacen lip sync y la ganadora se queda en el escenario, y así hasta tres lip syncs. Las tres
+ganadoras hacen un lip sync por la victoria: la mejor es WIN y las otras dos TOP 3, y la ganadora usa el
+**Golden Balut** para salvar a una de las tres perdedoras (casilla "GOLDEN BALUT"); las otras dos hacen
+lip sync por su vida con eliminación normal. Con 5 reinas o menos, el jurado es el de la temporada
+regular. Las finales y los estrenos funcionan igual que siempre.

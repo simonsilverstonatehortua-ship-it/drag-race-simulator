@@ -63,6 +63,8 @@ const DEFAULT_FORMATS = [
     description: "Una concursante es nombrada 'asesina' y reta a otra a un lip sync sin reto de por medio." },
   { id: "SEASON_ALL_WINNERS", group: "season", label: "All Winners", custom: false,
     description: "Todas las concursantes son ganadoras previas de su temporada." },
+  { id: "SEASON_SLAYSIAN", group: "season", label: "Slaysian Royale", custom: false,
+    description: "Como el Legacy, con un torneo de lip syncs (LaLaPaRUza) al llegar a 6 reinas." },
 
   // --- Final ---
   { id: "FINALE_TOP2", group: "finale", label: "Top 2", custom: false,
