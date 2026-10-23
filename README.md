@@ -450,3 +450,10 @@ arriba; en la última semana la usa casi seguro. Si la usa, decide si **se salva
 entre las peores) o **se la regala a una amiga** (que puede aceptar o rechazar, y sube la relación entre
 ambas). La salvada sale de arriba/abajo y, si el bottom queda con menos de 2, entra la siguiente peor no
 inmune. En el track record, su casilla lleva un borde rosa.
+
+### Double Premiere (Global All Stars) (solo esopare)
+
+Doble estreno (dos mitades con 10 o más reinas) en el que cada mitad hace un **Show de talentos**; el
+Top 2 hace lip sync por la victoria (WIN y TOP2), **todas las demás de la mitad son HIGH** y nadie se
+va. La mitad que espera ese episodio tiene una casilla verde "RUN". Después, la temporada sigue normal
+con todas.

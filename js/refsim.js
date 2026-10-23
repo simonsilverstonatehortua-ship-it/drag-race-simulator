@@ -146,6 +146,7 @@
     "BTM": { bg: "tomato" },
     " BTM2": { text: "BTM2", bg: "hotpink" },
     "ELIM": { bg: "red", bold: true },
+    "RUN ": { text: "RUN", bg: "#D3FFB5", fg: "#000", bold: true },
     " WIN ": { text: "WIN", bg: "lightskyblue", bold: true },
     "LOSS": { bg: "#ff9e9e" },
     "LOSS ": { text: "LOSS", bg: "orange" },
@@ -295,7 +296,7 @@
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
-      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent || this.opts.doubleGG || this.opts.porkchop || this.opts.raq) && this.current.length >= 10) {
+      if ((this.opts.doublePremiere || this.opts.doubleNoElim || this.opts.doubleTalent || this.opts.doubleGG || this.opts.porkchop || this.opts.raq || this.opts.globalAS) && this.current.length >= 10) {
         let all = shuffle(this.current.slice());
         let first, second;
         if (this.opts.porkchop) {
@@ -307,13 +308,13 @@
           second = all.slice(first.length);
         }
         this.premiereHalf = true;
-        second.forEach((q) => q.addTR(""));
+        second.forEach((q) => q.addTR(this.opts.globalAS ? "RUN " : ""));
         this.current = first;
         this.playEpisode();
         this.trackRecordScreen(false);
         if (this.opts.doubleNoElim || this.opts.doubleGG) { this.flag.isTeam = false; this.flag.isPair = false; }
         const firstLeft = this.current;
-        firstLeft.forEach((q) => q.addTR(""));
+        firstLeft.forEach((q) => q.addTR(this.opts.globalAS ? "RUN " : ""));
         this.current = second;
         this.playEpisode();
         this.premiereHalf = false;
@@ -504,7 +505,7 @@
       const n = cast.length;
       const opening = this.opts.opening;
       let fn;
-      if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent || this.opts.raq ? "talent" : this.randomMaxi();
+      if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG ? "girlgroup" : this.opts.doubleTalent || this.opts.raq || this.opts.globalAS ? "talent" : this.randomMaxi();
       else if (this.lateNow() || this.uk3Now()) fn = "runway";
       else if (this.episode === 1) {
         fn = { DESIGN: "design", RUNWAY: "runway", TALENT_SHOW: "talent", GIRL_GROUP: "girlgroup" }[opening] || pick(["design", "runway", "talent", "girlgroup"]);
@@ -1126,7 +1127,7 @@
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
       if (this.premiereHalf && this.opts.raq) return this.raqPremiereJudging();
-      if (this.premiereHalf && this.opts.doubleNoElim) return this.doubleNoElimJudging();
+      if (this.premiereHalf && (this.opts.doubleNoElim || this.opts.globalAS)) return this.doubleNoElimJudging();
       if (this.lateNow()) return this.lateJudging();
       if (this.uk3Now()) {
         byPerf();
@@ -1383,12 +1384,13 @@
       cast.sort((a, b) => a.performanceScore - b.performanceScore);
       const top = [cast[0], cast[1]];
       let highs = [], lows = [];
-      if (n >= 6) { highs = [cast[2], cast[3]]; lows = [cast[n - 2], cast[n - 1]]; }
+      if (this.opts.globalAS) highs = cast.slice(2);
+      else if (n >= 6) { highs = [cast[2], cast[3]]; lows = [cast[n - 2], cast[n - 1]]; }
       const safe = cast.filter((q) => !top.includes(q) && !highs.includes(q) && !lows.includes(q));
       highs.forEach((q) => { q.addTR("HIGH"); q.ppe += 4; });
       lows.forEach((q) => { q.addTR("LOW"); q.ppe += 2; });
       safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
-      top.forEach((q) => { q.ppe += 3; });
+      top.forEach((q) => { q.ppe += this.opts.globalAS ? 4 : 3; });
       const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
       s.b("Chicas, he tomado algunas decisiones...");
       s.q(top.map((q) => q.name), "cyan", `${top[0].name}, ${top[1].name}, condragulations, ¡sois el Top 2 de la semana!`);
@@ -3266,7 +3268,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -3308,6 +3310,7 @@
       porkchop: formatChoice.premiere === "PREMIERE_PORKCHOP",
       doubleTalent: formatChoice.premiere === "PREMIERE_DOUBLE_TALENT",
       doubleGG: formatChoice.premiere === "PREMIERE_DOUBLE_GG",
+      globalAS: formatChoice.premiere === "PREMIERE_GLOBAL_AS",
       raq: formatChoice.premiere === "PREMIERE_RATE_A_QUEEN",
     });
     sim.play();

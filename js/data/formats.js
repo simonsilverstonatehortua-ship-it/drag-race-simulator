@@ -21,6 +21,8 @@ const DEFAULT_FORMATS = [
     description: "Dos mitades hacen un Show de talentos y eliminan a una cada una, pero las eliminadas vuelven en el episodio 3." },
   { id: "PREMIERE_DOUBLE_GG", group: "premiere", label: "Doble estreno (Girl Groups)", custom: false,
     description: "Dos mitades hacen un reto de Girl Group, con su jurado y eliminación normales." },
+  { id: "PREMIERE_GLOBAL_AS", group: "premiere", label: "Doble estreno (Global All Stars)", custom: false,
+    description: "Dos mitades hacen un Show de talentos; el Top 2 hace lip sync por la victoria, el resto HIGH y nadie se va." },
   { id: "PREMIERE_LATE_ENTRY", group: "premiere", label: "Entrada tardía", custom: false,
     description: "Una concursante adicional se incorpora tras el primer reto." },
   { id: "PREMIERE_PORKCHOP", group: "premiere", label: "Reto Porkchop", custom: false,
