@@ -27,6 +27,8 @@ const DEFAULT_FORMATS = [
     description: "Una concursante adicional se incorpora tras el primer reto." },
   { id: "PREMIERE_PORKCHOP", group: "premiere", label: "Reto Porkchop", custom: false,
     description: "Las concursantes llegan por parejas; un mini reto decide quién compite esa semana." },
+  { id: "PREMIERE_PORKCHOP_ELIM", group: "premiere", label: "Reto Porkchop (con eliminación)", custom: false,
+    description: "Como el Porkchop, pero los dos grupos hacen un episodio con eliminación normal." },
   { id: "PREMIERE_RATE_A_QUEEN", group: "premiere", label: "Puntuar a una compañera", custom: false,
     description: "Cada concursante puntúa el look de otra antes del reto principal." },
   { id: "PREMIERE_MEET_THE_QUEENS", group: "premiere", label: "Meet the Queens", custom: false,

@@ -457,3 +457,9 @@ Doble estreno (dos mitades con 10 o más reinas) en el que cada mitad hace un **
 Top 2 hace lip sync por la victoria (WIN y TOP2), **todas las demás de la mitad son HIGH** y nadie se
 va. La mitad que espera ese episodio tiene una casilla verde "RUN". Después, la temporada sigue normal
 con todas.
+
+### Porkchop Premiere (Elimination) (solo esopare)
+
+Igual que el Porkchop (episodio 1 solo de lip syncs y votación de la chuleta), pero los dos grupos
+hacen su episodio de Girl Group con **jurado y eliminación normales** en lugar de sin eliminación;
+una reina se va de cada grupo (salvo doble shantay).
