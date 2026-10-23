@@ -484,3 +484,16 @@ jueces ni las críticas del formato normal. La casilla del episodio **combina** 
 se queda con su "WIN" y si gana también la pasarela es un "WIN" azul oscuro). Con un reto de diseño
 no hay segunda prueba. Lo demás (lip sync, eliminación, finales, estrenos) es igual que en la
 temporada regular. El Thailand de esopare ("Thailand S1/2 Format") y el de myrainboww son el mismo.
+
+### Formato de temporada Teams ("Teams" / "Teams of 2")
+
+Con un número **par** de reinas (6 o más) se forman **parejas al azar** que compiten juntas toda la
+temporada con la **media de sus estadísticas** (la pareja lleva un nombre como "Team Fion..." hecho con
+las letras de sus nombres). Cada semana: un mini reto que gana una pareja al azar, un maxi reto (solo los
+retos básicos; Snatch Game con 5 parejas y Ball con 3), jurado con 2 parejas arriba y 3 abajo (1 y 2
+con 3 parejas): la mejor gana (WIN), la segunda es HIGH, la mejor de las tres de abajo es LOW y las dos
+peores hacen lip sync, en el que **solo hace lip sync una reina de cada pareja** (al azar; un 2 % de que
+pulse el botón de "she-mergency" y salga su compañera). La pareja perdedora se va entera (los dos
+puestos empatados). En la final quedan dos parejas, cuatro reinas: o se van una reina de cada pareja o
+se va la pareja peor, y las dos restantes hacen lip sync por la corona. Con un reparto impar o de menos
+de 6 reinas se juega una temporada regular. La final elegida se ignora (como en el original).
