@@ -173,7 +173,7 @@
     " WIN": { text: "WIN", bg: "darkblue", fg: "white", bold: true },
     "HIGH": { bg: "lightblue" },
     "HIGH TEAM": { bg: "aquamarine" },
-    "SAFE": { bg: "white" },
+    "SAFE": { bg: "#f9f9ff" },
     "LOW": { bg: "pink" },
     "BTM2": { bg: "tomato" },
     "BTM3": { bg: "tomato" },
@@ -191,11 +191,12 @@
     " ELIM": { text: "ELIM\n(falsa)", bg: "orange", bold: true },
     " ELIM ": { text: "ELIM", bg: "darkred", fg: "white", bold: true },
     "WINWIN": { text: "WIN", bg: "mediumblue", fg: "white", bold: true },
-    "WINHIGH": { text: "WIN\n+\nHIGH", bg: "cornflowerblue" },
-    "WINLOW": { text: "WIN\n+\nLOW", bg: "#ee82ee" },
-    "WINBTM2": { text: "WIN\n+\nBTM2", bg: "mediumorchid" },
-    "WINBTM3": { text: "WIN\n+\nBTM3", bg: "mediumorchid" },
-    "WINELIM": { text: "WIN\n+\nELIM", bg: "#9400d3", fg: "white", bold: true },
+    "WINHIGH": { text: "WIN+HIGH", bg: "cornflowerblue", bold: true },
+    "WINLOW": { text: "WIN+LOW", bg: "#ee82ee", bold: true },
+    "WINBTM2": { text: "WIN+BTM2", bg: "mediumorchid", bold: true },
+    "WINBTM3": { text: "WIN+BTM3", bg: "mediumorchid", bold: true },
+    "WINELIM": { text: "WIN+ELIM", bg: "#9400d3", fg: "white", bold: true },
+    "OUT": { text: "OUT", bg: "purple", fg: "white", bold: true },
     "LOST 1ST ROUND ": { text: "PERDIÓ\nRONDA 1", bg: "#75975E", bold: true },
     "LOST 3RD ROUND ": { text: "PERDIÓ\nRONDA 3", bg: "#A3C585", bold: true },
     "WINNER ": { text: "REINA\nSDADHH", bg: "#C7DDB5", bold: true },
@@ -2594,7 +2595,13 @@
             losers.splice(losers.indexOf(wild), 1);
             advancers.push(wild);
             for (let i = wild.trackRecord.length - 1; i >= 0; i--) {
-              if (/\+ELIM$/.test(wild.trackRecord[i])) { wild.trackRecord[i] = wild.trackRecord[i].replace(/\+ELIM$/, "+WILD"); break; }
+              if (/\+ELIM$/.test(wild.trackRecord[i])) { wild.trackRecord[i] = "RTRN+" + wild.trackRecord[i].replace(/\+ELIM$/, ""); break; }
+            }
+          });
+          // las candidatas que no vuelven quedan como "OUT" (morado), como en la wiki
+          wildCands.filter((q) => !winners.includes(q)).forEach((q) => {
+            for (let i = q.trackRecord.length - 1; i >= 0; i--) {
+              if (/\+ELIM$/.test(q.trackRecord[i])) { q.trackRecord[i] = "OUT"; break; }
             }
           });
         }
@@ -2745,7 +2752,8 @@
         ["ELIMINATED", "La concursante fue eliminada en la final."],
         ["+ADV", "La concursante pasó a la siguiente ronda del torneo."],
         ["+ELIM", "La concursante fue eliminada del torneo por la puntuación."],
-        ["+WILD", "La concursante había sido eliminada, pero volvió como comodín."],
+        ["RTRN+", "La concursante había sido eliminada, pero volvió como comodín (RTRN+resultado)."],
+        ["OUT", "La concursante fue candidata a comodín, pero no la eligieron para volver."],
         ["MISS CON", "La concursante fue Miss Simpatía."],
         ["GUEST", "La concursante fue invitada en la final."],
       ];
@@ -2753,14 +2761,15 @@
       this.queens.forEach((q) => q.trackRecord.forEach((c) => {
         if (typeof c !== "string") return;
         used.add(c);
-        const m = c.match(/^(.*?)(\+ADV|\+ELIM|\+WILD|\+BLOCKED)$/);
+        const m = c.match(/^(.*?)(\+ADV|\+ELIM|\+BLOCKED)$/);
+        if (c.startsWith("RTRN+")) used.add("RTRN+");
         if (m) { used.add(m[1]); used.add(m[2]); }
       }));
       const items = [];
       all.forEach(([label, text]) => {
-        const hit = label.startsWith("+") ? used.has(label) : used.has(label) || (label === "ELIM" && used.has("ELIM"));
+        const hit = label.startsWith("+") || label === "RTRN+" ? used.has(label) : used.has(label) || (label === "ELIM" && used.has("ELIM"));
         if (!hit) return;
-        const style = CELL_STYLE[label.startsWith("+") ? (label === "+ADV" ? "WIN" : label === "+WILD" ? "WINHIGH" : "ELIMINATED") : label];
+        const style = CELL_STYLE[label === "RTRN+" ? "WIN" : label.startsWith("+") ? (label === "+ADV" ? "WIN" : "ELIMINATED") : label];
         items.push({ color: (style && style.bg) || "white", text });
       });
       return { t: "legend", items };
@@ -3557,20 +3566,31 @@
     // ======================================================================================
     cellFor(raw, queen, col) {
       // "RTRN + X": la reina comodín que regresó (el estilo es el de X con el prefijo "REGRESO +")
+      // Resultados combinados al estilo de la wiki: una sola línea "WIN+ELIM", "SAFE+ADV", "RTRN+SAFE"...
       const blockedCell = typeof raw === "string" && raw.endsWith("+BLOCKED"); // All Winners: bloqueada por el desatascador
       if (blockedCell) raw = raw.slice(0, -8);
-      const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM") || raw.endsWith("+WILD")) ? (raw.endsWith("+ADV") ? "ADV" : raw.endsWith("+WILD") ? "WILD" : "ELIM") : null; // Torneo
+      const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM")) ? (raw.endsWith("+ADV") ? "ADV" : "ELIM") : null; // Torneo
       if (tourMark) raw = raw.slice(0, -(tourMark.length + 1));
+      const returned = typeof raw === "string" && raw.startsWith("RTRN+"); // comodín que vuelve
+      if (returned) raw = raw.slice(5);
       const wild = typeof raw === "string" && raw.startsWith("RTRN + ");
       const style = CELL_STYLE[wild ? raw.slice(7) : raw] || { text: raw };
       let baseText = style.text !== undefined ? style.text : (wild ? raw.slice(7) : raw);
-      if (blockedCell) baseText += "\n+\nBLOQUEADA";
-      if (tourMark) baseText += "\n+\n" + (tourMark === "ADV" ? "PASA" : tourMark === "WILD" ? "COMODÍN" : "ELIM");
-      const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg: style.bg, fg: style.fg, bold: style.bold };
-      if (queen.starLog[col]) cell.sub = (cell.sub ? cell.sub + " · " : "") + `+${queen.starLog[col]} MVQ`;
+      let bg = style.bg, fg = style.fg, bold = style.bold;
+      if (returned) baseText = "RTRN+" + baseText;
+      if (blockedCell) { baseText += "+BLOCKED"; bg = "#f4a6a6"; fg = "#202122"; bold = true; }
+      if (tourMark === "ADV") { baseText += "+ADV"; bold = true; }
+      if (tourMark === "ELIM") {
+        baseText += "+ELIM";
+        bg = /^WIN/.test(String(raw).trim()) ? (style.bg === "deepskyblue" ? "#C64FFF" : "#9400D3") : "sienna";
+        fg = "#FFF"; bold = true;
+      }
+      const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg, fg, bold };
+      if (queen.starLog[col]) cell.sub = `+${queen.starLog[col]} MVQ`;
       if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
-        cell.sub = queen.tCaptain.includes(col + 1) ? "Capitana de equipo" : "Ganadora del mini reto";
+        const mini = queen.tCaptain.includes(col + 1) ? "Capitana de equipo" : "Ganadora del mini reto";
+        cell.sub = cell.sub ? `${mini} · ${cell.sub}` : mini;
       }
       // Jury Vote: en la columna de la final se muestran los puntos del jurado.
       if (this.opts.jury && queen.juryPoints !== undefined && col === this.episodeChallenges.length - 1

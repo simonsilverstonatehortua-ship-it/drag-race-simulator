@@ -591,3 +591,7 @@ Como en la wiki del fandom, el torneo y All Winners muestran:
   negros; cada episodio tiene dos columnas (puntos del reto/lip sync en azul fuerte, celeste o azul claro, y el
   punto MVQ recibido de otra reina) y una columna de **puntos totales**; debajo, el historial de puntos regalados.
 - Un doble ganador con una sola reina arriba ya no puede romper una temporada de torneo.
+
+## Casillas del track record al estilo de la wiki
+
+Las casillas usan los textos en una sola línea de la wiki: `WIN+HIGH`, `WIN+ELIM`, `SAFE+ADV`, `SAFE+ELIM`, `OUT` y `RTRN+SAFE`. En el torneo, la comodín elegida pasa de `X+ELIM` a `RTRN+X` y las candidatas que no vuelven quedan como `OUT` (morado). La leyenda incluye las nuevas entradas.
