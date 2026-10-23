@@ -463,3 +463,13 @@ con todas.
 Igual que el Porkchop (episodio 1 solo de lip syncs y votación de la chuleta), pero los dos grupos
 hacen su episodio de Girl Group con **jurado y eliminación normales** en lugar de sin eliminación;
 una reina se va de cada grupo (salvo doble shantay).
+
+### Triple Premiere y Estreno al azar
+
+- **Triple Premiere** (12 o más reinas): el reparto se divide al azar en tres grupos, que hacen los
+  episodios 1, 2 y 3 (cada uno con su reto, jurado y eliminación normales) mientras los otros dos
+  esperan con casillas vacías; en el episodio 4 siguen todas las que quedan.
+- **Estreno al azar**: sortea el estreno entre los copiados (normal, sin eliminación, Slayers/Top 2,
+  UK3, entrada tardía, doble y sus variantes, Porkchop y su variante, Rate A Queen y triple),
+  descartando los que no caben en el reparto. Una primera pantalla avisa de cuál ha tocado.
+  (Esopare no tiene esta opción; la añadí como la "Final al azar".)

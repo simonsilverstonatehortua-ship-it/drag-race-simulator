@@ -290,9 +290,33 @@
     // TEMPORADA
     // ======================================================================================
     play() {
+      if (this.opts.randomPremiereLabel) this.newScreen("Estreno al azar", "Empezar").p(`Estreno aleatorio: esta temporada empieza con «${this.opts.randomPremiereLabel}».`);
       if (this.opts.lateEntry && this.current.length > 5) {
         this.late = pick(this.current);
         this.current = this.current.filter((q) => q !== this.late);
+      }
+      // Triple estreno (12 o más reinas): tres grupos al azar hacen los episodios 1, 2 y 3, cada uno con su
+      // eliminación; en el episodio 4 siguen todas las que quedan.
+      if (this.opts.triple && this.current.length >= 12) {
+        const all = shuffle(this.current.slice());
+        const a = Math.floor(all.length / 3), b = Math.floor((all.length - a) / 2);
+        const groups = [all.slice(0, a), all.slice(a, a + b), all.slice(a + b)];
+        this.premiereHalf = true;
+        const left = [];
+        groups.forEach((g, k) => {
+          groups.forEach((o, j) => { if (j !== k) (j < k ? left[j] : o).forEach((q) => q.addTR("")); });
+          this.current = g;
+          this.playEpisode();
+          this.flag.isTeam = false; this.flag.isPair = false;
+          left[k] = this.current;
+          if (k < groups.length - 1) {
+            this.current = left.slice(0, k + 1).flat();
+            this.trackRecordScreen(false);
+          }
+        });
+        this.premiereHalf = false;
+        this.current = left.flat();
+        this.trackRecordScreen(false);
       }
       // Doble estreno: la mitad del reparto (al azar) hace el episodio 1 y la otra mitad el 2, cada
       // grupo con su eliminación; después sigue la temporada con todas las que quedan.
@@ -3254,6 +3278,16 @@
   // API
   // ======================================================================================
   const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8, FINALE_TOP8_LFTC: 8, FINALE_TOP8_WILDCARD: 7 };
+  // [id, mínimo de reinas, nombre] de los estrenos que puede sortear "Estreno al azar".
+  const RANDOM_PREMIERES = [
+    ["PREMIERE_NORMAL", 3, "Estreno normal"], ["PREMIERE_NORMAL_NOELIM", 3, "Estreno normal (sin eliminación)"],
+    ["PREMIERE_SLAYERS", 3, "Estreno normal (Slayers / Top 2)"], ["PREMIERE_UK3", 4, "Estreno UK3 (Top 2 y Bottom 2)"],
+    ["PREMIERE_LATE_ENTRY", 6, "Estreno normal (entrada tardía)"], ["PREMIERE_DOUBLE", 10, "Doble estreno"],
+    ["PREMIERE_DOUBLE_NOELIM", 10, "Doble estreno (sin eliminación)"], ["PREMIERE_DOUBLE_TALENT", 10, "Doble estreno (Talent Show / eliminación falsa)"],
+    ["PREMIERE_DOUBLE_GG", 10, "Doble estreno (Girl Groups)"], ["PREMIERE_GLOBAL_AS", 10, "Doble estreno (Global All Stars)"],
+    ["PREMIERE_PORKCHOP", 10, "Reto Porkchop"], ["PREMIERE_PORKCHOP_ELIM", 10, "Reto Porkchop (con eliminación)"],
+    ["PREMIERE_RATE_A_QUEEN", 10, "Rate A Queen"], ["PREMIERE_TRIPLE", 12, "Triple estreno"],
+  ];
   const RANDOM_FINALES = ["FINALE_TOP5", "FINALE_TOP4", "FINALE_TOP3", "FINALE_TEAMS", "FINALE_LIPSYNC_CROWN",
     "FINALE_LIPSYNC_FINALE", "FINALE_JURY_VOTE", "FINALE_TOP2", "FINALE_TOP8", "FINALE_TOP8_LFTC", "FINALE_JURY_TOP5",
     "FINALE_TOP8_WILDCARD", "FINALE_TOP6_AS11"];
@@ -3268,7 +3302,7 @@
   // El formato que copia este simulador: estreno normal + temporada regular + final Top 2 +
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
-    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM")
+    return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
       && formatChoice.season === "SEASON_REGULAR"
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
@@ -3289,6 +3323,15 @@
       finale = pool.length ? pool[rnd(0, pool.length - 1)] : "FINALE_TOP2";
       randomLabel = FINALE_NAME[finale];
     }
+    // Estreno al azar: se sortea entre los estrenos copiados que caben en el reparto.
+    let premiere = formatChoice.premiere;
+    let randomPremiereLabel = null;
+    if (premiere === "PREMIERE_RANDOM") {
+      const options = RANDOM_PREMIERES.filter(([, min]) => names.length >= min);
+      const [id, , label] = pick(options);
+      premiere = id;
+      randomPremiereLabel = label;
+    }
     const sim = new Sim(names, statsByName, relNumeric, {
       opening: formatChoice.openingChallenge,
       finaleSize: FINALE_SIZE[finale] || 2,
@@ -3301,18 +3344,20 @@
       top8return: finale === "FINALE_TOP8_WILDCARD",
       jury: finale === "FINALE_JURY_VOTE" || finale === "FINALE_JURY_TOP5",
       randomLabel,
-      premiereNoElim: formatChoice.premiere === "PREMIERE_NORMAL_NOELIM",
-      premiereSlayers: formatChoice.premiere === "PREMIERE_SLAYERS",
-      uk3: formatChoice.premiere === "PREMIERE_UK3",
-      lateEntry: formatChoice.premiere === "PREMIERE_LATE_ENTRY",
-      doublePremiere: formatChoice.premiere === "PREMIERE_DOUBLE",
-      doubleNoElim: formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_PORKCHOP",
-      porkchopElim: formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM",
-      porkchop: formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM",
-      doubleTalent: formatChoice.premiere === "PREMIERE_DOUBLE_TALENT",
-      doubleGG: formatChoice.premiere === "PREMIERE_DOUBLE_GG",
-      globalAS: formatChoice.premiere === "PREMIERE_GLOBAL_AS",
-      raq: formatChoice.premiere === "PREMIERE_RATE_A_QUEEN",
+      randomPremiereLabel,
+      triple: premiere === "PREMIERE_TRIPLE",
+      premiereNoElim: premiere === "PREMIERE_NORMAL_NOELIM",
+      premiereSlayers: premiere === "PREMIERE_SLAYERS",
+      uk3: premiere === "PREMIERE_UK3",
+      lateEntry: premiere === "PREMIERE_LATE_ENTRY",
+      doublePremiere: premiere === "PREMIERE_DOUBLE",
+      doubleNoElim: premiere === "PREMIERE_DOUBLE_NOELIM" || premiere === "PREMIERE_PORKCHOP",
+      porkchopElim: premiere === "PREMIERE_PORKCHOP_ELIM",
+      porkchop: premiere === "PREMIERE_PORKCHOP" || premiere === "PREMIERE_PORKCHOP_ELIM",
+      doubleTalent: premiere === "PREMIERE_DOUBLE_TALENT",
+      doubleGG: premiere === "PREMIERE_DOUBLE_GG",
+      globalAS: premiere === "PREMIERE_GLOBAL_AS",
+      raq: premiere === "PREMIERE_RATE_A_QUEEN",
     });
     sim.play();
     return {
