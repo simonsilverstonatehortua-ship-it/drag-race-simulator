@@ -65,6 +65,8 @@ const DEFAULT_FORMATS = [
     description: "Todas las concursantes son ganadoras previas de su temporada." },
   { id: "SEASON_SLAYSIAN", group: "season", label: "Slaysian Royale", custom: false,
     description: "Como el Legacy, con un torneo de lip syncs (LaLaPaRUza) al llegar a 6 reinas." },
+  { id: "SEASON_TOURNAMENT", group: "season", label: "Tournament of All Stars (grupos a medida)", custom: false,
+    description: "El reparto se divide en grupos que juegan varios episodios con puntos MVQ; pasan las mejores de cada grupo, con segunda ronda opcional." },
 
   // --- Final ---
   { id: "FINALE_TOP2", group: "finale", label: "Top 2", custom: false,

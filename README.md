@@ -550,3 +550,18 @@ ganadoras hacen un lip sync por la victoria: la mejor es WIN y las otras dos TOP
 **Golden Balut** para salvar a una de las tres perdedoras (casilla "GOLDEN BALUT"); las otras dos hacen
 lip sync por su vida con eliminación normal. Con 5 reinas o menos, el jurado es el de la temporada
 regular. Las finales y los estrenos funcionan igual que siempre.
+
+### Tournament of All Stars (grupos a medida, como en esopare)
+
+En el selector de temporada, "Tournament of All Stars (grupos a medida)" muestra un panel de
+**ajustes del torneo**: **número de grupos**, **episodios por grupo**, **reinas que pasan por grupo** y
+una **segunda ronda de grupos** opcional (con sus propios grupos, episodios y reinas que pasan). El
+reparto se divide al azar en grupos de tamaño parecido y cada grupo juega sus episodios mientras las
+demás esperan con casillas vacías. En cada episodio las 3 mejores están arriba: el **Top 2** gana 2 puntos
+MVQ (lip sync por su legado: la ganadora, un punto extra), la tercera es HIGH y las demás quedan SAFE; las
+reinas que no son Top 2 **regalan su punto MVQ** a la compañera que prefieran. Al acabar los episodios del
+grupo pasan las que más puntos tengan (el empate se rompe por PPE, con un 1 % de que pasen todas las
+empatadas) y las demás quedan eliminadas con la casilla "+ELIM" (las que pasan, "+PASA"). Los retos son los
+del original (Rumix, Improv, Runway, Design, Comedy, Rusical, Design, Girl Group, Improv, y vuelta a
+empezar). Tras la última ronda las reinas que pasan siguen como una temporada regular con eliminación
+hasta la final elegida. Con 3 grupos, 3 episodios y 3 pasan por grupo es el Tournament of All Stars original.

@@ -214,17 +214,48 @@ function renderSimulate() {
   wrap.appendChild(el("h3", { class: "group-title", text: "Formato" }));
   // Aviso: con Estreno normal + Regular + Top 2 + sin regresos ni opciones, la temporada se
   // juega con la copia del simulador de referencia (js/refsim.js).
+  let refreshTour = () => {};
   const refNote = el("p", { class: "muted small" });
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio; la copia del simulador de referencia está hecha solo para: estreno normal (con o sin eliminación, , Slayers/Top 2, entrada tardía, doble estreno, sin eliminación, con eliminación falsa, Girl Groups, Porkchop, Rate A Queen, UK3, Global All Stars, Porkchop con eliminación, triple o estreno al azar) + temporada regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners o Slaysian Royale + final Top 2, Top 3, Top 4, Top 5, por equipos, Lip-Sync For The Crown, Lip Sync for the Finale, Jury Vote (Top 4 o Top 5), Top 6 All Stars 11, Top 8, Top 8 Lip-Sync For The Crown (con o sin Wildcard) o Random Finale + sin regresos ni opciones.";
+      : "Este formato todavía usa el motor propio. La copia del simulador de referencia cubre todos los estrenos normales y sus variantes (doble, triple, Porkchop, Rate A Queen, UK3, entrada tardía, al azar...), las temporadas Regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale y Tournament of All Stars, y todas las finales, siempre sin regresos ni opciones extra.";
+  };
+  // Ajustes del Tournament of All Stars: grupos, episodios por grupo, reinas que pasan y segunda ronda.
+  const tourBox = el("div", { class: "section", style: "margin-top:.6rem;" });
+  refreshTour = () => {
+    tourBox.innerHTML = "";
+    if (formatChoice.season !== "SEASON_TOURNAMENT") return;
+    const t = formatChoice.tournament = formatChoice.tournament || { groups: 3, episodes: 3, passers: 3, second: null };
+    const numField = (label, obj, key, min) => {
+      const input = el("input", { type: "number", min: String(min), value: String(obj[key]), style: "max-width:90px;" });
+      input.addEventListener("change", () => { obj[key] = Math.max(min, parseInt(input.value, 10) || min); input.value = obj[key]; });
+      return el("label", { class: "form-row" }, [el("span", { text: label }), input]);
+    };
+    tourBox.appendChild(el("h4", { text: "Ajustes del torneo" }));
+    tourBox.appendChild(el("p", { class: "muted small", text: "Primera ronda: el reparto se divide al azar en grupos; cada grupo juega sus episodios y pasan las que más puntos MVQ tengan. Las que pasan siguen en la temporada regular (o en una segunda ronda de grupos si la activas)." }));
+    const row = el("div", { class: "grid grid--formats" });
+    row.appendChild(numField("Número de grupos", t, "groups", 2));
+    row.appendChild(numField("Episodios por grupo", t, "episodes", 1));
+    row.appendChild(numField("Pasan por grupo", t, "passers", 1));
+    tourBox.appendChild(row);
+    const second = el("input", { type: "checkbox" });
+    second.checked = !!t.second;
+    second.addEventListener("change", () => { t.second = second.checked ? { groups: 2, episodes: 3, passers: 2 } : null; refreshTour(); });
+    tourBox.appendChild(el("label", { class: "form-row form-row--checkbox" }, [second, el("span", { text: "Segunda ronda de grupos" })]));
+    if (t.second) {
+      const row2 = el("div", { class: "grid grid--formats" });
+      row2.appendChild(numField("Grupos (2ª ronda)", t.second, "groups", 2));
+      row2.appendChild(numField("Episodios por grupo (2ª ronda)", t.second, "episodes", 1));
+      row2.appendChild(numField("Pasan por grupo (2ª ronda)", t.second, "passers", 1));
+      tourBox.appendChild(row2);
+    }
   };
   const formatGrid = el("div", { class: "grid grid--formats" });
   Object.entries(GROUP_LABELS).forEach(([group, label]) => {
     const options = DB.formats.filter((f) => f.group === group);
     const select = el("select", {
-      onchange: (e) => { formatChoice[group] = e.target.value; updateRefNote(); },
+      onchange: (e) => { formatChoice[group] = e.target.value; updateRefNote(); refreshTour(); },
     });
     options.forEach((f) => {
       const opt = el("option", { value: f.id, text: f.label });
@@ -235,6 +266,8 @@ function renderSimulate() {
   });
   wrap.appendChild(formatGrid);
   wrap.appendChild(refNote);
+  wrap.appendChild(tourBox);
+  refreshTour();
   updateRefNote();
 
   wrap.appendChild(el("p", { class: "muted small", text: "Reto de estreno: con qué reto empieza la temporada (episodio 1), o al azar. No aplica al estreno Meet the Queens." }));

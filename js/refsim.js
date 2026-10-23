@@ -336,6 +336,8 @@
     // TEMPORADA
     // ======================================================================================
     play() {
+      if (this.opts.tournament && this.current.length >= 6) this.playTournament();
+      else this.opts.tournament = null;
       if (this.opts.winners && this.current.length >= 6) {
         // All Winners: temporada de estrellas sin eliminaciones y con una final de las 4 con más estrellas.
         const eps = this.winnersEpisodes();
@@ -482,7 +484,7 @@
     }
 
     checkForDeptQuit(s) {
-      if (this.opts.winners) return;
+      if (this.opts.winners || this.tour) return;
       if (rnd(0, 1000) >= 999 && !this.flag.disqOrDept && this.current.length > 6) {
         const quitter = this.current[rnd(0, this.current.length - 1)];
         if (rnd(0, 10) >= 5) {
@@ -617,7 +619,8 @@
       if (this.opts.slaysian && n === 6 && !this.flag.slaysianDone) return this.slaysianLalaparuza();
       const opening = this.opts.opening;
       let fn;
-      if (this.opts.winners) fn = this.winnersChallenge();
+      if (this.tour) fn = this.tournamentChallenge();
+      else if (this.opts.winners) fn = this.winnersChallenge();
       else if (this.opts.teams) fn = this.teamChallenge();
       else if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG || this.opts.porkchop ? "girlgroup" : this.opts.doubleTalent || this.opts.raq || this.opts.globalAS ? "talent" : this.randomMaxi();
       else if (this.lateNow() || this.uk3Now()) fn = "runway";
@@ -1309,6 +1312,7 @@
         }
         return this.judgingScreen();
       }
+      if (this.tour) return this.tournamentJudging();
       if (this.opts.winners) return this.winnersJudging();
       if (this.opts.teams) return this.teamJudging();
       if (this.noElimNow()) {
@@ -2487,6 +2491,171 @@
       return this.lipsyncDesc();
     }
 
+    // ======================================================================================
+    // TOURNAMENT OF ALL STARS (esopare, con brackets a medida): el reparto se divide en grupos que juegan
+    // varios episodios cada uno; dentro de un grupo se juntan puntos MVQ y pasan las que más tengan.
+    // Opcionalmente hay una segunda ronda de grupos y luego el resto de la temporada es regular.
+    // ======================================================================================
+    tourSizes(n, groups) {
+      const base = Math.floor(n / groups), extra = n % groups;
+      return Array.from({ length: groups }, (_, i) => base + (i < extra ? 1 : 0));
+    }
+
+    playTournament() {
+      const cfg = this.opts.tournament;
+      let queens = this.current.slice();
+      const rounds = [cfg].concat(cfg.second ? [cfg.second] : []);
+      this.tourAlive = queens.slice();
+      this.tourEpisodes = 0;
+      rounds.forEach((rc, ri) => {
+        const entering = queens.slice();
+        const groups = Math.max(2, Math.min(rc.groups, Math.floor(entering.length / 2)));
+        const sizes = this.tourSizes(entering.length, groups);
+        const pool = shuffle(entering.slice());
+        const intro = this.newScreen(ri === 0 ? "¡Comienza el torneo!" : "¡Segunda ronda del torneo!", "Empezar");
+        intro.b(`${entering.length} reinas se dividen en ${groups} grupos. Cada grupo juega ${rc.episodes} ${rc.episodes === 1 ? "episodio" : "episodios"} y pasan ${rc.passers} de cada uno.`);
+        const bracketList = [];
+        sizes.forEach((sz, gi) => {
+          const g = pool.splice(0, sz);
+          bracketList.push(g);
+          intro.hr();
+          intro.big(`Grupo ${gi + 1}`);
+          intro.q(g.map((q) => q.name), undefined, g.map((q) => q.name).join(" • "));
+        });
+        const advancers = [];
+        const losers = [];
+        bracketList.forEach((group, gi) => {
+          group.forEach((q) => { q.stars = 0; });
+          const passers = Math.max(1, Math.min(rc.passers, group.length - 1));
+          for (let e = 0; e < rc.episodes; e++) {
+            this.tourAlive.filter((q) => !group.includes(q)).forEach((q) => q.addTR(""));
+            this.current = group.slice();
+            this.tour = { round: ri + 1, bracket: gi + 1, ep: e + 1 };
+            this.playEpisode();
+            this.tourEpisodes++;
+            this.trackRecordScreen(false);
+          }
+          this.tour = null;
+          // resultado del grupo
+          const r = this.newScreen(`Resultado del grupo ${gi + 1}`, "Continuar");
+          group.sort((a, b) => b.stars - a.stars || b.ppe - a.ppe);
+          const adv = group.slice(0, passers);
+          const cutoff = adv[passers - 1].stars;
+          const tied = group.slice(passers).filter((q) => q.stars === cutoff);
+          if (tied.length) {
+            if (rnd(1, 100) === 21) {
+              r.b("Hay un empate... basándonos en vuestras actuaciones, el empate no se rompe: todas pasáis.");
+              tied.forEach((q) => adv.push(q));
+            } else {
+              r.b("Hay un empate... basándonos en vuestras actuaciones de esta noche y de toda la temporada...");
+              const contenders = [adv[passers - 1], ...tied].sort((a, b) => b.ppe - a.ppe);
+              adv[passers - 1] = contenders[0];
+            }
+          }
+          r.b("Las reinas que pasan son...");
+          adv.forEach((q) => {
+            this.tourMark(q, "+ADV");
+            r.q([q.name], "gold", `${q.name} con ${q.stars} ${q.stars === 1 ? "punto" : "puntos"} MVQ`);
+          });
+          r.hr();
+          r.b("El resto...");
+          const out = group.filter((q) => !adv.includes(q));
+          out.forEach((q) => {
+            this.tourMark(q, "+ELIM");
+            r.q([q.name], "red", `${q.name}, tienes ${q.stars} ${q.stars === 1 ? "punto" : "puntos"}. Lo siento, querida, no avanzas... sashay away.`);
+            losers.push(q);
+          });
+          advancers.push(...adv);
+        });
+        // las eliminadas de esta ronda: puestos compartidos
+        const lo = advancers.length + 1, hi = entering.length;
+        losers.forEach((q) => { q.rankP = `rng:${lo}-${hi}`; });
+        losers.reverse().forEach((q) => { this.eliminated.unshift(q); });
+        this.tourAlive = advancers.slice();
+        queens = advancers.slice();
+      });
+      this.tourAlive = null;
+      this.current = queens;
+      this.total = queens.length;
+    }
+
+    // añade un marcador a la última casilla del grupo ("WIN" -> "WIN+ADV")
+    tourMark(q, mark) {
+      if (q.trackRecord.length) q.trackRecord[q.trackRecord.length - 1] += mark;
+    }
+
+    tournamentChallenge() {
+      const seq = ["rumix", "improv", "runway", "design", "comedy", "rusical", "design", "girlgroup", "improv"];
+      return seq[this.tourEpisodes % seq.length];
+    }
+
+    // Juzgado del torneo: 3 arriba (el Top 2 gana 2 puntos MVQ, la tercera es HIGH), el resto SAFE; el Top 2
+    // hace lip sync por un punto extra y las demás regalan su punto MVQ a la reina que prefieran.
+    tournamentJudging() {
+      const cast = this.current;
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      const k = Math.min(3, cast.length);
+      const top = cast.slice(0, k);
+      const s = this.newScreen("¡El jurado!", "Ver a las ganadoras");
+      s.b("Basándonos en las actuaciones de esta noche...");
+      s.q(top.map((q) => q.name), "cyan", `${list(top.map((q) => q.name))}, representáis los tops de la semana.`);
+      s.hr();
+      cast.filter((q) => !top.includes(q)).forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
+      top.forEach((q) => { q.performanceScore -= (q.runwayScore - q.favoritism); });
+      top.sort((a, b) => a.performanceScore - b.performanceScore);
+      const two = top.slice(0, Math.min(2, top.length));
+      const highs = top.slice(two.length);
+      const w = this.newScreen("¡Las dos mejores!", "Ir al lip sync");
+      w.q(two.map((q) => q.name), "cyan", `${list(two.map((q) => q.name))}, condragulations, habéis ganado 2 puntos MVQ cada una.`);
+      two.forEach((q) => { q.stars += 2; q.favoritism += 5; });
+      highs.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
+      if (highs.length) w.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, podéis retiraros al fondo del escenario.`);
+
+      const e = this.newScreen("¡Lip sync por la victoria!", "Ver el resultado");
+      e.b("Reinas, es vuestra oportunidad de impresionarme, ganar y llevaros un codiciado punto extra en el Tournament of All Stars.");
+      e.b("Ha llegado la hora... ¡de hacer lip sync por vuestro LEGADO! ¡Suerte, y no la caguéis!");
+      two.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, two);
+      const raw = two.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, two, song);
+      two.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      two.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+
+      const r = this.newScreen("He tomado mi decisión...", "Los puntos MVQ de las demás");
+      if (two.length === 2 && two[0].lipsyncScore === two[1].lipsyncScore && two[0].lipsyncScore > 7 && cast.length > 5) {
+        this.addSong(two, [], song);
+        r.q(two.map((q) => q.name), "royalblue", "Condragulations, ¡sois las dos ganadoras, baby!");
+        two.forEach((q) => { q.stars++; q.addTR(" WIN"); q.favoritism += 5; q.ppe += 5; });
+      } else {
+        this.addSong([two[0]], two.slice(1), song);
+        two[0].stars++;
+        r.q([two[0].name], "royalblue", `${two[0].name}, ¡eres una ganadora, baby! Has ganado un punto extra, así que tienes ${two[0].stars} puntos.`);
+        two[0].addTR("WIN"); two[0].favoritism += 5; two[0].ppe += 5;
+        if (two[1]) {
+          r.q([two[1].name], "cyan", `${two[1].name}, condragulations, tienes ${two[1].stars} puntos.`);
+          two[1].addTR("WIN "); two[1].favoritism += 4; two[1].ppe += 5;
+        }
+      }
+
+      // las demás regalan su punto MVQ
+      const g = this.newScreen("Puntos MVQ", "Continuar");
+      g.b("Las reinas a salvo darán ahora su punto MVQ a la concursante que prefieran.");
+      cast.filter((q) => !two.includes(q)).forEach((v) => {
+        const choices = cast.filter((q) => q !== v);
+        const chosen = this.bestSister(v, choices) || pick(choices);
+        chosen.stars++;
+        g.q([v.name, chosen.name], "gold", `${v.name} da su punto MVQ a ${chosen.name}.`);
+        this.modRelation(1, [v, chosen]);
+      });
+      g.hr();
+      g.b("Puntos MVQ actuales");
+      cast.slice().sort((a, b) => b.stars - a.stars || b.ppe - a.ppe).forEach((q, i) => g.p(`${i + 1}. ${q.name} — ${q.stars} ${q.stars === 1 ? "punto" : "puntos"} MVQ`));
+      this.topQueens = []; this.bottomQueens = [];
+      return this.untucked();
+    }
+
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
     slayNow() { return !!this.opts.premiereSlayers && this.episode === 1; }
@@ -3255,10 +3424,13 @@
       // "RTRN + X": la reina comodín que regresó (el estilo es el de X con el prefijo "REGRESO +")
       const blockedCell = typeof raw === "string" && raw.endsWith("+BLOCKED"); // All Winners: bloqueada por el desatascador
       if (blockedCell) raw = raw.slice(0, -8);
+      const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM")) ? (raw.endsWith("+ADV") ? "ADV" : "ELIM") : null; // Torneo
+      if (tourMark) raw = raw.slice(0, -(tourMark.length + 1));
       const wild = typeof raw === "string" && raw.startsWith("RTRN + ");
       const style = CELL_STYLE[wild ? raw.slice(7) : raw] || { text: raw };
       let baseText = style.text !== undefined ? style.text : (wild ? raw.slice(7) : raw);
       if (blockedCell) baseText += "\n+\nBLOQUEADA";
+      if (tourMark) baseText += "\n+\n" + (tourMark === "ADV" ? "PASA" : "ELIM");
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg: style.bg, fg: style.fg, bold: style.bold };
       if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
@@ -3280,7 +3452,7 @@
         return { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn * 2).toFixed(2) : "0.00" };
       };
       const rows = [];
-      const cur = this.teamsFlat();
+      const cur = this.tourAlive ? this.tourAlive.slice() : this.teamsFlat();
       if (finale) {
         const winner = cur[0];
         rows.push(mkRow(winner, "1º\n(Ganadora)" + (winner.minqdd ? "\n" + winner.minqdd : "")));
@@ -3297,6 +3469,7 @@
         else if (q.rankP === 38) rank = "3º-8º";
         else if (q.rankP === 5678) rank = "5º-8º";
         else if (q.rankP === 58) rank = "5º-8º";
+        else if (typeof q.rankP === "string" && q.rankP.startsWith("rng:")) { const [lo, hi] = q.rankP.slice(4).split("-"); rank = `${lo}º-${hi}º`; }
         else if (q.rankP === 56) rank = "5º/6º";
         else if (q.rankP === 34) rank = "3º/4º";
         else if (q.rankP === 234) rank = "2º-4º\n(Subcampeona)";
@@ -4147,10 +4320,19 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
+  }
+
+  // Ajustes del torneo (grupos, episodios por grupo, reinas que pasan y segunda ronda opcional).
+  function tournamentCfg(t) {
+    const num = (v, d, min) => Math.max(min, Math.floor(Number(v)) || d);
+    const base = t || {};
+    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null };
+    if (base.second && base.second.groups) cfg.second = { groups: num(base.second.groups, 2, 2), episodes: num(base.second.episodes, 3, 1), passers: num(base.second.passers, 2, 1) };
+    return cfg;
   }
 
   function simulate(names, formatChoice, statsByName, relationships) {
@@ -4168,7 +4350,7 @@
       randomLabel = FINALE_NAME[finale];
     }
     // Estreno al azar: se sortea entre los estrenos copiados que caben en el reparto.
-    let premiere = formatChoice.premiere;
+    let premiere = formatChoice.season === "SEASON_TOURNAMENT" ? "PREMIERE_NORMAL" : formatChoice.premiere;
     let randomPremiereLabel = null;
     if (premiere === "PREMIERE_RANDOM") {
       const options = RANDOM_PREMIERES.filter(([, min]) => names.length >= min);
@@ -4198,6 +4380,7 @@
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
+      tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
       uk3: premiere === "PREMIERE_UK3",
       lateEntry: premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: premiere === "PREMIERE_DOUBLE",
