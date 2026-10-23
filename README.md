@@ -565,3 +565,12 @@ empatadas) y las demás quedan eliminadas con la casilla "+ELIM" (las que pasan,
 del original (Rumix, Improv, Runway, Design, Comedy, Rusical, Design, Girl Group, Improv, y vuelta a
 empezar). Tras la última ronda las reinas que pasan siguen como una temporada regular con eliminación
 hasta la final elegida. Con 3 grupos, 3 episodios y 3 pasan por grupo es el Tournament of All Stars original.
+
+### Tournament of All Stars (S11)
+
+Como el torneo anterior, con los ajustes de la temporada 11: **3 grupos de 3 episodios** (el primer
+grupo juega Rumix, Design y Marketing) en los que **pasan solo las 2 mejores de cada grupo**; además
+vuelve una **comodín**: de cada grupo se elige a la eliminada con mejor PPE y se sortea una de las tres
+(casilla "+COMODÍN"). Con las 7 reinas que quedan empieza la fase regular, que cambia: la ganadora del
+reto está a salvo, las demás **se puntúan entre sí (Rate-A-Queen, con las relaciones)** y las dos peor
+valoradas hacen lip sync por su vida. La final es la que elijas (por ejemplo, Top 6 All Stars 11).

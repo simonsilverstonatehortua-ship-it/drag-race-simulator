@@ -1313,6 +1313,7 @@
         return this.judgingScreen();
       }
       if (this.tour) return this.tournamentJudging();
+      if (this.raqMerge && this.current.length > 3) return this.raqMergeJudging();
       if (this.opts.winners) return this.winnersJudging();
       if (this.opts.teams) return this.teamJudging();
       if (this.noElimNow()) {
@@ -2524,6 +2525,7 @@
         });
         const advancers = [];
         const losers = [];
+        const wildCands = [];
         bracketList.forEach((group, gi) => {
           group.forEach((q) => { q.stars = 0; });
           const passers = Math.max(1, Math.min(rc.passers, group.length - 1));
@@ -2565,8 +2567,24 @@
             r.q([q.name], "red", `${q.name}, tienes ${q.stars} ${q.stars === 1 ? "punto" : "puntos"}. Lo siento, querida, no avanzas... sashay away.`);
             losers.push(q);
           });
+          if (rc.s11 && out.length) wildCands.push(out.slice().sort((a, b) => b.ppe - a.ppe)[0]); // la mejor PPE de cada grupo
           advancers.push(...adv);
         });
+        // Tournament of All Stars (S11): una eliminada (la de mejor PPE de cada grupo) vuelve como comodín
+        if (rc.s11 && wildCands.length) {
+          const w = this.newScreen("El comodín", "Continuar");
+          w.b("De cada grupo se ha elegido a una reina eliminada según su rendimiento general.");
+          wildCands.forEach((q) => w.q([q.name], "gold", q.name));
+          w.hr();
+          w.b("Girando la lotería del comodín...");
+          const wild = pick(wildCands);
+          w.q([wild.name], "royalblue", `${wild.name}, condragulations, ¡eres el comodín y vuelves a la competición!`);
+          losers.splice(losers.indexOf(wild), 1);
+          advancers.push(wild);
+          for (let i = wild.trackRecord.length - 1; i >= 0; i--) {
+            if (/\+ELIM$/.test(wild.trackRecord[i])) { wild.trackRecord[i] = wild.trackRecord[i].replace(/\+ELIM$/, "+WILD"); break; }
+          }
+        }
         // las eliminadas de esta ronda: puestos compartidos
         const lo = advancers.length + 1, hi = entering.length;
         losers.forEach((q) => { q.rankP = `rng:${lo}-${hi}`; });
@@ -2575,6 +2593,7 @@
         queens = advancers.slice();
       });
       this.tourAlive = null;
+      this.raqMerge = !!cfg.s11;
       this.current = queens;
       this.total = queens.length;
     }
@@ -2585,6 +2604,8 @@
     }
 
     tournamentChallenge() {
+      const cfg = this.opts.tournament;
+      if (cfg && cfg.s11) return this.tourEpisodes < 3 ? ["rumix", "design", "marketing"][this.tourEpisodes] : this.randomMaxi();
       const seq = ["rumix", "improv", "runway", "design", "comedy", "rusical", "design", "girlgroup", "improv"];
       return seq[this.tourEpisodes % seq.length];
     }
@@ -2654,6 +2675,30 @@
       cast.slice().sort((a, b) => b.stars - a.stars || b.ppe - a.ppe).forEach((q, i) => g.p(`${i + 1}. ${q.name} — ${q.stars} ${q.stars === 1 ? "punto" : "puntos"} MVQ`));
       this.topQueens = []; this.bottomQueens = [];
       return this.untucked();
+    }
+
+    // Tras el torneo S11: la ganadora del reto está a salvo y el resto se puntúa entre sí (Rate-A-Queen);
+    // las dos peor valoradas hacen lip sync por su vida.
+    raqMergeJudging() {
+      const cast = this.current;
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      cast.forEach((q) => { q.performanceScore -= (q.runwayScore - q.favoritism); });
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      const winner = cast[0];
+      const s = this.newScreen("Rate-A-Queen", "Ir al lip sync");
+      s.q([winner.name], "royalblue", `${winner.name}, condragulations, ¡eres la ganadora del reto de hoy!`);
+      winner.addTR("WIN"); winner.favoritism += 5; winner.ppe += 5;
+      s.b("La ganadora del reto está a salvo de la eliminación.");
+      s.q([winner.name], "royalblue", `${winner.name} no participará en el Rate-A-Queen.`);
+      s.hr();
+      const voters = cast.filter((q) => q !== winner);
+      voters.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
+      const order = this.raqRanking(s, voters);
+      const bottom = order.slice(-2);
+      bottom.forEach((q) => { if (q.trackRecord[q.trackRecord.length - 1] === "SAFE") { q.trackRecord.pop(); q.ppe -= 3; } });
+      s.q(bottom.map((q) => q.name), "tomato", `${bottom[0].name} y ${bottom[1].name}, sois las peor valoradas: haréis lip sync por vuestras vidas.`);
+      this.topQueens = []; this.bottomQueens = bottom;
+      return this.lipsyncDesc();
     }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
@@ -3424,13 +3469,13 @@
       // "RTRN + X": la reina comodín que regresó (el estilo es el de X con el prefijo "REGRESO +")
       const blockedCell = typeof raw === "string" && raw.endsWith("+BLOCKED"); // All Winners: bloqueada por el desatascador
       if (blockedCell) raw = raw.slice(0, -8);
-      const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM")) ? (raw.endsWith("+ADV") ? "ADV" : "ELIM") : null; // Torneo
+      const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM") || raw.endsWith("+WILD")) ? (raw.endsWith("+ADV") ? "ADV" : raw.endsWith("+WILD") ? "WILD" : "ELIM") : null; // Torneo
       if (tourMark) raw = raw.slice(0, -(tourMark.length + 1));
       const wild = typeof raw === "string" && raw.startsWith("RTRN + ");
       const style = CELL_STYLE[wild ? raw.slice(7) : raw] || { text: raw };
       let baseText = style.text !== undefined ? style.text : (wild ? raw.slice(7) : raw);
       if (blockedCell) baseText += "\n+\nBLOQUEADA";
-      if (tourMark) baseText += "\n+\n" + (tourMark === "ADV" ? "PASA" : "ELIM");
+      if (tourMark) baseText += "\n+\n" + (tourMark === "ADV" ? "PASA" : tourMark === "WILD" ? "COMODÍN" : "ELIM");
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg: style.bg, fg: style.fg, bold: style.bold };
       if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
@@ -4320,7 +4365,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT" || formatChoice.season === "SEASON_TOURNAMENT_S11")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -4330,7 +4375,7 @@
   function tournamentCfg(t) {
     const num = (v, d, min) => Math.max(min, Math.floor(Number(v)) || d);
     const base = t || {};
-    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null };
+    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null, s11: !!base.s11 };
     if (base.second && base.second.groups) cfg.second = { groups: num(base.second.groups, 2, 2), episodes: num(base.second.episodes, 3, 1), passers: num(base.second.passers, 2, 1) };
     return cfg;
   }
@@ -4350,7 +4395,7 @@
       randomLabel = FINALE_NAME[finale];
     }
     // Estreno al azar: se sortea entre los estrenos copiados que caben en el reparto.
-    let premiere = formatChoice.season === "SEASON_TOURNAMENT" ? "PREMIERE_NORMAL" : formatChoice.premiere;
+    let premiere = (formatChoice.season === "SEASON_TOURNAMENT" || formatChoice.season === "SEASON_TOURNAMENT_S11") ? "PREMIERE_NORMAL" : formatChoice.premiere;
     let randomPremiereLabel = null;
     if (premiere === "PREMIERE_RANDOM") {
       const options = RANDOM_PREMIERES.filter(([, min]) => names.length >= min);
@@ -4380,7 +4425,7 @@
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
-      tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
+      tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : formatChoice.season === "SEASON_TOURNAMENT_S11" ? tournamentCfg({ groups: 3, episodes: 3, passers: 2, s11: true }) : null,
       uk3: premiere === "PREMIERE_UK3",
       lateEntry: premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: premiere === "PREMIERE_DOUBLE",

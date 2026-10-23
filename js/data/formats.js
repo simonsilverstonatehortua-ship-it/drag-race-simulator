@@ -67,6 +67,8 @@ const DEFAULT_FORMATS = [
     description: "Como el Legacy, con un torneo de lip syncs (LaLaPaRUza) al llegar a 6 reinas." },
   { id: "SEASON_TOURNAMENT", group: "season", label: "Tournament of All Stars (grupos a medida)", custom: false,
     description: "El reparto se divide en grupos que juegan varios episodios con puntos MVQ; pasan las mejores de cada grupo, con segunda ronda opcional." },
+  { id: "SEASON_TOURNAMENT_S11", group: "season", label: "Tournament of All Stars (S11)", custom: false,
+    description: "3 grupos de 3 episodios; pasan las 2 mejores de cada uno y un comodín; después, eliminaciones por Rate-A-Queen." },
 
   // --- Final ---
   { id: "FINALE_TOP2", group: "finale", label: "Top 2", custom: false,
