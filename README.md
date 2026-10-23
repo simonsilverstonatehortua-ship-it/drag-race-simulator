@@ -497,3 +497,15 @@ pulse el botón de "she-mergency" y salga su compañera). La pareja perdedora se
 puestos empatados). En la final quedan dos parejas, cuatro reinas: o se van una reina de cada pareja o
 se va la pareja peor, y las dos restantes hacen lip sync por la corona. Con un reparto impar o de menos
 de 6 reinas se juega una temporada regular. La final elegida se ignora (como en el original).
+
+### Formato de temporada Lipsync For Your Legacy (All Stars)
+
+Los episodios son como los de la temporada regular, con estas diferencias: el episodio 1 es un
+**Show de talentos** con la **biblioteca** (lectura) de mini reto; cada semana, las **dos mejores
+reinas** (Top 2) eligen el **pintalabios** de una de las reinas del bottom (sus compañeras se llevan
+mejor o peor con ella según la relación); luego el Top 2 hace **lip sync por su legado**. La ganadora
+(WIN) elimina a la reina cuyo pintalabios eligió; la otra (casilla "WIN" azul claro) se queda a salvo.
+Si el lip sync empata con un buen resultado, ganan las dos y se van las dos elegidas (o solo una si
+eligieron la misma). Las demás reinas del Top son HIGH, una del bottom puede ser LOW y las del bottom
+que no se van quedan BTM2/BTM3/BTM4. Con 3 reinas, dos están arriba y una abajo. Las finales y los
+estrenos funcionan igual que en la temporada regular. No he copiado el 0,5 % de que la ganadora se retire.
