@@ -751,3 +751,21 @@ footer {
 }
 .rtr .rtr-ppe { background: lightgray; font-weight: 700; }
 .rtr .rtr-sub { display: block; font-style: italic; font-size: 0.62rem; margin-top: 0.2rem; font-weight: 500; }
+
+/* Secciones "Contestants" de la wiki: tarjetas del reparto, leyenda de colores y tabla de puntos MVQ */
+.rcards { display: flex; flex-direction: column; gap: 14px; margin: 0.8rem 0; }
+.rcards__title { display: inline-block; padding: 3px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+.rcards__row { display: flex; flex-wrap: wrap; gap: 10px; }
+.rcard { position: relative; width: 105px; padding: 4px; border-radius: 8px; box-sizing: border-box; }
+.rcard__photo { width: 97px; height: 95px; border-radius: 8px; background-color: #d9d4dc; background-size: cover; background-position: center top; }
+.rcard__name { position: absolute; right: 0; bottom: 0; max-width: 100%; font-size: 10px; font-weight: 700; padding: 0 5px; border-radius: 8px 0 8px 0; line-height: 1.5; text-align: right; }
+.rlegend { margin: 1rem 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.rlegend__row { display: flex; align-items: center; gap: 8px; }
+.rlegend__sq { display: inline-block; width: 16px; height: 16px; border: 1px solid #888; flex: none; }
+.rmvq-wrap { margin: 1.2rem 0; }
+.rmvq-scroll { display: flex; align-items: flex-start; overflow-x: auto; background: #000; padding: 0; }
+.rmvq-sep { width: 8px; align-self: stretch; background: #000; flex: none; }
+.rmvq { border-collapse: collapse; background: #f5ebf5; color: #202122; font-size: 0.75rem; text-align: center; flex: none; }
+.rmvq th, .rmvq td { border: 1px solid #a2a9b1; padding: 3px 6px; white-space: pre-line; }
+.rmvq th { background: #e9dfe9; }
+.rmvq__name { font-weight: 700; text-align: left; }

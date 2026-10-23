@@ -1128,6 +1128,85 @@ function refLipsyncTables(block) {
   return wrap;
 }
 
+// ---- Bloques copiados de la sección "Contestants" de la wiki (All Stars 10 y 11) ----
+
+// Tarjetas con el reparto: marco redondeado del color del grupo, foto y nombre en una etiqueta.
+function refCards(block) {
+  const wrap = el("div", { class: "rcards" });
+  block.groups.forEach((g) => {
+    const group = el("div", { class: "rcards__group" });
+    group.appendChild(el("div", { class: "rcards__title", text: g.title, style: `background:${g.color};color:${readableTextColor(g.color) || "#fff"};` }));
+    const row = el("div", { class: "rcards__row" });
+    g.names.forEach((name) => {
+      const src = contestantImage(name);
+      const card = el("div", { class: "rcard", style: `background:${g.color};` });
+      card.appendChild(el("div", { class: "rcard__photo", style: src ? `background-image:url("${String(src).replace(/"/g, "%22")}");` : "" }));
+      card.appendChild(el("span", { class: "rcard__name", text: name, style: `background:${g.color};color:${readableTextColor(g.color) || "#fff"};` }));
+      row.appendChild(card);
+    });
+    group.appendChild(row);
+    wrap.appendChild(group);
+  });
+  return wrap;
+}
+
+// Leyenda de colores del track record ("█ La concursante ...").
+function refLegend(block) {
+  const box = el("div", { class: "rlegend" });
+  block.items.forEach((it) => {
+    const row = el("div", { class: "rlegend__row" });
+    row.appendChild(el("span", { class: "rlegend__sq", style: `background:${it.color};` }));
+    row.appendChild(el("span", { text: it.text }));
+    box.appendChild(row);
+  });
+  return box;
+}
+
+// Tabla de puntos MVQ / estrellas: un cuadro por grupo (cabecera del color del grupo) y separadores negros.
+function refMvq(block) {
+  const outer = el("div", { class: "rmvq-wrap" });
+  outer.appendChild(el("h3", { class: "group-title", text: "Puntos del torneo (MVQ)" }));
+  const scroll = el("div", { class: "rmvq-scroll" });
+  block.groups.forEach((g, gi) => {
+    const table = el("table", { class: "rmvq" });
+    const head = el("tr");
+    head.appendChild(el("th", { text: g.title, colspan: String(g.cols.length * 2 + 2), style: `background:${g.color};color:${readableTextColor(g.color) || "#fff"};` }));
+    table.appendChild(head);
+    const head2 = el("tr");
+    head2.appendChild(el("th", { text: "Concursante" }));
+    g.cols.forEach((c) => head2.appendChild(el("th", { text: c, colspan: "2" })));
+    head2.appendChild(el("th", { text: "Puntos\ntotales" }));
+    table.appendChild(head2);
+    g.rows.forEach((r) => {
+      const tr = el("tr");
+      tr.appendChild(el("td", { class: "rmvq__name", text: r.name }));
+      r.cells.forEach((c) => {
+        const mainStyle = c.main >= 3 ? "background:royalblue;color:#fff;" : c.main === 2 ? "background:deepskyblue;color:#000;" : c.main === 1 ? "background:lightblue;color:#000;" : "";
+        tr.appendChild(el("td", { text: c.main ? `+${c.main}` : "—", style: mainStyle + (c.main ? "font-weight:700;" : "") }));
+        tr.appendChild(el("td", { text: c.gift ? `+${c.gift}` : "—", style: c.gift ? "background:lightblue;color:#000;font-weight:700;" : "" }));
+      });
+      tr.appendChild(el("td", { text: String(r.total), style: "font-weight:700;" }));
+      table.appendChild(tr);
+    });
+    if (gi) scroll.appendChild(el("div", { class: "rmvq-sep" }));
+    scroll.appendChild(table);
+  });
+  outer.appendChild(scroll);
+  outer.appendChild(el("p", { class: "muted small", text: "Primera columna de cada episodio: puntos del reto y del lip sync. Segunda columna: punto MVQ recibido de otra reina." }));
+  if (block.history && block.history.length) {
+    const d = el("details", { class: "rel-overview" });
+    d.appendChild(el("summary", { text: "Historial de puntos MVQ regalados" }));
+    const byEp = {};
+    block.history.forEach((h) => { (byEp[h.ep] = byEp[h.ep] || []).push(h.text); });
+    Object.keys(byEp).forEach((ep) => {
+      d.appendChild(el("p", { class: "season-line", text: `Ep. ${ep}` }));
+      byEp[ep].forEach((t) => d.appendChild(el("p", { class: "muted small", text: t })));
+    });
+    outer.appendChild(d);
+  }
+  return outer;
+}
+
 function renderRefBlocks(blocks) {
   const wrap = el("div", { class: "ref-screen" });
   blocks.forEach((b) => {
@@ -1138,6 +1217,9 @@ function renderRefBlocks(blocks) {
     else if (b.t === "q") wrap.appendChild(refQueensRow(b));
     else if (b.t === "tr") wrap.appendChild(refTrackRecord(b));
     else if (b.t === "lipsyncs") wrap.appendChild(refLipsyncTables(b));
+    else if (b.t === "cards") wrap.appendChild(refCards(b));
+    else if (b.t === "legend") wrap.appendChild(refLegend(b));
+    else if (b.t === "mvq") wrap.appendChild(refMvq(b));
     else if (b.t === "reveal") {
       const d = el("details", { class: "rel-overview" });
       d.appendChild(el("summary", { text: b.label }));

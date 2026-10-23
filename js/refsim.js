@@ -94,6 +94,8 @@
       this.immuneCols = [];
       this.stars = 0;
       this.starLog = []; // puntos MVQ / estrellas ganados en cada columna del track record
+      this.starMain = []; // ... ganados por el reto y el lip sync
+      this.starGift = []; // ... recibidos de otra reina
       this.bracket = 0;
       this.blocked = false;
       this.lipstick = null;
@@ -343,6 +345,7 @@
       if (this.opts.winners && this.current.length >= 6) {
         // All Winners: temporada de estrellas sin eliminaciones y con una final de las 4 con más estrellas.
         const eps = this.winnersEpisodes();
+        this.newScreen("¡Las ganadoras!", "Empezar").add(this.cardsBlock([{ title: "All Winners", color: "#8203D0", names: this.current.map((q) => q.name) }]));
         for (let i = 0; i < eps; i++) {
           this.playEpisode();
           this.trackRecordScreen(false);
@@ -2320,7 +2323,8 @@
         two.forEach((q) => {
           const g = this.bestSister(q, blockQueens);
           r.q([q.name, g.name], "gold", `¡${q.name} ha dado su estrella a... ${g.name}!`);
-          this.addStars(g, 1);
+          this.addStars(g, 1, "gift");
+          (this.mvqHistory = this.mvqHistory || []).push({ ep: this.episodeChallenges.length, text: `${q.name} dio su estrella a ${g.name}` });
           if (rnd(0, 100) >= 80) { this.modRelation(2, [q, g]); r.p(`${g.name} se sintió muy agradecida.`); }
           else { this.modRelation(1, [q, g]); r.p(`${g.name} dio las gracias.`); }
         });
@@ -2525,11 +2529,13 @@
           intro.big(`Grupo ${gi + 1}`);
           intro.q(g.map((q) => q.name), undefined, g.map((q) => q.name).join(" • "));
         });
+        intro.add(this.cardsBlock(bracketList.map((g, gi) => ({ title: (ri === 0 ? "Grupo " : "2ª ronda · Grupo ") + (gi + 1), color: (cfg.colors[gi] || TOUR_COLORS[gi % TOUR_COLORS.length]), names: g.map((q) => q.name) }))));
         const advancers = [];
         const losers = [];
         const wildCands = [];
         bracketList.forEach((group, gi) => {
           group.forEach((q) => { q.stars = 0; if (ri === 0) q.bracket = gi + 1; });
+          const gcols = [];
           const passers = Math.max(1, Math.min(rc.passers, group.length - 1));
           for (let e = 0; e < rc.episodes; e++) {
             this.tourAlive.filter((q) => !group.includes(q)).forEach((q) => q.addTR(""));
@@ -2537,9 +2543,12 @@
             this.tour = { round: ri + 1, bracket: gi + 1, ep: e + 1 };
             this.playEpisode();
             this.tourEpisodes++;
+            this.flag.isTeam = false; this.flag.isPair = false;
+            gcols.push(this.episodeChallenges.length - 1);
             this.trackRecordScreen(false);
           }
           this.tour = null;
+          (this.tourGroups = this.tourGroups || []).push({ title: (ri === 0 ? "Grupo " : "2ª ronda · Grupo ") + (gi + 1), color: (cfg.colors[gi] || TOUR_COLORS[gi % TOUR_COLORS.length]), cols: gcols, queens: group.slice() });
           // resultado del grupo
           const r = this.newScreen(`Resultado del grupo ${gi + 1}`, "Continuar");
           group.sort((a, b) => b.stars - a.stars || b.ppe - a.ppe);
@@ -2604,10 +2613,12 @@
 
     // añade un marcador a la última casilla del grupo ("WIN" -> "WIN+ADV")
     // suma puntos MVQ / estrellas a una reina y los anota en la columna actual del track record
-    addStars(q, n) {
+    addStars(q, n, kind = "main") {
       q.stars += n;
       const col = Math.max(0, this.episodeChallenges.length - 1);
       q.starLog[col] = (q.starLog[col] || 0) + n;
+      const arr = kind === "gift" ? q.starGift : q.starMain;
+      arr[col] = (arr[col] || 0) + n;
     }
 
     tourMark(q, mark) {
@@ -2677,7 +2688,8 @@
       cast.filter((q) => !two.includes(q)).forEach((v) => {
         const choices = cast.filter((q) => q !== v);
         const chosen = this.bestSister(v, choices) || pick(choices);
-        this.addStars(chosen, 1);
+        this.addStars(chosen, 1, "gift");
+        (this.mvqHistory = this.mvqHistory || []).push({ ep: this.episodeChallenges.length, text: `${v.name} dio su punto MVQ a ${chosen.name}` });
         g.q([v.name, chosen.name], "gold", `${v.name} da su punto MVQ a ${chosen.name}.`);
         this.modRelation(1, [v, chosen]);
       });
@@ -2711,6 +2723,73 @@
       this.topQueens = []; this.bottomQueens = bottom;
       return this.lipsyncDesc();
     }
+
+    // ---- Bloques de presentación copiados de la wiki (secciones "Contestants" de All Stars 10 y 11) ----
+    // Leyenda de colores bajo el track record: solo los resultados que han salido en la temporada.
+    legendBlock() {
+      const all = [
+        ["WINNER", "La concursante ganó la temporada."],
+        ["RUNNER UP", "La concursante fue subcampeona."],
+        ["LOST 3RD ROUND", "La concursante perdió la tercera ronda del Lip Sync For The Crown."],
+        ["LOST 2ND ROUND", "La concursante perdió la segunda ronda del Lip Sync For The Crown."],
+        ["LOST 1ST ROUND", "La concursante perdió la primera ronda del Lip Sync For The Crown."],
+        ["WIN", "La concursante ganó el reto (o el lip sync por su legado)."],
+        [" WIN", "La concursante ganó el reto junto a otra reina (doble victoria)."],
+        ["WIN ", "La concursante ganó el reto, pero perdió el lip sync por su legado."],
+        ["TOP2", "La concursante estuvo en el Top 2 sin ganar."],
+        ["HIGH", "La concursante estuvo arriba, pero no ganó el reto."],
+        ["SAFE", "La concursante estuvo a salvo."],
+        ["LOW", "La concursante estuvo abajo, pero se salvó."],
+        ["BTM2", "La concursante estuvo en peligro de eliminación y ganó el lip sync por su vida."],
+        ["ELIM", "La concursante estuvo en peligro, perdió el lip sync por su vida y fue eliminada."],
+        ["ELIMINATED", "La concursante fue eliminada en la final."],
+        ["+ADV", "La concursante pasó a la siguiente ronda del torneo."],
+        ["+ELIM", "La concursante fue eliminada del torneo por la puntuación."],
+        ["+WILD", "La concursante había sido eliminada, pero volvió como comodín."],
+        ["MISS CON", "La concursante fue Miss Simpatía."],
+        ["GUEST", "La concursante fue invitada en la final."],
+      ];
+      const used = new Set();
+      this.queens.forEach((q) => q.trackRecord.forEach((c) => {
+        if (typeof c !== "string") return;
+        used.add(c);
+        const m = c.match(/^(.*?)(\+ADV|\+ELIM|\+WILD|\+BLOCKED)$/);
+        if (m) { used.add(m[1]); used.add(m[2]); }
+      }));
+      const items = [];
+      all.forEach(([label, text]) => {
+        const hit = label.startsWith("+") ? used.has(label) : used.has(label) || (label === "ELIM" && used.has("ELIM"));
+        if (!hit) return;
+        const style = CELL_STYLE[label.startsWith("+") ? (label === "+ADV" ? "WIN" : label === "+WILD" ? "WINHIGH" : "ELIMINATED") : label];
+        items.push({ color: (style && style.bg) || "white", text });
+      });
+      return { t: "legend", items };
+    }
+
+    // Tabla de puntos MVQ / estrellas: un cuadro por grupo con los puntos de cada episodio (dos columnas:
+    // los ganados en el reto y los recibidos de otra reina) y el total.
+    mvqBlock() {
+      const groups = [];
+      const cols = (q) => q.starMain.length > q.starGift.length ? q.starMain.length : q.starGift.length;
+      const make = (title, color, colIdx, queens) => ({
+        title, color,
+        cols: colIdx.map((c) => `Ep. ${c + 1}`),
+        rows: queens.map((q) => {
+          const cells = colIdx.map((c) => ({ main: q.starMain[c] || 0, gift: q.starGift[c] || 0 }));
+          return { name: q.name, cells, total: cells.reduce((a, x) => a + x.main + x.gift, 0) };
+        }).sort((a, b) => b.total - a.total),
+      });
+      if (this.tourGroups && this.tourGroups.length) {
+        this.tourGroups.forEach((g) => groups.push(make(g.title, g.color, g.cols, g.queens)));
+      } else if (this.opts.winners) {
+        const n = this.winnersEpisodes();
+        groups.push(make("All Winners", "#8203D0", Array.from({ length: n }, (_, i) => i), this.queens));
+      }
+      return { t: "mvq", groups, history: this.mvqHistory || [] };
+    }
+
+    // Tarjetas con el reparto, con el color de cada grupo (como la foto de cada concursante en la wiki).
+    cardsBlock(groups) { return { t: "cards", groups }; }
 
     // ¿Es el estreno sin eliminación (episodio 1 con ese formato)?
     noElimNow() { return !!this.opts.premiereNoElim && this.episode === 1; }
@@ -2868,7 +2947,7 @@
         } else {
           this.singleWin(s, top);
         }
-      } else if ((top.length > 1 && top[0].performanceScore === top[1].performanceScore && rnd(0, 100) < 60) || (f.isPair && rnd(0, 100) < 85)) {
+      } else if ((top.length > 1 && top[0].performanceScore === top[1].performanceScore && rnd(0, 100) < 60) || (f.isPair && top.length > 1 && rnd(0, 100) < 85)) {
         this.doubleWin(s, top);
       } else {
         this.singleWin(s, top);
@@ -4350,6 +4429,8 @@
     finalScreens() {
       const s = this.newScreen("Progreso de las concursantes", "Volver a simular");
       s.add(this.trData(true));
+      s.add(this.legendBlock());
+      if (this.opts.tournament || this.opts.winners) s.add(this.mvqBlock());
       s.add({ t: "lipsyncs", alots: this.alots, blots: this.blots });
       this.finalScreen = s;
     }
@@ -4370,7 +4451,7 @@
     ["PREMIERE_RATE_A_QUEEN", 10, "Rate A Queen"], ["PREMIERE_TRIPLE", 12, "Triple estreno"],
   ];
   // Colores por defecto de los grupos del torneo (se pueden cambiar en los ajustes).
-  const TOUR_COLORS = ["#ffd1dc", "#c1e1c1", "#bde0fe", "#fde68a", "#e9d5ff", "#fecaca", "#bfdbfe", "#d9f99d"];
+  const TOUR_COLORS = ["#FE5007", "#EA00B7", "#8203D0", "#0AA5FF", "#00A86B", "#FFB400", "#E63946", "#2A9D8F"];
   const RANDOM_FINALES = ["FINALE_TOP5", "FINALE_TOP4", "FINALE_TOP3", "FINALE_TEAMS", "FINALE_LIPSYNC_CROWN",
     "FINALE_LIPSYNC_FINALE", "FINALE_JURY_VOTE", "FINALE_TOP2", "FINALE_TOP8", "FINALE_TOP8_LFTC", "FINALE_JURY_TOP5",
     "FINALE_TOP8_WILDCARD", "FINALE_TOP6_AS11"];

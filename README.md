@@ -579,3 +579,15 @@ torneo** (el botón "Cargar los ajustes de la temporada 11" los pone todos de go
 
 **Puntos MVQ en el track record**: en el Tournament of All Stars y en All Winners, cada casilla muestra los
 puntos que ganó la reina ese episodio ("+2 MVQ") y hay una columna **MVQ (pts)** con el total de cada reina.
+
+### Aspecto copiado de la wiki (sección "Contestants" de All Stars 10 y 11)
+
+Como en la wiki del fandom, el torneo y All Winners muestran:
+- **Tarjetas del reparto** al empezar: marco redondeado del color del grupo, foto y el nombre en una etiqueta
+  en la esquina (los colores por defecto son los de la temporada 11: #FE5007, #EA00B7, #8203D0...).
+- **Leyenda de colores** bajo el track record (con todas las temporadas): "█ La concursante ganó el reto...",
+  solo con los resultados que han salido en esa temporada.
+- **Tabla de puntos del torneo (MVQ)**: un cuadro por grupo con cabecera del color del grupo y separadores
+  negros; cada episodio tiene dos columnas (puntos del reto/lip sync en azul fuerte, celeste o azul claro, y el
+  punto MVQ recibido de otra reina) y una columna de **puntos totales**; debajo, el historial de puntos regalados.
+- Un doble ganador con una sola reina arriba ya no puede romper una temporada de torneo.
