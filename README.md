@@ -509,3 +509,18 @@ Si el lip sync empata con un buen resultado, ganan las dos y se van las dos eleg
 eligieron la misma). Las demás reinas del Top son HIGH, una del bottom puede ser LOW y las del bottom
 que no se van quedan BTM2/BTM3/BTM4. Con 3 reinas, dos están arriba y una abajo. Las finales y los
 estrenos funcionan igual que en la temporada regular. No he copiado el 0,5 % de que la ganadora se retire.
+
+### Formato de temporada Lipsync Assassin
+
+Como el Legacy (episodio 1 con Show de talentos y biblioteca), pero cada semana **una sola reina** gana
+el reto (Top All Star, WIN) y el resto de las de arriba son HIGH. La ganadora elige el pintalabios de
+una reina del bottom y **todas las demás reinas votan** su pintalabios (la pantalla muestra los
+votos al pulsar el botón; una del bottom con 3 o más puede salvarse con LOW). Después aparece una
+**asesina misteriosa de fuera del reparto** (una concursante de la base de datos que no juega la
+temporada y que no se repite) y hace lip sync contra la ganadora del reto por su legado:
+si gana la ganadora, se va la reina de su propio pintalabios; si gana la asesina, se va la más votada
+por el grupo (y si hay un empate en los votos, el poder vuelve a la ganadora del reto, cuyo pintalabios
+decide). Si el lip sync empata con un buen resultado, ganan las dos y se van las dos elegidas. Las
+demás del bottom que no se van quedan BTM2-BTM5. Con 4 reinas o menos solo una está arriba. Las finales
+y los estrenos funcionan como en la temporada regular. No está copiado el estreno "Lip-Sync Assassin
+Premiere" ni el 0,5 % de que la ganadora se retire.
