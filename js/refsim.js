@@ -113,7 +113,16 @@
     getRunway() { this.runwayScore = this.calc(12, 35, this.st.runway); }
     getLipsync() { this.lipsyncScore = this.calc(0, this.st.lipsync, this.unfavoritism) + this.favoritism; }
     getASLipsync() { this.lipsyncScore = this.calc(0, this.st.lipsync); }
-    addTR(placement) { this.trackRecord.push(placement); }
+    addTR(placement) {
+      // Thailand: tras un maxi reto ganado, el resultado del jurado se une a la misma casilla (WIN + HIGH...)
+      if (this.maxiT) {
+        this.maxiT = false;
+        if (placement === "SAFE") return;
+        this.trackRecord[this.trackRecord.length - 1] += String(placement).trim();
+        return;
+      }
+      this.trackRecord.push(placement);
+    }
   }
 
   // Etiquetas de reto en la cabecera del track record: siempre en inglés (como en los originales).
@@ -152,6 +161,12 @@
     "LOSS ": { text: "LOSS", bg: "orange" },
     " ELIM": { text: "ELIM\n(falsa)", bg: "orange", bold: true },
     " ELIM ": { text: "ELIM", bg: "darkred", fg: "white", bold: true },
+    "WINWIN": { text: "WIN", bg: "mediumblue", fg: "white", bold: true },
+    "WINHIGH": { text: "WIN\n+\nHIGH", bg: "cornflowerblue" },
+    "WINLOW": { text: "WIN\n+\nLOW", bg: "#ee82ee" },
+    "WINBTM2": { text: "WIN\n+\nBTM2", bg: "mediumorchid" },
+    "WINBTM3": { text: "WIN\n+\nBTM3", bg: "mediumorchid" },
+    "WINELIM": { text: "WIN\n+\nELIM", bg: "#9400d3", fg: "white", bold: true },
     "TOP2": { bg: "deepskyblue" },
     "TOP 2": { bg: "lightgreen", bold: true },
     "SAFE<br>R1": { text: "SAFE\n(Ronda 1)", bg: "lightcoral", fg: "white" },
@@ -1080,7 +1095,7 @@
         this.finishMaxi();
       } else {
         s.button = "Ir a la pasarela";
-        this.runway(s);
+        if (this.opts.thailand) this.thaiRunway(s); else this.runway(s);
       }
     }
 
@@ -1124,6 +1139,54 @@
         [bad, "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala pasarela...`],
       ]);
       this.finishMaxi();
+    }
+
+    // ---- Formato Thailand (temporadas 1 y 2): cada episodio tiene un maxi reto (solo se elige a la ganadora)
+    // y luego un reto de pasarela que es el que se juzga (tops, bottoms, lip sync y eliminación). La casilla
+    // del episodio combina las dos cosas ("WIN + HIGH", "WIN + BTM2"...). ----
+    thaiRunway(maxiS) {
+      const cast = this.current;
+      maxiS.button = "Ir a la ganadora del maxi reto";
+      const w = this.newScreen("¡Ganadora del maxi reto!", "Ir al reto de pasarela");
+      w.b("Basándonos en las actuaciones de esta noche...");
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      const winners = (cast[0].performanceScore === cast[1].performanceScore && rnd(0, 100) < 60) ? [cast[0], cast[1]] : [cast[0]];
+      winners.forEach((q) => { q.trackRecord.push(winners.length > 1 ? " WIN" : "WIN"); q.favoritism += 4; q.maxiT = true; });
+      if (winners.length > 1) w.q(winners.map((q) => q.name), "darkblue", `${winners[0].name}, ${winners[1].name}, condragulations, ¡sois las ganadoras del maxi reto de esta semana!`);
+      else w.q([winners[0].name], "cyan", `${winners[0].name}, condragulations, ¡eres la ganadora del maxi reto de esta semana!`);
+
+      const r = this.newScreen("¡Reto de pasarela!", "Ir al jurado");
+      const makeover = (cast.length === 6 || cast.length === 5) && !this.flag.makeover;
+      if (makeover) {
+        r.b("¡Es el reto de transformación! Las reinas convertirán en sus hermanas drag " + pick(D.makeoverPeople) + ".");
+        this.flag.makeover = true;
+      } else {
+        r.b("¡Las reinas desfilarán por la pasarela! La categoría es: " + pick(D.runwayCategories));
+      }
+      cast.forEach((q) => q.getRunwayChallenge());
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      cast.forEach((q) => { q.runwayScore = 0; });
+      const by = (lo, hi) => cast.filter((q) => q.performanceScore >= lo && q.performanceScore < hi);
+      this.describeGroups(r, [
+        [by(-Infinity, 6), "darkblue", (l, pl) => `¡${l} ${pl ? "arrasaron" : "arrasó"} en la pasarela!`],
+        [by(6, 16), "royalblue", (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} una gran pasarela!`],
+        [by(16, 26), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una buena pasarela.`],
+        [by(26, Infinity), "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala pasarela...`],
+      ]);
+      this.finishMaxi();
+    }
+
+    // Jurado de Thailand: sin panel de jueces ni críticas; el maxi ganador que queda SAFE conserva solo su "WIN".
+    thaiJudgingScreen() {
+      const s = this.newScreen("¡El jurado!", "Ver las decisiones");
+      s.b("Basándonos en la pasarela de esta noche...");
+      const judged = shuffle([...this.topQueens, ...this.bottomQueens]).map((q) => q.name);
+      s.q(judged, "cyan", `${list(judged)}, representáis los tops y bottoms de la semana.`);
+      s.hr();
+      const safe = this.current.filter((q) => !this.topQueens.includes(q) && !this.bottomQueens.includes(q));
+      safe.forEach((q) => { q.addTR("SAFE"); q.ppe += 3; });
+      if (safe.length) s.q(safe.map((q) => q.name), undefined, `${list(safe.map((q) => q.name))}, ${safe.length > 1 ? "estáis" : "estás"} a salvo.`);
+      return this.winAndBtm2();
     }
 
     finishMaxi() { this.judging(); }
@@ -1221,6 +1284,12 @@
         for (let i = 1; i < n; i++) bottom.push(cast[i]);
         f.s14 = false;
         return this.judgingLaLaPaRUZa();
+      }
+      if (this.opts.thailand && n > 6) {
+        byPerf();
+        const k = n > 13 ? 4 : 3;
+        for (let i = 0; i < k; i++) { top.push(cast[i]); bottom.push(cast[n - (i + 1)]); }
+        return this.judgingScreen();
       }
       if (n > 13) {
         byPerf();
@@ -1667,6 +1736,7 @@
     }
 
     judgingScreen() {
+      if (this.opts.thailand) return this.thaiJudgingScreen();
       const f = this.flag;
       const s = this.newScreen("¡El jurado!", "Ver las decisiones");
       // Presentación del jurado (versión de esopare): RuPaul, 3 jueces del panel y un invitado.
@@ -1835,7 +1905,7 @@
       };
       if (bottom.length === 5) lowSafe(3);
       else if (bottom.length === 4) lowSafe(2);
-      else if (bottom.length === 3 && bottom[0].performanceScore >= 30 && this.current.length > 5 && !this.noElimNow()) {
+      else if (bottom.length === 3 && bottom[0].performanceScore >= (this.opts.thailand ? 35 : 30) && this.current.length > 5 && !this.noElimNow()) {
         f.thirdqueen = true;
         s.b("... nadie está a salvo.");
       } else if (bottom.length === 3) lowSafe(1);
@@ -3303,7 +3373,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && formatChoice.season === "SEASON_REGULAR"
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -3348,6 +3418,7 @@
       triple: premiere === "PREMIERE_TRIPLE",
       premiereNoElim: premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: premiere === "PREMIERE_SLAYERS",
+      thailand: formatChoice.season === "SEASON_THAILAND",
       uk3: premiere === "PREMIERE_UK3",
       lateEntry: premiere === "PREMIERE_LATE_ENTRY",
       doublePremiere: premiere === "PREMIERE_DOUBLE",

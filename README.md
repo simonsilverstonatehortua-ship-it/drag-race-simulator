@@ -473,3 +473,14 @@ una reina se va de cada grupo (salvo doble shantay).
   UK3, entrada tardía, doble y sus variantes, Porkchop y su variante, Rate A Queen y triple),
   descartando los que no caben en el reparto. Una primera pantalla avisa de cuál ha tocado.
   (Esopare no tiene esta opción; la añadí como la "Final al azar".)
+
+### Formato de temporada Thailand ("Thailand's" / "Thailand S1/2 Format")
+
+Cada episodio tiene dos retos: un **maxi reto**, del que solo se elige a la ganadora (WIN, o dos si
+empatan; sin tops ni bottoms), y un **reto de pasarela** (o transformación con 5 o 6 reinas) que es el
+que se juzga: con 7 o más reinas hay siempre 3 arriba y 3 abajo (4 y 4 con más de 13), sin el panel de
+jueces ni las críticas del formato normal. La casilla del episodio **combina** el maxi y la pasarela
+("WIN + HIGH", "WIN + BTM2", "WIN + ELIM", "WIN + LOW"; si la ganadora del maxi queda a salvo solo
+se queda con su "WIN" y si gana también la pasarela es un "WIN" azul oscuro). Con un reto de diseño
+no hay segunda prueba. Lo demás (lip sync, eliminación, finales, estrenos) es igual que en la
+temporada regular. El Thailand de esopare ("Thailand S1/2 Format") y el de myrainboww son el mismo.

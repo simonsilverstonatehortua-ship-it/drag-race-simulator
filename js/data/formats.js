@@ -53,6 +53,8 @@ const DEFAULT_FORMATS = [
   // --- Formato de temporada ---
   { id: "SEASON_REGULAR", group: "season", label: "Regular", custom: false,
     description: "Formato estándar: reto semanal, top/bottom, lip sync, eliminación." },
+  { id: "SEASON_THAILAND", group: "season", label: "Thailand (temporadas 1 y 2)", custom: false,
+    description: "Cada episodio: un maxi reto (solo gana una) y un reto de pasarela que es el que se juzga." },
   { id: "SEASON_TEAMS", group: "season", label: "Por equipos", custom: false,
     description: "Las concursantes compiten organizadas en equipos durante parte de la temporada." },
   { id: "SEASON_LIPSYNC_LEGACY", group: "season", label: "Lipsync For Your Legacy", custom: false,
