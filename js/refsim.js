@@ -194,6 +194,15 @@
     "LOSS ": { text: "LOSS", bg: "orange" },
     "RTRN ": { text: "RTRN", bg: "orange", bold: true },
     "CHOC": { text: "CHOC", bg: "#fcea7c", bold: true },
+    "GBOOT": { text: "GOLDEN BOOT", bg: "gold", bold: true },
+    "FANFAV": { text: "FAN FAVORITE", bg: "hotpink", bold: true },
+    "VILLAIN": { text: "MISS VILLAIN", bg: "#8B0000", fg: "#fff", bold: true },
+    "ROBBED": { text: "MISS ROBBED", bg: "#39FF14", fg: "#fff", bold: true },
+    "POPSTAR": { text: "DRAG POPSTAR", bg: "hotpink", fg: "#000", bold: true },
+    "FASHION MOGUL": { text: "FASHION MOGUL", bg: "#C8A2FF", fg: "#fff", bold: true },
+    "WORSTLOOK": { text: "MISS WORST LOOK", bg: "#556B2F", fg: "#fff", bold: true },
+    "LOSTLOOK": { text: "MISS LOST LOOK", bg: "gold", bold: true },
+    "BRICK": { text: "MISS BRICK", bg: "#A0522D", fg: "#fff", bold: true },
     "BDNK": { text: "BDNK", bg: "hotpink", border: "3px solid #FFD700" },
     "GBEAV": { text: "LOW", bg: "pink", border: "3px solid #FFD700" },
     "OUT ": { text: "OUT", bg: "purple", fg: "#fff" },
@@ -480,7 +489,8 @@
         this.current.sort((a, b) => b.finaleScore - a.finaleScore);
         this.current = this.teamsFlat();
       }
-      if (!this.tw.has("DISABLE_REUNION")) this.reunion();
+      if (this.tw.has("REUNION_SMACKDOWN")) { this.reunionSmackdown(); this.reunion(); }
+      else if (!this.tw.has("DISABLE_REUNION")) this.reunion();
       this.finale();
       this.finalScreens();
     }
@@ -1283,6 +1293,190 @@
       }
     }
 
+    // ---------- Retos de lip sync (twists) ----------
+    // ¿Toca el reto "LaLaPaRUza Smackdown" esta semana? (cuando se ha ido la mitad de las reinas que se tienen que ir antes de la final)
+    lscNow() {
+      return this.tw.has("LIPSYNC_CHALLENGE") && !this.flag.lsc && !this.opts.teams && !this.opts.winners && !this.tour
+        && this.eliminated.length > 0 && this.eliminated.length === Math.floor((this.total - this.finaleSize) / 2);
+    }
+
+    // ¿Toca el "Slay Off Extravaganza" esta semana? (con 8 reinas)
+    slayOffNow() {
+      return this.tw.has("SLAY_OFF") && !this.flag.slayoffCheck && !this.opts.teams && !this.opts.winners && !this.tour && this.current.length === 8;
+    }
+
+    // Maxi reto "Lip Sync" (LaLaPaRUza Smackdown): torneo de lip syncs en el que las ganadoras de cada ronda se salvan y
+    // la última que queda se va a casa.
+    lipsyncBracket() {
+      this.flag.lsc = true;
+      const col = this.extraColumn("Lip Sync", false);
+      const s0 = this.newScreen("¡Maxi reto: el torneo de lip syncs!", "Empezar");
+      s0.b("Esta semana el maxi reto es un lip sync: en cada ronda las ganadoras se salvan... y la última que quede se va a casa.");
+      let order = shuffle(this.current.slice());
+      let rounds = order.length, count = 0, extra = false;
+      do {
+        if (rounds % 2 !== 0) extra = true;
+        rounds = Math.floor(rounds / 2);
+        if (extra) { rounds++; extra = false; }
+        count++;
+      } while (rounds !== 1);
+      const safe = (q, r) => { this.setCell(q, col, `SAFE<br>R${r}`); q.ppe += 3; };
+      for (let r = 1; r <= count; r++) {
+        const R = this.newScreen(r === count ? "Ronda final" : `Ronda ${r}`, "Continuar");
+        if (r === count) {
+          if (order.length === 3) {
+            const saved = order[0];
+            R.q([saved.name], "#DD3075", `${saved.name} se salva por votación de sus compañeras.`);
+            safe(saved, r);
+            order.splice(0, 1);
+          }
+          const pair = order.slice(0, 2);
+          R.q(pair.map((q) => q.name), undefined, `${pair[0].name} y ${pair[1].name} harán lip sync...`);
+          R.p("Ha llegado la hora de que hagáis lip sync... ¡por vuestra vida! Buena suerte, y no la caguéis.");
+          const song = this.duelLipsync(R, pair);
+          pair.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+          R.p("He tomado mi decisión.");
+          if (pair[0].lipsyncScore >= pair[1].lipsyncScore && pair[0].lipsyncScore > 7 && pair[1].lipsyncScore > 7 && !this.tw.has("DISABLE_DOUBLE")) {
+            this.addSong(pair, [], song);
+            R.q(pair.map((q) => q.name), "darkblue", "¡Shantay, las dos os quedáis, baby!");
+            pair.forEach((q) => safe(q, r));
+          } else {
+            this.addSong([pair[0]], [pair[1]], song);
+            R.q([pair[0].name], "royalblue", `${pair[0].name}, shantay, te quedas.`);
+            safe(pair[0], r);
+            const loser = pair[1];
+            if (!this.fateSave(R, loser)) {
+              R.q([loser.name], "red", `${loser.name}, sashay away.`);
+              this.exitLine(R, loser);
+              this.eliminateNow(loser, col, " ELIM ");
+            }
+          }
+        } else {
+          const groups = [];
+          const pool = order.slice();
+          while (pool.length) groups.push(pool.length === 3 ? pool.splice(0, 3) : pool.splice(0, 2));
+          groups.forEach((g) => {
+            if (g.length === 1) { R.q([g[0].name], undefined, `${g[0].name} pasa de ronda sin hacer lip sync.`); return; }
+            R.q(g.map((q) => q.name), undefined, `${list(g.map((q) => q.name))} harán lip sync...`);
+            const song = this.duelLipsync(R, g);
+            g.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+            this.addSong([g[0]], g.slice(1), song);
+            R.q([g[0].name], "royalblue", `${g[0].name}, shantay, te quedas.`);
+            R.q(g.slice(1).map((q) => q.name), "darkred", `${list(g.slice(1).map((q) => q.name))}, seguís en peligro de eliminación...`);
+            safe(g[0], r);
+            order.splice(order.indexOf(g[0]), 1);
+            R.hr();
+          });
+          order = shuffle(order);
+          if (order.length === 3) count--;
+        }
+      }
+      this.current.forEach((q) => { if (q.trackRecord[col] === undefined) this.setCell(q, col, "SAFE"); });
+      return this.untucked();
+    }
+
+    // Slay Off Extravaganza (con 8 reinas): en vez del reto normal hay dos rondas de lip syncs; las ganadoras de la final son
+    // WIN y TOP2, las dos del medio salvadas con HIGH y las perdedoras de la primera ronda quedan en el bottom.
+    slayOffEpisode() {
+      this.flag.slayoffCheck = true;
+      const col = this.extraColumn("Lip Sync", false);
+      const s0 = this.newScreen("¡Maxi reto: Lip Sync Slay Off Extravaganza!", "Empezar");
+      s0.b("Esta semana el maxi reto es el Lip Sync Slay Off Extravaganza: las reinas se enfrentan en dos rondas de lip syncs y la última pareja se juega la victoria.");
+      let order = shuffle(this.current.slice());
+      const bottom = [];
+      for (let r = 1; r <= 2; r++) {
+        const R = this.newScreen(`Ronda ${r}`, "Continuar");
+        const next = [];
+        for (let i = 0; i + 1 < order.length; i += 2) {
+          const pair = [order[i], order[i + 1]];
+          R.q(pair.map((q) => q.name), undefined, `${pair[0].name} y ${pair[1].name} harán lip sync...`);
+          const song = this.duelLipsync(R, pair);
+          pair.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+          this.addSong([pair[0]], [pair[1]], song);
+          R.q([pair[0].name], "royalblue", `${pair[0].name}, condragulations, pasas a la siguiente ronda.`);
+          next.push(pair[0]);
+          if (r === 1) { R.q([pair[1].name], "darkred", `${pair[1].name}, lo siento, querida, estás en peligro de eliminación.`); bottom.push(pair[1]); }
+          else { R.q([pair[1].name], "darkred", `${pair[1].name}, excelente trabajo, estás a salvo.`); this.setCell(pair[1], col, "HIGH"); pair[0].favoritism += 1; pair[1].ppe += 4; }
+          R.hr();
+        }
+        order = shuffle(next);
+      }
+      const F = this.newScreen("Ronda final", "Continuar");
+      const fin = order.slice(0, 2);
+      F.q(fin.map((q) => q.name), undefined, `${fin[0].name} y ${fin[1].name} harán lip sync...`);
+      const song = this.duelLipsync(F, fin);
+      fin.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      this.addSong([fin[0]], [fin[1]], song);
+      F.q([fin[0].name], "royalblue", `${fin[0].name}, condragulations, ¡eres la ganadora del Lip Sync Slay Off Extravaganza!`);
+      this.setCell(fin[0], col, "WIN"); fin[0].favoritism += 5; fin[0].ppe += 5;
+      F.q([fin[1].name], "darkred", `${fin[1].name}, increíble trabajo, estás a salvo.`);
+      this.setCell(fin[1], col, "TOP2"); fin[1].ppe += 4.5;
+      F.hr();
+      this.gbm = [fin[0]];
+      this.topQueens = []; this.bottomQueens = bottom;
+      this.twistBottom(F, bottom);
+      if (bottom.length === 4) {
+        shuffle(bottom);
+        F.b("¡Ronda extra!");
+        for (let i = 0; i < 2; i++) {
+          const pair = [bottom[i], bottom[i + 1]];
+          F.q(pair.map((q) => q.name), undefined, `${pair[0].name} y ${pair[1].name} harán lip sync...`);
+          const sg = this.duelLipsync(F, pair);
+          pair.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+          this.addSong([pair[0]], [pair[1]], sg);
+          F.q([pair[0].name], "royalblue", `${pair[0].name}, condragulations, estás a salvo.`);
+          this.setCell(pair[0], col, "LOW"); pair[0].unfavoritism += 1; pair[0].ppe += 2;
+          bottom.splice(bottom.indexOf(pair[0]), 1);
+          F.q([pair[1].name], "darkred", `${pair[1].name}, lo siento, querida, estás en peligro de eliminación...`);
+          F.hr();
+        }
+      }
+      F.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, lo siento, queridas, pero estáis en riesgo de eliminación.`);
+      return this.lipsyncDesc();
+    }
+
+    // Reunion Smackdown: antes de la reunión, todas las eliminadas hacen un torneo de lip syncs por el título de
+    // "She Done Already Done Had Herses".
+    reunionSmackdown() {
+      const col = this.extraColumn("Lip Sync");
+      const s0 = this.newScreen("¡Lip Sync Smackdown de la reunión!", "Empezar");
+      s0.p("Todas las reinas eliminadas vuelven para pelear en un LaLaPaRUza Smackdown por el título de Reina de She Done Already Done Had Herses.");
+      this.current.forEach((q) => this.setCell(q, col, "RUN "));
+      const players = this.eliminated.filter((q) => !q.queenDisqOrDept);
+      this.eliminated.forEach((q) => { if (q.queenDisqOrDept) this.setCell(q, col, ""); });
+      let bowl = shuffle(players.slice());
+      const nth = ["1ST", "2ND", "3RD", "4TH", "5TH", "6TH"];
+      let r = 0;
+      while (bowl.length > 1) {
+        const R = this.newScreen(bowl.length <= 3 ? "Ronda final" : `Ronda ${r + 1}`, "Continuar");
+        const groups = [];
+        const pool = bowl.slice();
+        while (pool.length) groups.push(pool.length === 3 ? pool.splice(0, 3) : pool.splice(0, 2));
+        const winners = [];
+        groups.forEach((g) => {
+          R.q(g.map((q) => q.name), undefined, `${list(g.map((q) => q.name))} harán lip sync...`);
+          const song = this.duelLipsync(R, g);
+          g.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+          this.addSong([g[0]], g.slice(1), song);
+          R.q([g[0].name], "royalblue", `${g[0].name}, condragulations, ¡eres una ganadora, baby!`);
+          R.q(g.slice(1).map((q) => q.name), "darkred", `${list(g.slice(1).map((q) => q.name))}, gracias por una temporada inolvidable.`);
+          g.slice(1).forEach((q) => this.setCell(q, col, `LOST ${nth[Math.min(r, nth.length - 1)]} ROUND `));
+          winners.push(g[0]);
+          R.hr();
+        });
+        bowl = shuffle(winners);
+        r++;
+      }
+      if (bowl.length === 1) {
+        const w = bowl[0];
+        this.setCell(w, col, "WINNER ");
+        w.minqdd = w.minqdd ? w.minqdd + "\n(Reina de SDADHH)" : "(Reina de SDADHH)";
+        const F = this.newScreen("La Reina de She Done Already Done Had Herses", "Ir a la reunión");
+        F.q([w.name], "royalblue", `¡La Reina de She Done Already Done Had Herses es... ${w.name}!`);
+      }
+      this.trackRecordScreen(false);
+    }
+
     // Split Format: tres estrenos con un tercio del reparto cada uno (cada grupo con su eliminación) y después
     // dos rondas de dos grupos (A y B) que juegan por separado; la que no juega ese episodio no puntúa.
     // Después siguen todas las que quedan, como en una temporada normal.
@@ -1382,14 +1576,17 @@
       this.miniType = null;
       const readingNow = (cast.length === 6 && this.total >= 9 && this.episode > 2 ||
         cast.length === 7 && this.total >= 30 && this.episode > 3 || (this.opts.legacy || this.opts.assassin || this.opts.slaysian) && this.episode === 1 && !(this.opts.return === "RETURN_READING" && !this.opts.slaysian)) && !this.flag.reading && !this.opts.winners;
-      if (readingNow) {
+      if (this.lscNow() || this.slayOffNow()) {
+        text = "Hoy no hay mini reto, ¡vamos directas al maxi reto!";
+        this.flag.miniHappen = true;
+      } else if (readingNow) {
         text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas se leerán entre ellas.";
         this.miniType = "comedy";
         this.flag.reading = true;
         const readingIF = this.opts.return === "RETURN_READING" && !this.returned && this.episode > 1 && !this.opts.teams && this.eliminated.some((q) => !q.queenDisqOrDept);
         this.readingIFNow = readingIF;
-        if (readingIF) text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas eliminadas se leerán entre ellas... ¡y la ganadora vuelve a la competición!";
-        this.readingBlocks = this.readingChallenge(readingIF ? this.eliminated.filter((q) => !q.queenDisqOrDept) : cast, !readingIF);
+        if (readingIF) text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas eliminadas leerán a las que siguen... ¡y la mejor lectora vuelve a la competición!";
+        this.readingBlocks = this.readingChallenge(readingIF ? this.eliminated.filter((q) => !q.queenDisqOrDept) : cast, !readingIF, readingIF ? cast : null);
       } else if (this.total !== 5 && cast.length === 5) {
         text = "¡Que salgan los títeres! Las reinas se parodiarán entre ellas usando títeres.";
         this.miniType = "comedy";
@@ -1462,7 +1659,7 @@
     }
 
     // ---------- la biblioteca (mini reto de lectura y reunión) ----------
-    readingChallenge(cast, isCurrent) {
+    readingChallenge(cast, isCurrent, targets) {
       const blocks = [];
       if (isCurrent && this.eliminated.length > 0) this.readReu = this.eliminated.slice();
       const readuMode = cast === this.readReu;
@@ -1473,7 +1670,7 @@
         else blocks.push({ t: "q", names: [queen.name], color: "black", text: `Le toca a... ¡${queen.name}!` });
         let numberOfReads = readuMode ? 1 : 2;
         for (let i = 0; i < numberOfReads; i++) {
-          const pool = readuMode ? this.eliminated : cast;
+          const pool = targets || (readuMode ? this.eliminated : cast);
           const candidates = pool.filter((q) => q !== queen && q !== first);
           if (!candidates.length) break;
           const readTarget = pick(candidates);
@@ -1497,7 +1694,9 @@
       this.current.forEach((q) => { q.episodesOn++; });
       const cast = this.current;
       const n = cast.length;
-      if (this.opts.slaysian && n === 6 && !this.flag.slaysianDone) return this.slaysianLalaparuza();
+      if (this.lscNow()) return this.lipsyncBracket();
+      if (this.slayOffNow()) return this.slayOffEpisode();
+      if ((this.opts.slaysian || this.tw.has("SLAYSIAN_LALA")) && n === 6 && !this.flag.slaysianDone) return this.slaysianLalaparuza();
       const opening = this.opts.opening;
       let fn;
       if (this.conj && this.conj.pending) { this.conj.pending = false; this.conj.active = true; fn = "conjoined"; }
@@ -4719,6 +4918,103 @@
         s.hr();
       }
       this.missCongeniality(s);
+      this.titlesBlock(s);
+    }
+
+    // Títulos extra de la reunión (Miss Villain, Fan Favorite, Golden Boot, Fashion Mogul, Miss Robbed, Miss Worst Look,
+    // Drag Popstar, Miss Lost Look y Miss Brick): cada uno marca la casilla de la ganadora si ya estaba eliminada.
+    titlesBlock(s) {
+      const tw = this.tw;
+      const mark = (winner, code, label) => {
+        if (this.eliminated.includes(winner)) winner.trackRecord[winner.trackRecord.length - 1] = code;
+        winner.minqdd = winner.minqdd ? winner.minqdd + `\n(${label})` : `(${label})`;
+      };
+      const whole = () => this.current.concat(this.eliminated);
+      const voteFor = (title, color, pickTarget) => {
+        const all = shuffle(whole());
+        this.eliminated.forEach((q) => { q.votes = 0; q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
+        this.current.forEach((q) => { q.votes = 0; });
+        all.forEach((q) => {
+          q.lipstick = pickTarget(q, all);
+          s.q([q.name, q.lipstick.name], "black", `¡${q.name} votó a ${q.lipstick.name} para ser ${title}!`);
+          q.lipstick.votes++;
+        });
+        s.hr();
+        all.sort((a, b) => b.votes - a.votes);
+        s.q([all[0].name], color, `La ganadora de ${title} de esta temporada es... ¡${all[0].name}!`);
+        return all[0];
+      };
+      if (tw.has("TITLE_VILLAIN")) {
+        s.big("¡Las concursantes votarán a Miss Villana!");
+        mark(voteFor("Miss Villana", "red", (q, all) => this.worstSister(q, all)), "VILLAIN", "Miss Villana");
+        s.hr();
+      }
+      if (tw.has("TITLE_FAN_FAVORITE")) {
+        s.big("¡Premio a la Favorita del público! 💖");
+        const pts = (tr) => (tr.includes("WIN") ? 6 : tr.includes("TOP2") ? 6 : tr.includes("HIGH") ? 5 : tr.includes("SAFE") ? 5 : tr.includes("LOW") ? 1 : tr.includes("BTM") ? 8 : tr.includes("ELIM") ? 20 : 0);
+        const scores = whole().map((q) => ({ q, score: q.trackRecord.reduce((a, tr) => a + (typeof tr === "string" ? pts(tr) : 0), 0) })).sort((a, b) => b.score - a.score);
+        const w = scores[0].q;
+        s.q([w.name], "hotpink", `El premio a la Favorita del público es para... ¡${w.name}!`);
+        mark(w, "FANFAV", "Favorita del público");
+        s.hr();
+      }
+      if (tw.has("TITLE_GOLDEN_BOOT")) {
+        s.big("¡Premio Bota de Oro! 👢");
+        const c = this.eliminated.filter((q) => q.trackRecord.includes("SAFE") || q.trackRecord.includes("LOW") || q.trackRecord.includes("BTM"));
+        if (!c.length) s.b("¡Esta temporada no se ha podido dar la Bota de Oro!");
+        else {
+          c.sort((a, b) => b.runwayScore - a.runwayScore);
+          s.q([c[0].name], "gold", `El premio Bota de Oro es para... ¡${c[0].name}!`);
+          mark(c[0], "GBOOT", "Bota de Oro");
+        }
+        s.hr();
+      }
+      if (tw.has("TITLE_MOGUL")) {
+        s.big("¡Premio Magnate de la Moda! 💜");
+        const c = whole().sort((a, b) => b.st.design - a.st.design);
+        s.q([c[0].name], "plum", `El premio Magnate de la Moda es para... ¡${c[0].name}!`);
+        mark(c[0], "FASHION MOGUL", "Magnate de la Moda");
+        s.hr();
+      }
+      if (tw.has("TITLE_ROBBED")) {
+        s.big("¡Premio Miss Robada! 😭");
+        const c = this.eliminated.filter((q) => ["SAFE", "HIGH", "WIN", "ELIM", "TOP2"].some((k) => q.trackRecord.includes(k)));
+        if (!c.length) s.b("¡Esta temporada no se ha podido dar Miss Robada!");
+        else {
+          const pts = (tr) => (tr.includes("WIN") ? 10 : tr.includes("TOP2") ? 7 : tr.includes("HIGH") ? 9 : tr.includes("SAFE") ? 8 : tr.includes("LOW") ? 2 : tr.includes("BTM") ? 1 : tr.includes("ELIM") ? 35 : 0);
+          const w = c.map((q) => ({ q, score: q.trackRecord.reduce((a, tr) => a + (typeof tr === "string" ? pts(tr) : 0), 0) })).sort((a, b) => b.score - a.score)[0].q;
+          s.q([w.name], "deepskyblue", `El premio Miss Robada es para... ¡${w.name}!`);
+          mark(w, "ROBBED", "Miss Robada");
+        }
+        s.hr();
+      }
+      if (tw.has("TITLE_WORST_LOOK")) {
+        s.big("¡Premio Miss Peor Look! 💀");
+        const c = this.eliminated.slice().sort((a, b) => a.runwayScore - b.runwayScore);
+        if (!c.length) s.b("¡Esta temporada no se ha podido dar Miss Peor Look!");
+        else { s.q([c[0].name], "gray", `El premio Miss Peor Look es para... ¡${c[0].name}!`); mark(c[0], "WORSTLOOK", "Miss Peor Look"); }
+        s.hr();
+      }
+      if (tw.has("TITLE_POPSTAR")) {
+        s.big("¡Premio Estrella del Pop Drag! 🎤");
+        const c = whole().sort((a, b) => b.st.dance - a.st.dance);
+        s.q([c[0].name], "hotpink", `El premio Estrella del Pop Drag es para... ¡${c[0].name}!`);
+        mark(c[0], "POPSTAR", "Estrella del Pop Drag");
+        s.hr();
+      }
+      if (tw.has("TITLE_LOST_LOOK")) {
+        s.big("¡Premio Miss Look Perdido! ✨");
+        const c = this.eliminated.slice().sort((a, b) => b.runwayScore - a.runwayScore);
+        if (!c.length) s.b("¡Esta temporada no se ha podido dar Miss Look Perdido!");
+        else { s.q([c[0].name], "deepskyblue", `El premio Miss Look Perdido es para... ¡${c[0].name}!`); mark(c[0], "LOSTLOOK", "Miss Look Perdido"); }
+        s.hr();
+      }
+      if (tw.has("TITLE_BRICK")) {
+        s.big("¡Las concursantes votarán a Miss Ladrillo!");
+        const w = voteFor("Miss Ladrillo", "sienna", (q, all) => pick(all.filter((o) => o !== q).sort((a, b) => a.runwayScore - b.runwayScore).slice(0, 3)));
+        mark(w, "BRICK", "Miss Ladrillo");
+        s.hr();
+      }
     }
 
     missCongeniality(s) {
@@ -5520,7 +5816,7 @@
     ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
   // Twists copiados (los demás twists de la lista siguen con el motor propio)
-  const IMPLEMENTED_TWISTS = ["DISABLE_DOUBLE", "DISABLE_REUNION", "RIGGORY", "RIGGORY_LIPSYNC", "CLAIM_QUEEN", "IMMUNITY", "BEAVER", "CHOCOLATE_RANDOM", "CHOCOLATE_CHOOSABLE", "BADONKA_RANDOM", "BADONKA_CHOOSABLE", "SOLID_BACKGROUND"];
+  const IMPLEMENTED_TWISTS = ["DISABLE_DOUBLE", "DISABLE_REUNION", "RIGGORY", "RIGGORY_LIPSYNC", "CLAIM_QUEEN", "IMMUNITY", "BEAVER", "CHOCOLATE_RANDOM", "CHOCOLATE_CHOOSABLE", "BADONKA_RANDOM", "BADONKA_CHOOSABLE", "SOLID_BACKGROUND", "TITLE_GOLDEN_BOOT", "TITLE_FAN_FAVORITE", "TITLE_VILLAIN", "TITLE_ROBBED", "TITLE_POPSTAR", "TITLE_MOGUL", "TITLE_WORST_LOOK", "TITLE_LOST_LOOK", "TITLE_BRICK", "LIPSYNC_CHALLENGE", "SLAY_OFF", "SLAYSIAN_LALA", "REUNION_SMACKDOWN"];
   // Regresos copiados (el resto de regresos de la lista siguen con el motor propio)
   const IMPLEMENTED_RETURNS = ["RETURN_NONE", "RETURN_CHOOSE", "RETURN_CHOOSE2", "RETURN_CHOOSE5", "RETURN_RANDOM", "RETURN_VOTE", "RETURN_SMACKDOWN", "RETURN_HELLBOUND", "RETURN_LALAPARUZA", "RETURN_RANDOM_PICK", "RETURN_READING", "RETURN_CONJOINED", "RETURN_QOC", "RETURN_REINAS", "RETURN_KITTY", "RETURN_ATTENTION"];
   // "Random return" (ranop): se sortea entre los regresos copiados (menos Hellbound), como en el original
