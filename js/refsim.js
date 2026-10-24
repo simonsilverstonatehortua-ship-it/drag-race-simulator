@@ -260,12 +260,11 @@
 
   // Casillas de Drag Race Thailand copiadas de la wiki (temporada 1 y 2). Devuelve null si la casilla no es de las
   // que cambian: "WIN" suelto = ganó solo la pasarela; "WIN + X" = ganó también el maxi reto.
-  function ThaiCell(raw, season) {
+  function ThaiCell(raw) {
     const k = String(raw).trim().replace("HIGH TEAM", "HIGH");
-    const S1 = season === 1;
     const pal = {
-      WIN: S1 ? { bg: "darkblue", fg: "white" } : { bg: "deepskyblue", fg: "#000" },
-      WINSAFE: S1 ? { bg: "royalblue", fg: "white" } : { bg: "darkblue", fg: "white" },
+      WIN: { bg: "deepskyblue", fg: "#000" },
+      WINSAFE: { bg: "darkblue", fg: "white" },
       WINHIGH: { bg: "cornflowerblue", fg: "#000" },
       WINLOW: { bg: "violet", fg: "#000" },
       WINWIN: { bg: "mediumblue", fg: "white" },
@@ -277,7 +276,7 @@
     const m = k.match(/^WIN(SAFE|HIGH|LOW|WIN|BTM\d|TOP2|ELIM|QUIT)$/);
     if (k === "WIN" || m) {
       const p = pal[k] || { bg: /BTM/.test(k) ? "mediumorchid" : "cornflowerblue", fg: "#000" };
-      return { text: k === "WIN" ? "WIN" : "WIN\n+\n" + k.slice(3), bg: p.bg, fg: p.fg, bold: true };
+      return { text: k === "WIN" || k === "WINSAFE" ? "WIN" : "WIN\n+\n" + k.slice(3), bg: p.bg, fg: p.fg, bold: true };
     }
     return null;
   }
@@ -4402,14 +4401,14 @@ this.plan = this.makePlan();
         items.push({ color: (style && style.bg) || "white", text });
       });
       if (this.opts.thailand) {
-        const S = this.thaiS || 1;
+
         const win = items.find((i) => i.text.startsWith("La concursante ganó el reto"));
-        if (win) win.text = "La concursante ganó la pasarela (pero no el maxi reto).";
+        if (win) { win.text = "La concursante ganó la pasarela (pero no el maxi reto)."; win.color = "deepskyblue"; }
         [["WINSAFE", "WIN + SAFE", "Ganó el maxi reto y quedó a salvo en la pasarela."], ["WINHIGH", "WIN + HIGH", "Ganó el maxi reto y estuvo arriba en la pasarela."],
           ["WINLOW", "WIN + LOW", "Ganó el maxi reto y estuvo abajo, pero se salvó."], ["WINWIN", "WIN + WIN", "Ganó el maxi reto y también la pasarela."],
           ["WINBTM2", "WIN + BTM2", "Ganó el maxi reto, pero estuvo en peligro de eliminación y ganó el lip sync."], ["WINBTM3", "WIN + BTM3", "Ganó el maxi reto, pero estuvo en peligro de eliminación y se salvó."],
           ["WINELIM", "WIN + ELIM", "Ganó el maxi reto, pero perdió el lip sync y fue eliminada."]].forEach(([code, , text]) => {
-          if (used.has(code)) items.push({ color: ThaiCell(code, S).bg, text });
+          if (used.has(code)) items.push({ color: ThaiCell(code).bg, text });
         });
       }
       return { t: "legend", items };
@@ -5251,10 +5250,9 @@ this.allianceTick(s);
         fg = "#FFF"; bold = true;
       }
       // Thailand (wiki de las temporadas 1 y 2): la ganadora del maxi reto lleva "WIN + resultado" apilado y la que solo
-      // gana la pasarela, un "WIN" suelto. Cada simulación copia los colores de una de las dos temporadas.
+      // gana la pasarela, un "WIN" celeste; si queda a salvo, su "WIN" es azul oscuro.
       if (this.opts.thailand && typeof raw === "string") {
-        if (this.thaiS === undefined) this.thaiS = rnd(1, 2);
-        const t = ThaiCell(raw, this.thaiS);
+        const t = ThaiCell(raw);
         if (t) {
           if (returned) { baseText = "RTRN+" + t.text; } else baseText = t.text;
           bg = returned ? bg : t.bg; fg = t.fg; bold = t.bold;
