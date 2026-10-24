@@ -615,3 +615,7 @@ En el paso "¡Conoce a las concursantes!" aparece un panel **Grupos** cuando el 
 ## Formato de temporada al azar
 
 La opción «Formato al azar» sortea la temporada entre Regular, Thailand, Por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale, Split Format, Fatal Selection y Tournament of All Stars, sólo entre los que caben en el reparto (p. ej. Por equipos necesita un número par y el Split o el torneo, 12 o más). La lista es `RANDOM_SEASONS` en `js/refsim.js`; al empezar se anuncia el formato que ha salido.
+
+## Segunda ronda del torneo en la casilla del nombre
+
+Cuando el torneo tiene segunda ronda de grupos, la casilla del nombre de las reinas que llegan a ella se parte en diagonal en dos triángulos (el color de su grupo de la primera ronda y el de la segunda) y debajo se indican los dos grupos.

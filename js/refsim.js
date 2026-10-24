@@ -2695,7 +2695,7 @@
         const losers = [];
         const wildCands = [];
         bracketList.forEach((group, gi) => {
-          group.forEach((q) => { q.stars = 0; if (ri === 0) q.bracket = gi + 1; });
+          group.forEach((q) => { q.stars = 0; if (ri === 0) q.bracket = gi + 1; else q.bracket2 = gi + 1; });
           const gcols = [];
           const passers = Math.max(1, Math.min(rc.passers, group.length - 1));
           for (let e = 0; e < rc.episodes; e++) {
@@ -3780,6 +3780,10 @@
         if (mvq) row.mvq = queen.starLog.reduce((a, b) => a + (b || 0), 0);
         if (this.opts.tournament && queen.bracket) {
           row.bracket = queen.bracket;
+          if (queen.bracket2) {
+            row.bracket2 = queen.bracket2;
+            row.bracket2Color = (this.opts.tournament.colors || [])[queen.bracket2 - 1] || TOUR_COLORS[(queen.bracket2 - 1) % TOUR_COLORS.length];
+          }
           row.bracketColor = (this.opts.tournament.colors || [])[queen.bracket - 1] || TOUR_COLORS[(queen.bracket - 1) % TOUR_COLORS.length];
         }
         return row;

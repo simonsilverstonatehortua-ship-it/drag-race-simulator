@@ -1051,8 +1051,17 @@ function refTrackRecord(block) {
       // Torneo: el nombre lleva el color de su grupo y "(Grupo N)" debajo, como en esopare
       nameTd.style.background = row.bracketColor;
       nameTd.style.color = readableTextColor(row.bracketColor) || "#202122";
+      let groupText = `(Grupo ${row.bracket})`;
+      if (row.bracket2) {
+        // Pasó a la segunda ronda: la casilla se parte en diagonal en dos triángulos, uno por cada grupo
+        nameTd.style.background = `linear-gradient(135deg, ${row.bracketColor} 50%, ${row.bracket2Color} 50%)`;
+        nameTd.style.color = "#fff";
+        nameTd.style.textShadow = "0 0 3px #000, 0 0 3px #000";
+        groupText = `(Grupo ${row.bracket})
+(Grupo ${row.bracket2})`;
+      }
       nameTd.appendChild(document.createElement("br"));
-      nameTd.appendChild(el("small", { class: "rtr-sub", text: `(Grupo ${row.bracket})` }));
+      nameTd.appendChild(el("small", { class: "rtr-sub", text: groupText }));
     }
     tr.appendChild(nameTd);
     const src = contestantImage(row.name);

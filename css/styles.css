@@ -750,7 +750,7 @@ footer {
   background-repeat: no-repeat;
 }
 .rtr .rtr-ppe { background: lightgray; font-weight: 700; }
-.rtr .rtr-sub { display: block; font-style: italic; font-size: 0.62rem; margin-top: 0.2rem; font-weight: 500; }
+.rtr .rtr-sub { display: block; font-style: italic; font-size: 0.62rem; margin-top: 0.2rem; font-weight: 500; white-space: pre-line; }
 
 /* Secciones "Contestants" de la wiki: tarjetas del reparto, leyenda de colores y tabla de puntos MVQ */
 .rcards { display: flex; flex-direction: column; gap: 14px; margin: 0.8rem 0; }
