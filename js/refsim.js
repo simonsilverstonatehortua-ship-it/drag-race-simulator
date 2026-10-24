@@ -263,11 +263,11 @@
   function ThaiCell(raw) {
     const k = String(raw).trim().replace("HIGH TEAM", "HIGH");
     const pal = {
-      WIN: { bg: "deepskyblue", fg: "#000" },
-      WINSAFE: { bg: "darkblue", fg: "white" },
+      WIN: { bg: "#00bfff", fg: "#000" },
+      WINSAFE: { bg: "#4169e1", fg: "white" },
       WINHIGH: { bg: "cornflowerblue", fg: "#000" },
       WINLOW: { bg: "violet", fg: "#000" },
-      WINWIN: { bg: "mediumblue", fg: "white" },
+      WINWIN: { bg: "#0000cd", fg: "white" },
       WINBTM2: { bg: "mediumorchid", fg: "#000" },
       WINBTM3: { bg: "mediumorchid", fg: "#000" },
       WINELIM: { bg: "#9400D3", fg: "white" },
@@ -4403,7 +4403,7 @@ this.plan = this.makePlan();
       if (this.opts.thailand) {
 
         const win = items.find((i) => i.text.startsWith("La concursante ganó el reto"));
-        if (win) { win.text = "La concursante ganó la pasarela (pero no el maxi reto)."; win.color = "deepskyblue"; }
+        if (win) { win.text = "La concursante ganó la pasarela (pero no el maxi reto)."; win.color = "#00bfff"; }
         [["WINSAFE", "WIN + SAFE", "Ganó el maxi reto y quedó a salvo en la pasarela."], ["WINHIGH", "WIN + HIGH", "Ganó el maxi reto y estuvo arriba en la pasarela."],
           ["WINLOW", "WIN + LOW", "Ganó el maxi reto y estuvo abajo, pero se salvó."], ["WINWIN", "WIN + WIN", "Ganó el maxi reto y también la pasarela."],
           ["WINBTM2", "WIN + BTM2", "Ganó el maxi reto, pero estuvo en peligro de eliminación y ganó el lip sync."], ["WINBTM3", "WIN + BTM3", "Ganó el maxi reto, pero estuvo en peligro de eliminación y se salvó."],
@@ -5250,7 +5250,7 @@ this.allianceTick(s);
         fg = "#FFF"; bold = true;
       }
       // Thailand (wiki de las temporadas 1 y 2): la ganadora del maxi reto lleva "WIN + resultado" apilado y la que solo
-      // gana la pasarela, un "WIN" celeste; si queda a salvo, su "WIN" es azul oscuro.
+      // gana la pasarela, un "WIN" celeste; si queda a salvo, su "WIN" es #4169e1.
       if (this.opts.thailand && typeof raw === "string") {
         const t = ThaiCell(raw);
         if (t) {
