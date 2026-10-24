@@ -685,4 +685,4 @@ Temporada nueva (opción *Formato de temporada*): el estreno UK3 pero **todas la
 - **Bottom 4**: las dos mejores se salvan con LOW.
 - Doble shantay y doble sashay funcionan como siempre (también el número de capítulos elegido).
 
-Con menos de 5 reinas en la carrera se usa el juicio normal. También entra en «Formato al azar».
+Solo con 3 reinas en la carrera se usa el juicio normal. También entra en «Formato al azar».

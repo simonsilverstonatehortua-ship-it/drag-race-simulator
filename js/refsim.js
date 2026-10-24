@@ -2706,7 +2706,7 @@ this.plan = this.makePlan();
         }
         return this.judgingScreen();
       }
-      if (this.opts.lftw && n >= 5 && !this.slayNow() && !this.noElimNow() && !this.premiereHalf && !this.splitNow) {
+      if (this.opts.lftw && n >= 4 && !this.slayNow() && !this.noElimNow() && !this.premiereHalf && !this.splitNow) {
         // Lipsync for the win: cada semana un Top 2 (o 3) y un Bottom 2 (o 3, 4) como en el estreno UK3
         byPerf();
         f.isTeam = false; f.isPair = false; f.isNoTeam = false;
