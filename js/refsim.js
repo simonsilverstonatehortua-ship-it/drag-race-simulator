@@ -2733,13 +2733,14 @@ this.plan = this.makePlan();
         byPerf();
         f.isTeam = false; f.isPair = false; f.isNoTeam = false;
         const r = rnd(0, 100);
-        const tc = n >= 10 && r < 25 ? 4 : n >= 7 && r < 65 ? 3 : n >= 5 && r < 35 ? 3 : 2;
+        const h = n >= 10 ? (r < 15 ? 0 : r < 50 ? 1 : r < 80 ? 2 : 3) : n >= 7 ? (r < 20 ? 0 : r < 65 ? 1 : 2) : n >= 5 ? (r < 35 ? 0 : 1) : 0;
+        const tc = 2 + h;
         const rb = rnd(0, 100);
-        let bc = rb < 30 ? 2 : rb < 70 ? 3 : 4;
-        bc = Math.min(bc, n <= 6 ? 3 : 4, n - tc - (n <= 4 ? 0 : 0));
+        let bc = rb < 20 ? 2 : rb < 55 ? 3 : rb < 85 ? 4 : 5;
+        bc = Math.min(bc, n <= 6 ? 3 : n <= 9 ? 4 : 5, n - tc);
         for (let i = 0; i < tc; i++) top.push(cast[i]);
         for (let i = 0; i < bc; i++) bottom.push(cast[n - (i + 1)]);
-        f.lftwJ = { threeWay: tc === 3 && rnd(0, 100) < 25 };
+        f.lftwJ = { threeWay: tc >= 3 && rnd(0, 100) < 20 };
         return this.judgingScreen();
       }
       if (this.tour) return this.tournamentJudging();
@@ -2920,11 +2921,10 @@ this.plan = this.makePlan();
       top.sort((a, b) => a.performanceScore - b.performanceScore);
       const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
       s.b("Chicas, he tomado algunas decisiones...");
-      let contenders = top.slice(0, 2);
-      if (top.length >= 3) {
-        if (cfg.threeWay) contenders = top.slice();
-        else {
-          const highs = top.slice(2);
+      let contenders = top.slice(0, cfg.threeWay ? 3 : 2);
+      {
+        const highs = top.slice(contenders.length);
+        if (highs.length) {
           highs.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
           s.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, buen trabajo esta semana, ${highs.length > 1 ? "estáis" : "estás"} a salvo.`);
         }

@@ -679,7 +679,7 @@ Arreglos en esta tanda: en Thailand con el estreno Slayers (y 9 reinas) el juici
 
 Temporada nueva (opción *Formato de temporada*): el estreno UK3 pero **todas las semanas**. Cada capítulo hay un Top 2 que hace lip sync por la victoria y un Bottom 2 que lo hace por su vida. Con variaciones al azar:
 
-- **Top 3 o 4**: las de más son HIGH (muy frecuente), o las tres hacen un lip sync a tres por la victoria.
+- **Top 3, 4 o 5**: las de más son HIGH (de 1 a 3 cada semana), o las tres hacen un lip sync a tres por la victoria.
 - **Doble victoria**: las dos que hacen el lip sync for the win ganan el reto.
 - **Bottom 3** (muy frecuente): la mejor se salva con LOW y las otras dos hacen lip sync, o las tres lo hacen a la vez (se va una o dos).
 - **Bottom 4**: las dos mejores se salvan con LOW.
