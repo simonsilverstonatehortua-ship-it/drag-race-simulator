@@ -772,3 +772,16 @@ footer {
 
 /* Opción "Fondo liso": quita la decoración del fondo mientras se ve la temporada. */
 body.solid-bg { background-image: none; }
+
+/* Opciones y twists: panel desplegable con un desplegable por grupo */
+.twist-panel { background: var(--bg-panel); border: 1px solid var(--border, #3a3046); border-radius: 12px; padding: 0.6rem 0.9rem; margin: 0.6rem 0 1rem; }
+.twist-panel__title { cursor: pointer; font-weight: 700; font-size: 1.05rem; list-style: none; }
+.twist-panel__title::-webkit-details-marker, .twist-group__title::-webkit-details-marker { display: none; }
+.twist-panel__title::before, .twist-group__title::before { content: "▸"; display: inline-block; margin-right: 0.5rem; transition: transform .15s; }
+.twist-panel[open] > .twist-panel__title::before, .twist-group[open] > .twist-group__title::before { transform: rotate(90deg); }
+.twist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.7rem; margin-top: 0.8rem; align-items: start; }
+.twist-group { background: var(--bg-card); border-radius: 10px; padding: 0.55rem 0.8rem; }
+.twist-group__title { cursor: pointer; font-weight: 700; list-style: none; }
+.twist-group__title--on { color: var(--accent, #E4136B); }
+.twist-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.9rem; cursor: pointer; }
+.twist-item input { margin-top: 0.2rem; }

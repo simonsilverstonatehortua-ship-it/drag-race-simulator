@@ -340,27 +340,47 @@ function renderSimulate() {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "max-width:260px;" }, [el("span", { text: "Reto de estreno" }), openingSelect]));
 
-  // 2b. Opciones/twists (multi-selección, a diferencia de los desplegables de arriba)
-  wrap.appendChild(el("h3", { class: "group-title", text: "Opciones" }));
-  wrap.appendChild(el("p", { class: "muted small", text: "Puedes activar varias a la vez." }));
-  const twistsWrap = el("div", { class: "chip-list" });
-  let lastSection = null;
+  // 2b. Opciones/twists: un panel desplegable con un desplegable por grupo (como en los simuladores de referencia)
+  const twistsPanel = el("details", { class: "twist-panel" });
+  const twistsTitle = el("summary", { class: "twist-panel__title" });
+  twistsPanel.appendChild(twistsTitle);
+  const updateTwistsTitle = () => { twistsTitle.textContent = `Opciones y twists${selectedTwists.size ? ` (${selectedTwists.size} activadas)` : ""}`; };
+  updateTwistsTitle();
+  if (selectedTwists.size) twistsPanel.setAttribute("open", "open");
+  const twistsGrid = el("div", { class: "twist-grid" });
+  const sections = [];
   DB.twists.forEach((t) => {
-    if (t.section && t.section !== lastSection) {
-      lastSection = t.section;
-      twistsWrap.appendChild(el("div", { class: "muted small", style: "flex-basis:100%;font-weight:700;margin-top:.4rem;", text: t.section }));
-    }
-    const checkbox = el("input", { type: "checkbox" });
-    checkbox.checked = selectedTwists.has(t.id);
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) selectedTwists.add(t.id); else selectedTwists.delete(t.id);
-      formatChoice.twists = [...selectedTwists];
-      updateRefNote();
-    });
-    const labelEl = el("label", { class: "form-row form-row--checkbox", title: t.description }, [checkbox, el("span", { text: t.label })]);
-    twistsWrap.appendChild(labelEl);
+    const name = t.section || "Otras";
+    let sec = sections.find((x) => x.name === name);
+    if (!sec) { sec = { name, items: [] }; sections.push(sec); }
+    sec.items.push(t);
   });
-  wrap.appendChild(twistsWrap);
+  sections.forEach((sec) => {
+    const box = el("details", { class: "twist-group" });
+    const sum = el("summary", { class: "twist-group__title" });
+    box.appendChild(sum);
+    const updateSum = () => {
+      const n = sec.items.filter((t) => selectedTwists.has(t.id)).length;
+      sum.textContent = `${sec.name}${n ? ` (${n})` : ""}`;
+      if (n) sum.classList.add("twist-group__title--on"); else sum.classList.remove("twist-group__title--on");
+    };
+    updateSum();
+    if (sec.items.some((t) => selectedTwists.has(t.id))) box.setAttribute("open", "open");
+    sec.items.forEach((t) => {
+      const checkbox = el("input", { type: "checkbox" });
+      checkbox.checked = selectedTwists.has(t.id);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) selectedTwists.add(t.id); else selectedTwists.delete(t.id);
+        formatChoice.twists = [...selectedTwists];
+        updateSum(); updateTwistsTitle();
+        updateRefNote();
+      });
+      box.appendChild(el("label", { class: "twist-item", title: t.description }, [checkbox, el("span", { text: t.label })]));
+    });
+    twistsGrid.appendChild(box);
+  });
+  twistsPanel.appendChild(twistsGrid);
+  wrap.appendChild(twistsPanel);
 
   // 3. Concursantes elegidas
   wrap.appendChild(el("h3", { class: "group-title", text: `Concursantes elegidas (${simSelection.size})` }));
