@@ -3595,6 +3595,7 @@ const ALL_SEASONS = [
       { name: "Zehra Shalimar", finalPlacement: "Por determinar",
         image: "img/pakistan-s5-placeholder.svg", stats: { acting: 9, comedy: 2, dance: 10, design: 8, improv: 0, runway: 8, lipsync: 12, makeup: 6, singing: 10, verses: 4, strategy: 5, charisma: 12, uniqueness: 11, nerve: 13, talent: 1 } },
     ],
+  },
   {
     id: "PK_S6",
     seasonName: "Drag Race Pakistán — Temporada 6",
@@ -3621,7 +3622,6 @@ const ALL_SEASONS = [
       { name: "Zarak Mirza", finalPlacement: "Por determinar",
         image: "img/pakistan-s6-placeholder.svg", stats: { acting: 12, comedy: 10, dance: 13, design: 9, improv: 0, runway: 14, lipsync: 1, makeup: 2, singing: 7, verses: 0, strategy: 10, charisma: 6, uniqueness: 9, nerve: 14, talent: 6 } },
     ],
-  },
   },
   {
     id: "EG_S1",
