@@ -2706,6 +2706,20 @@ this.plan = this.makePlan();
         }
         return this.judgingScreen();
       }
+      if (this.opts.lftw && n >= 5 && !this.slayNow() && !this.noElimNow() && !this.premiereHalf && !this.splitNow) {
+        // Lipsync for the win: cada semana un Top 2 (o 3) y un Bottom 2 (o 3, 4) como en el estreno UK3
+        byPerf();
+        f.isTeam = false; f.isPair = false; f.isNoTeam = false;
+        const r = rnd(0, 100);
+        const tc = n >= 7 && r < 35 ? 3 : 2;
+        const rb = rnd(0, 100);
+        let bc = rb < 50 ? 2 : rb < 85 ? 3 : 4;
+        bc = Math.min(bc, n <= 6 ? 3 : 4, n - tc);
+        for (let i = 0; i < tc; i++) top.push(cast[i]);
+        for (let i = 0; i < bc; i++) bottom.push(cast[n - (i + 1)]);
+        f.lftwJ = { threeWay: tc === 3 && rnd(0, 100) < 45 };
+        return this.judgingScreen();
+      }
       if (this.tour) return this.tournamentJudging();
       if (this.raqMerge && this.current.length > 3) return this.raqMergeJudging();
       if (this.opts.winners) return this.winnersJudging();
@@ -2867,6 +2881,82 @@ this.plan = this.makePlan();
       safe.addTR("LOW"); safe.unfavoritism += 1; safe.ppe += 2;
       r.q([safe.name], "pink", `${safe.name}... estás a salvo.`);
       r.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, lo siento, queridas, pero estáis en riesgo de eliminación.`);
+      this.topQueens = [];
+      return this.lipsyncDesc();
+    }
+
+    // Lipsync for the win: como el UK3 pero cada semana. Las dos (o tres) mejores hacen lip sync por la victoria (puede
+    // ganar una sola, ganar las dos o haber una tercera en HIGH) y las peores hacen lip sync por su vida: dos, tres a la vez
+    // (con 1 o 2 eliminadas) o cuatro en el bottom (las dos mejores se salvan con LOW). Nada de esto cambia el lip sync de
+    // abajo: se reutiliza el de siempre (doble shantay, doble sashay, etc.).
+    lftwJudging() {
+      const f = this.flag, cfg = f.lftwJ;
+      f.lftwJ = null;
+      const top = this.topQueens;
+      const bottom = this.bottomQueens;
+      top.forEach((q) => this.rigAdj(q));
+      top.sort((a, b) => a.performanceScore - b.performanceScore);
+      const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
+      s.b("Chicas, he tomado algunas decisiones...");
+      let contenders = top.slice(0, 2);
+      if (top.length === 3) {
+        if (cfg.threeWay) contenders = top.slice();
+        else {
+          const high = top[2];
+          high.addTR("HIGH"); high.favoritism += 1; high.ppe += 4;
+          s.q([high.name], "lightblue", `${high.name}, buen trabajo esta semana, estás a salvo.`);
+        }
+      }
+      s.q(contenders.map((q) => q.name), "cyan", `${list(contenders.map((q) => q.name))}, condragulations, ¡${contenders.length === 3 ? "sois el Top 3" : "sois el Top 2"} de la semana!`);
+      s.hr();
+      s.b(`¡${contenders.length === 3 ? "Las tres" : "Las dos"} haréis ahora lip sync... por la victoria!`);
+      contenders.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(s);
+      s.hr();
+      this.lipsyncEvent(s, contenders);
+      const raw = contenders.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(s, contenders, song);
+      contenders.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+      contenders.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+
+      const r = this.newScreen("He tomado mi decisión.", "Continuar");
+      const doubleOk = !this.tw.has("DISABLE_DOUBLE") && contenders[0].lipsyncScore > 5 && contenders[1].lipsyncScore > 5;
+      const dbl = doubleOk && rnd(0, 100) < (contenders.length === 3 ? 20 : 30);
+      if (dbl) {
+        const pair = contenders.slice(0, 2);
+        this.addSong(pair, contenders.slice(2), song);
+        pair.forEach((q) => { q.addTR(" WIN"); q.favoritism += 5; q.ppe += 5; });
+        r.q(pair.map((q) => q.name), "darkblue", `${pair[0].name}, ${pair[1].name}, condragulations, ¡las dos habéis ganado el reto de hoy!`);
+        this.gbm = pair;
+      } else {
+        const w = contenders[0];
+        this.addSong([w], contenders.slice(1), song);
+        w.addTR("WIN"); w.favoritism += 5; w.ppe += 5;
+        r.q([w.name], "royalblue", `${w.name}, ¡eres una ganadora, baby!`);
+        this.gbm = [w];
+        this.twistWinner(r, w);
+      }
+      contenders.slice(dbl ? 2 : 1).forEach((q) => {
+        q.addTR("TOP2"); q.favoritism += 2; q.ppe += 4.5;
+        r.q([q.name], "deepskyblue", `${q.name}, estás a salvo.`);
+      });
+      r.hr();
+      r.b("Ahora...");
+      r.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, sois las peores de la semana...`);
+      bottom.forEach((q) => { q.performanceScore -= q.runwayScore; });
+      bottom.sort((a, b) => a.performanceScore - b.performanceScore);
+      this.twistBottom(r, bottom);
+      const lowSafe = (count) => {
+        const safe = bottom.splice(0, count);
+        safe.forEach((q) => { q.addTR("LOW"); q.unfavoritism += 1; q.ppe += 2; });
+        r.q(safe.map((q) => q.name), "pink", `${list(safe.map((q) => q.name))}... ${safe.length > 1 ? "estáis" : "estás"} a salvo.`);
+      };
+      if (bottom.length >= 4) lowSafe(bottom.length - 2);
+      else if (bottom.length === 3) {
+        if (this.current.length > 5 && rnd(0, 100) < 45) { f.thirdqueen = true; r.b("... nadie está a salvo."); }
+        else lowSafe(1);
+      }
+      r.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, lo siento, queridas, pero ${bottom.length > 1 ? "estáis" : "estás"} en riesgo de eliminación.`);
       this.topQueens = [];
       return this.lipsyncDesc();
     }
@@ -4372,6 +4462,7 @@ this.plan = this.makePlan();
       }
       this.safeUntucked();
       this.judgingCritiques();
+      if (f.lftwJ) return this.lftwJudging();
       return this.uk3Now() ? this.uk3Judging() : this.slayNow() ? this.slayersJudging() : this.winAndBtm2();
     }
 
@@ -6107,7 +6198,7 @@ this.allianceTick(s);
   const RANDOM_SEASONS = [
     ["SEASON_REGULAR", 3, "Regular"], ["SEASON_THAILAND", 6, "Thailand (temporadas 1 y 2)"], ["SEASON_TEAMS", 6, "Por equipos"],
     ["SEASON_LIPSYNC_LEGACY", 6, "Lipsync For Your Legacy"], ["SEASON_LIPSYNC_ASSASSIN", 6, "Lipsync Assassin"], ["SEASON_ALL_WINNERS", 6, "All Winners"],
-    ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
+    ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_LFTW", 6, "Lipsync for the win"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
   // Twists copiados (los demás twists de la lista siguen con el motor propio)
   const IMPLEMENTED_TWISTS = ["DISABLE_DOUBLE", "DISABLE_REUNION", "RIGGORY", "RIGGORY_LIPSYNC", "CLAIM_QUEEN", "IMMUNITY", "BEAVER", "CHOCOLATE_RANDOM", "CHOCOLATE_CHOOSABLE", "BADONKA_RANDOM", "BADONKA_CHOOSABLE", "SOLID_BACKGROUND", "TITLE_GOLDEN_BOOT", "TITLE_FAN_FAVORITE", "TITLE_VILLAIN", "TITLE_ROBBED", "TITLE_POPSTAR", "TITLE_MOGUL", "TITLE_WORST_LOOK", "TITLE_LOST_LOOK", "TITLE_BRICK", "LIPSYNC_CHALLENGE", "SLAY_OFF", "SLAYSIAN_LALA", "REUNION_SMACKDOWN", "FAME_GAMES", "PICK_POISON", "SNATCH_RUSICAL"];
@@ -6141,7 +6232,7 @@ this.allianceTick(s);
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_LFTW" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && IMPLEMENTED_RETURNS.includes(formatChoice.return)
       && (formatChoice.twists || []).every((t) => IMPLEMENTED_TWISTS.includes(t));
@@ -6269,6 +6360,7 @@ this.allianceTick(s);
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       split: formatChoice.season === "SEASON_SPLIT",
       fatal: formatChoice.season === "SEASON_FATAL",
+      lftw: formatChoice.season === "SEASON_LFTW",
       assign: formatChoice.groupAssign || {},
       twists: formatChoice.twists || [],
       episodes: formatChoice.episodes || 0,

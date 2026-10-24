@@ -674,3 +674,15 @@ Arreglos en esta tanda: en Thailand con el estreno Slayers (y 9 reinas) el juici
 - **Estrategia = alianzas**: tras cada episodio (en Untucked) cada reina puede aliarse con una compañera con la que se lleva bien, con más probabilidad cuanta más Estrategia tenga (≈3% por punto). Las alianzas (de 2 a 4 reinas) se anuncian en Untucked con su objetivo (la reina con la que peor se llevan). Las aliadas se prefieren entre sí al elegir (Miss Simpatía, regresos, pintalabios), votan juntas contra el objetivo (85% de las veces), se llevan cada vez mejor entre ellas y peor con el objetivo. Si se van reinas, la alianza se rompe cuando queda una sola.
 - **Doble shantay antes de la final** (con cualquier final de Top 3 o más): al eliminar a la que queda justo por encima de la final hay un 12% de probabilidad de que haya un capítulo extra en el que las dos de abajo se salvan (doble shantay) y entonces se pasa a la final.
 - **Número de capítulos** (opcional, en «Formato» de Simular): con la final incluida. Si pides más capítulos de los normales se añaden dobles shantay repartidos por la temporada (y los que sobren van en capítulos antes de la final); si pides menos, dobles sashay. Si no lo usas, no cambia nada. Disponible en las temporadas con juicio y lip sync normales (Regular, Split, etc.), no en Thailand, equipos, Legacy, Assassin, All Winners, Slaysian, Fatal Selection ni torneo.
+
+## Formato «Lipsync for the win»
+
+Temporada nueva (opción *Formato de temporada*): el estreno UK3 pero **todas las semanas**. Cada capítulo hay un Top 2 que hace lip sync por la victoria y un Bottom 2 que lo hace por su vida. Con variaciones al azar:
+
+- **Top 3**: la tercera es HIGH, o las tres hacen un lip sync a tres por la victoria.
+- **Doble victoria**: las dos que hacen el lip sync for the win ganan el reto.
+- **Bottom 3**: la mejor se salva con LOW y las otras dos hacen lip sync, o las tres lo hacen a la vez (se va una o dos).
+- **Bottom 4**: las dos mejores se salvan con LOW.
+- Doble shantay y doble sashay funcionan como siempre (también el número de capítulos elegido).
+
+Con menos de 5 reinas en la carrera se usa el juicio normal. También entra en «Formato al azar».

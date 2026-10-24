@@ -93,6 +93,8 @@ const DEFAULT_FORMATS = [
     description: "Tres estrenos con un tercio del reparto cada uno y después dos rondas de grupos A y B que juegan por separado, antes de que sigan todas juntas." },
   { id: "SEASON_FATAL", group: "season", label: "Fatal Selection", custom: false,
     description: "Las reinas del bottom eligen pintalabios; la ganadora elige a quién enfrenta a la asesina del lip sync por su vida." },
+  { id: "SEASON_LFTW", group: "season", label: "Lipsync for the win", custom: false,
+    description: "Como el estreno UK3 pero todas las semanas: un Top 2 hace lip sync por la victoria y un Bottom 2 (o 3) por su vida. Puede haber Top 3, doble victoria, tres en el bottom, doble shantay o doble eliminación." },
   { id: "SEASON_TOURNAMENT", group: "season", label: "Tournament of All Stars (grupos a medida)", custom: false,
     description: "El reparto se divide en grupos que juegan varios episodios con puntos MVQ; pasan las mejores de cada grupo, con segunda ronda opcional." },
 

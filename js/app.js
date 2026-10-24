@@ -241,7 +241,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio. La copia del simulador de referencia cubre todos los estrenos normales y sus variantes (doble, triple, Porkchop, Rate A Queen, UK3, entrada tardía, al azar...), las temporadas Regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale y Tournament of All Stars, y todas las finales, con regreso «Eligen quién regresa» o sin regresos, y sin opciones extra.";
+      : "Este formato todavía usa el motor propio. La copia del simulador de referencia cubre todos los estrenos normales y sus variantes (doble, triple, Porkchop, Rate A Queen, UK3, entrada tardía, al azar...), las temporadas Regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, Lipsync for the win, All Winners, Slaysian Royale y Tournament of All Stars, y todas las finales, con regreso «Eligen quién regresa» o sin regresos, y sin opciones extra.";
   };
   // Ajustes del Tournament of All Stars: grupos, episodios por grupo, reinas que pasan y segunda ronda.
   const tourBox = el("div", { class: "section", style: "margin-top:.6rem;" });
