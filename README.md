@@ -635,3 +635,11 @@ También corregí un fallo del Split Format: las reinas eliminadas en un estreno
 Igual que el regreso Choose (mismo momento, pantalla «Una grata sorpresa...», casilla `RTRN+...` y «(Orig. Nº)»), pero la reina que vuelve se elige al azar entre las eliminadas (no valen las descalificadas ni las que abandonaron) y hay un 5% de probabilidad de que vuelva una segunda reina en la misma pantalla.
 
 Corregí además un fallo de los juicios de Lipsync Assassin, Lipsync For Your Legacy, Slaysian Royale y Fatal Selection: tras un reto por equipos la bandera de equipo se quedaba puesta y en un episodio posterior podía meter en el bottom a una reina ya eliminada (aparecía duplicada en la tabla en ~1 de cada 5 temporadas de Assassin).
+
+## Regresos copiados de myrainboww y esopare (tanda 1)
+
+- **Choose / Choose 2 / Choose 5**: vuelven 1, 2 o 5 eliminadas (las eliges de antemano en «¡Conoce a las concursantes!»; volverán cuando las eliminen, y si no, al azar). Choose 2 necesita al menos 2 eliminadas y Choose 5 al menos 5.
+- **Votan las reinas que quedan**: cada reina que sigue vota a una eliminada (la que mejor le cae) y vuelve la más votada.
+- **Lip-Sync Smackdown** y **Hellbound Showdown**: justo antes de la final (al llegar a las reinas de la final) las eliminadas se enfrentan en una cadena de lip syncs/pasarelas (la más antigua contra la siguiente, la ganadora sigue; empates de doble eliminación juegan a tres); la última vuelve, o las dos si empatan alto. Añaden dos columnas al track record («Lipsync Smackdown»/«The Last Supper» y «Regreso» con `RTRN`/`OUT`) y las reinas que siguen reciben `RUN`.
+- **LaLaPaRUza**: a mitad de temporada, cada eliminada hace lip sync contra una reina que sigue (la ganadora del reto anterior tiene inmunidad); si gana la eliminada vuelve y la otra se va; hay lip syncs a tres cuando sobran reinas o eliminadas; la eliminada parte con -4.
+- **Regreso aleatorio**: sortea uno de los regresos anteriores (no vale con equipos ni All Winners).

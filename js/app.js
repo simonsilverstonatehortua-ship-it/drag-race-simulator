@@ -416,7 +416,7 @@ function runSimulation() {
   if (window.RefSim && window.RefSim.canRun(formatChoice)) {
     // Estreno normal + regular + Top 2 + sin regresos: copia del simulador de referencia
     // (js/refsim.js), con sus propias pantallas.
-    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {}, returnPick: returnPick || "" }), buildStatsByName(), relationships);
+    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {}, returnPick: returnPick || [] }), buildStatsByName(), relationships);
     seasonPlayer = {
       result,
       screens: result.screens.map((s) => ({ title: s.title, button: s.button, body: () => renderRefBlocks(s.blocks) })),
@@ -480,18 +480,22 @@ function renderRelationshipSetup() {
   const plan = window.RefSim && window.RefSim.canRun(formatChoice) && window.RefSim.groupPlan ? window.RefSim.groupPlan(formatChoice, setup.names.length) : null;
   if (plan) wrap.appendChild(groupAssignPanel(setup, plan, refresh));
 
-  if (formatChoice.return === "RETURN_CHOOSE" && window.RefSim && window.RefSim.canRun(formatChoice)) {
+  const pickCount = { RETURN_CHOOSE: 1, RETURN_CHOOSE2: 2, RETURN_CHOOSE5: 5 }[formatChoice.return];
+  if (pickCount && window.RefSim && window.RefSim.canRun(formatChoice)) {
     const rbox = el("div", { class: "rel-overview", style: "padding:.8rem 1rem;margin:1rem 0;" });
     rbox.appendChild(el("h3", { class: "group-title", text: "Regreso" }));
-    rbox.appendChild(el("p", { class: "muted small", text: "Elige qué concursante quieres que regrese a la competición. Volverá cuando la eliminen (en un episodio al azar, y seguro al quedar 5 reinas); si no la eliminan, regresa una eliminada al azar." }));
-    const rsel = el("select", { onchange: (e) => { setup.returnPick = e.target.value; } });
-    rsel.appendChild(el("option", { value: "", text: "Al azar" }));
-    setup.names.forEach((n) => {
-      const o = el("option", { value: n, text: n });
-      if (setup.returnPick === n) o.setAttribute("selected", "selected");
-      rsel.appendChild(o);
-    });
-    rbox.appendChild(rsel);
+    rbox.appendChild(el("p", { class: "muted small", text: `Elige ${pickCount === 1 ? "qué concursante quieres que regrese" : `qué ${pickCount} concursantes quieres que regresen`} a la competición. Volverán cuando las eliminen (en un episodio al azar, y seguro al quedar 5 reinas); las que no elijas o no lleguen a ser eliminadas se sustituyen por eliminadas al azar.` }));
+    const picks = setup.returnPick = Array.isArray(setup.returnPick) ? setup.returnPick : (setup.returnPick ? [setup.returnPick] : []);
+    for (let i = 0; i < pickCount; i++) {
+      const rsel = el("select", { style: "margin:.2rem .4rem .2rem 0;", onchange: (e) => { picks[i] = e.target.value; } });
+      rsel.appendChild(el("option", { value: "", text: "Al azar" }));
+      setup.names.forEach((n) => {
+        const o = el("option", { value: n, text: n });
+        if (picks[i] === n) o.setAttribute("selected", "selected");
+        rsel.appendChild(o);
+      });
+      rbox.appendChild(rsel);
+    }
     wrap.appendChild(rbox);
   }
 
