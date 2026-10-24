@@ -532,7 +532,7 @@
         return this.lalaparuzaReturn(elim);
       }
       // los que ocurren a la mitad de la temporada
-      if (cur === Math.round(total / 2) && total > 8 && elim.length >= 2) {
+      if (cur === Math.round(total / 2) && total > 8 && cur > this.finaleSize && elim.length >= 2) {
         if (mode === "RETURN_READING") return;
         this.returned = true;
         if (mode === "RETURN_CONJOINED") return this.conjoinedReturn(elim);
@@ -588,6 +588,28 @@
       q.unfavoritism += 5; q.votes = 0;
       this.eliminated.unshift(q);
       this.current.splice(this.current.indexOf(q), 1);
+    }
+
+    // Conjoined Queens Makeover: a mitad de temporada el siguiente episodio es un cambio de look en el que cada reina que
+    // sigue elige a una eliminada como pareja; si la reina gana el reto, su pareja vuelve (el resto de eliminadas se queda "OUT ").
+    conjoinedReturn(elim) {
+      this.conj = { elim: elim.slice(), pairs: [], pending: true };
+    }
+
+    conjoinedFinish() {
+      const col = this.episodeChallenges.length - 1;
+      const c = this.conj;
+      const won = (q) => /^\s*WIN/.test(String(q.trackRecord[col] || "")) && !/ELIM|QUIT|DISQ/.test(String(q.trackRecord[col]));
+      const back = c.pairs.filter(([q]) => this.current.includes(q) && won(q)).map(([, p]) => p);
+      this.eliminated.forEach((q) => this.setCell(q, col, back.includes(q) ? "RTRN " : (q.queenDisqOrDept ? "" : "OUT ")));
+      const s = this.newScreen("¡Vuelven a la competición!", "Continuar");
+      if (!back.length) s.p("Ninguna de las parejas ha conseguido ganar el reto: nadie vuelve a la competición.");
+      back.forEach((q) => {
+        const partner = c.pairs.find(([, p]) => p === q)[0];
+        this.bringBack(q, false);
+        s.q([q.name, partner.name], "orange", `${q.name}, tu pareja ${partner.name} ha ganado el reto: ¡estás de vuelta en la competición!`);
+      });
+      this.conj = null;
     }
 
     // "Contestants Votes": las reinas que siguen votan cuál de las eliminadas vuelve.
@@ -824,6 +846,7 @@
       this.top2 = [];
       this.flag.isNoTeam = false;
       this.miniChallenge();
+      if (this.conj && this.conj.active) { const c = this.conj; this.conjoinedFinish(); this.conj = null; void c; }
     }
 
     // ---------- mini reto ----------
@@ -869,12 +892,15 @@
       let text;
       this.miniType = null;
       const readingNow = (cast.length === 6 && this.total >= 9 && this.episode > 2 ||
-        cast.length === 7 && this.total >= 30 && this.episode > 3 || (this.opts.legacy || this.opts.assassin || this.opts.slaysian) && this.episode === 1) && !this.flag.reading && !this.opts.winners;
+        cast.length === 7 && this.total >= 30 && this.episode > 3 || (this.opts.legacy || this.opts.assassin || this.opts.slaysian) && this.episode === 1 && !(this.opts.return === "RETURN_READING" && !this.opts.slaysian)) && !this.flag.reading && !this.opts.winners;
       if (readingNow) {
         text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas se leerán entre ellas.";
         this.miniType = "comedy";
         this.flag.reading = true;
-        this.readingBlocks = this.readingChallenge(cast, true);
+        const readingIF = this.opts.return === "RETURN_READING" && !this.returned && this.episode > 1 && !this.opts.teams && this.eliminated.some((q) => !q.queenDisqOrDept);
+        this.readingIFNow = readingIF;
+        if (readingIF) text = "¡La biblioteca está abierta! En el mini reto de hoy, las reinas eliminadas se leerán entre ellas... ¡y la ganadora vuelve a la competición!";
+        this.readingBlocks = this.readingChallenge(readingIF ? this.eliminated.filter((q) => !q.queenDisqOrDept) : cast, !readingIF);
       } else if (this.total !== 5 && cast.length === 5) {
         text = "¡Que salgan los títeres! Las reinas se parodiarán entre ellas usando títeres.";
         this.miniType = "comedy";
@@ -916,6 +942,17 @@
       if (this.flag.miniHappen) return;
       const cast = this.current;
       this.scoreMini(s);
+      if (this.readingIFNow) {
+        // Reading is Fundamental: la ganadora de la lectura (una eliminada) vuelve a la competición en este mismo episodio
+        this.readingIFNow = false;
+        this.returned = true;
+        const winner = pick(this.eliminated.filter((q) => !q.queenDisqOrDept));
+        this.bringBack(winner);
+        winner.miniEpisode.push(this.episode);
+        winner.miniWinner = true;
+        s.q([winner.name], "royalblue", `¡${winner.name} ganó el reto de lectura y vuelve a la competición!`);
+        return;
+      }
       if (rnd(0, 100) <= 90) {
         const winner = cast[0];
         const roll = rnd(0, 10);
@@ -974,7 +1011,8 @@
       if (this.opts.slaysian && n === 6 && !this.flag.slaysianDone) return this.slaysianLalaparuza();
       const opening = this.opts.opening;
       let fn;
-      if (this.tour) fn = this.tournamentChallenge();
+      if (this.conj && this.conj.pending) { this.conj.pending = false; this.conj.active = true; fn = "conjoined"; }
+      else if (this.tour) fn = this.tournamentChallenge();
       else if (this.opts.winners) fn = this.winnersChallenge();
       else if (this.opts.teams) fn = this.teamChallenge();
       else if (this.premiereHalf) fn = this.opts.doubleNoElim || this.opts.doubleGG || this.opts.porkchop ? "girlgroup" : this.opts.doubleTalent || this.opts.raq || this.opts.globalAS ? "talent" : this.randomMaxi();
@@ -1086,6 +1124,30 @@
           this.flag.isDesign = true;
           this.cnt.design++;
           this.episodeChallenges.push("Design");
+          break;
+        }
+        case "conjoined": {
+          // Conjoined Queens Makeover: cada reina que sigue elige a una eliminada como pareja de cambio de look
+          const elim = this.conj.elim.slice();
+          s.b("Las reinas eliminadas se emparejarán con las concursantes actuales en un reto de gemelas drag conjuntas, luchando por una oportunidad de volver al juego.");
+          s.hr();
+          s.b("Las concursantes actuales eligen a su pareja...");
+          this.conj.pairs = [];
+          cast.forEach((q) => {
+            if (!elim.length) {
+              s.q([q.name], undefined, `Eso significa que ${q.name} hará el cambio de look de una de las del equipo de boxes.`);
+            } else {
+              let partner = this.bestSister(q, elim);
+              if (!elim.includes(partner)) partner = pick(elim);
+              elim.splice(elim.indexOf(partner), 1);
+              this.conj.pairs.push([q, partner]);
+              s.q([q.name, partner.name], undefined, `${q.name} ha elegido a ${partner.name}`);
+            }
+            q.getDesign();
+          });
+          cast.sort((a, b) => a.performanceScore - b.performanceScore);
+          this.flag.isDesign = true;
+          this.episodeChallenges.push("Conjoined Makeover");
           break;
         }
         case "improv": {
@@ -4947,9 +5009,9 @@
     ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
   // Regresos copiados (el resto de regresos de la lista siguen con el motor propio)
-  const IMPLEMENTED_RETURNS = ["RETURN_NONE", "RETURN_CHOOSE", "RETURN_CHOOSE2", "RETURN_CHOOSE5", "RETURN_RANDOM", "RETURN_VOTE", "RETURN_SMACKDOWN", "RETURN_HELLBOUND", "RETURN_LALAPARUZA", "RETURN_RANDOM_PICK"];
+  const IMPLEMENTED_RETURNS = ["RETURN_NONE", "RETURN_CHOOSE", "RETURN_CHOOSE2", "RETURN_CHOOSE5", "RETURN_RANDOM", "RETURN_VOTE", "RETURN_SMACKDOWN", "RETURN_HELLBOUND", "RETURN_LALAPARUZA", "RETURN_RANDOM_PICK", "RETURN_READING", "RETURN_CONJOINED"];
   // "Random return" (ranop): se sortea entre los regresos copiados (menos Hellbound), como en el original
-  const RANDOM_RETURN_POOL = ["RETURN_RANDOM", "RETURN_CHOOSE", "RETURN_VOTE", "RETURN_LALAPARUZA", "RETURN_SMACKDOWN", "RETURN_CHOOSE2", "RETURN_CHOOSE5"];
+  const RANDOM_RETURN_POOL = ["RETURN_RANDOM", "RETURN_CHOOSE", "RETURN_VOTE", "RETURN_CONJOINED", "RETURN_LALAPARUZA", "RETURN_SMACKDOWN", "RETURN_READING", "RETURN_CHOOSE2", "RETURN_CHOOSE5"];
   const RANDOM_PREMIERES = [
     ["PREMIERE_NORMAL", 3, "Estreno normal"], ["PREMIERE_NORMAL_NOELIM", 3, "Estreno normal (sin eliminación)"],
     ["PREMIERE_SLAYERS", 3, "Estreno normal (Slayers / Top 2)"], ["PREMIERE_UK3", 4, "Estreno UK3 (Top 2 y Bottom 2)"],
