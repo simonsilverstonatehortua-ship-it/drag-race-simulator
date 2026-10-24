@@ -750,6 +750,198 @@
       return this.untucked();
     }
 
+    // Kitty Girl Group / Attention Girl Group: a mitad de temporada el siguiente episodio es un grupo de chicas (Rumix) en el que
+    // compiten las reinas que siguen contra las eliminadas. Las ganadoras eligen qué eliminada vuelve (Kitty) o la peor de las que
+    // siguen hace lip sync contra la mejor eliminada (Attention).
+    girlGroupReturn(attention, elim) {
+      this.ggr = { attention, pending: true };
+    }
+
+    ggrMaxi(s, cast) {
+      const g = this.ggr;
+      g.pending = false; g.active = true;
+      g.cur = cast.slice();
+      g.elim = this.eliminated.filter((e) => !e.queenDisqOrDept);
+      if (g.attention) {
+        s.b("¡Es la hora del espectáculo! Las reinas actúan en un grupo de chicas contra las concursantes eliminadas.");
+      } else {
+        s.b("Las reinas eliminadas vuelven a la competición para vengarse. Pero antes, las reinas deben hacer una audición para el nuevo grupo de chicas de RuPaul, ¡las Kitty Girls!");
+      }
+      s.hr();
+      s.big(`Grupo 1: las ${g.cur.length} reinas que siguen`);
+      s.q(g.cur.map((q) => q.name), "black");
+      s.big("Grupo 2: las reinas eliminadas");
+      s.q(g.elim.map((q) => q.name), "black");
+      g.cur.forEach((q) => q.getRumix());
+      g.elim.forEach((q) => q.getRumix());
+      // las eliminadas también salen en las descripciones del reto
+      const allq = g.cur.concat(g.elim);
+      s.hr();
+      s.big("Actuaciones de las reinas...");
+      const by = (lo, hi) => allq.filter((q) => q.performanceScore >= lo && q.performanceScore < hi);
+      this.describeGroups(s, [
+        [by(-Infinity, 6), "darkblue", (l, pl) => `¡${l} ${pl ? "arrasaron" : "arrasó"} en el reto!`],
+        [by(6, 16), "royalblue", (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} una gran actuación!`],
+        [by(16, 26), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una buena actuación.`],
+        [by(26, 31), "pink", (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} una mala actuación...`],
+        [by(31, Infinity), "tomato", (l, pl) => `${l} ${pl ? "fracasaron" : "fracasó"} en el reto...`],
+      ]);
+      cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      this.flag.isDesign = true;
+      this.skipPerfDescription = true;
+      this.episodeChallenges.push(g.attention ? "Attention Girl Group" : "Kitty Girl Group");
+    }
+
+    // etiqueta del bottom según cuántas reinas siguen en él
+    btmLabel(n) {
+      return n >= 6 ? "BTM" : n === 5 ? "BTM6" : n === 4 ? "BTM5" : n === 3 ? "BTM4" : n === 2 ? "BTM3" : "BTM2";
+    }
+
+    ggrJudging() {
+      const g = this.ggr;
+      const col = this.episodeChallenges.length - 1;
+      const byScore = (a, b) => a.performanceScore - b.performanceScore;
+      const A = g.cur.slice().sort(byScore);
+      const E = g.elim.slice().sort(byScore);
+      const s = this.newScreen("¡El jurado!", "Continuar");
+      const outRest = (except) => g.elim.forEach((e) => { if (!except.includes(e)) this.setCell(e, col, "OUT "); });
+      this.topQueens = []; this.bottomQueens = [];
+      // ---- Attention Girl Group ----
+      if (g.attention) {
+        const worst = A[A.length - 1];
+        const best = E[0];
+        const top = A.slice(0, Math.min(4, A.length - 1));
+        const winner = top[0];
+        s.q([winner.name], "royalblue", `${winner.name}, condragulations, ¡eres la ganadora del reto de hoy!`);
+        this.setCell(winner, col, "WIN"); winner.favoritism += 5; winner.ppe += 5;
+        const highs = top.slice(1);
+        if (highs.length) {
+          highs.forEach((q) => { this.setCell(q, col, "HIGH"); q.favoritism += 1; q.ppe += 4; });
+          s.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, buen trabajo esta semana, estáis a salvo.`);
+        }
+        const safe = A.filter((q) => !top.includes(q) && q !== worst);
+        safe.forEach((q) => { this.setCell(q, col, "SAFE"); q.ppe += 3; });
+        if (safe.length) s.q(safe.map((q) => q.name), undefined, `${list(safe.map((q) => q.name))}, ${safe.length > 1 ? "estáis" : "estás"} a salvo.`);
+        s.hr();
+        s.q([worst.name, best.name], "tomato", `${worst.name}, lo siento, querida, pero estás en peligro de eliminación. Y tendrás que hacer lip sync contra...`);
+        s.q([best.name], "orange", `¡${best.name}!`);
+        const r = this.newScreen("Es la hora de la revelación...", "Ver el resultado");
+        r.p("Ha llegado la hora... ¡de que hagáis lip sync por vuestra VIDA! Buena suerte, y no la caguéis.");
+        const two = [worst, best];
+        const song = this.duelLipsync(r, two);
+        two.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+        const d = this.newScreen("He tomado mi decisión...", "Continuar");
+        const ret = (q, cell) => { this.setCell(q, col, cell); this.bringBack(q, false); };
+        if (two[0].lipsyncScore >= two[1].lipsyncScore && two[0].lipsyncScore > 6 && two[1].lipsyncScore > 6) {
+          this.addSong(two, [], song);
+          d.q(two.map((q) => q.name), "darkblue", "¡Condragulations, shantay, las dos os quedáis!");
+          this.setCell(worst, col, "BTM1"); worst.unfavoritism += 3; worst.ppe += 1;
+          this.setCell(best, col, "RTRN "); this.bringBack(best, false);
+          outRest([best]);
+        } else if (two[0] === best) {
+          this.addSong([best], [worst], song);
+          d.q([best.name], "blue", `${best.name}, ¡eres una ganadora, baby! ¡Estás de vuelta en el juego!`);
+          this.setCell(best, col, "RTRN "); this.bringBack(best, false);
+          d.q([worst.name], "red", `${worst.name}, sashay away.`);
+          this.eliminateNow(worst, col);
+          outRest([best]);
+        } else {
+          this.addSong([worst], [best], song);
+          d.q([worst.name], "blue", `${worst.name}, shantay, te quedas.`);
+          d.q([best.name], "red", `${best.name}, lo siento, querida, pero este no es tu momento... sashay away.`);
+          this.setCell(worst, col, "BTM1"); worst.unfavoritism += 3; worst.ppe += 1;
+          this.setCell(best, col, "OUT"); outRest([best]);
+        }
+        this.ggr = null;
+        return this.untucked();
+      }
+      // ---- Kitty Girl Group ----
+      const sum = (arr) => arr.reduce((t, q) => t + q.performanceScore, 0);
+      const currentWins = sum(A) <= sum(E);
+      const lipstickOf = (list_) => (rnd(0, 100) <= 45 ? list_[list_.length - 1] : list_[rnd(Math.max(0, list_.length - 2), list_.length - 1)]);
+      let top2, bottom;
+      if (currentWins) {
+        s.b(`Mis ${A.length} reinas, condragulations, ¡sois el equipo ganador!`);
+        top2 = [A[0], A[1]];
+        s.q(top2.map((q) => q.name), "cyan", `${top2[0].name} y ${top2[1].name}, sois las dos All Stars top de la semana.`);
+        if (this.total > 10) {
+          const safe = A.slice(2, A.length - 2);
+          safe.forEach((q) => { this.setCell(q, col, "SAFE"); q.ppe += 3; });
+          if (safe.length) s.q(safe.map((q) => q.name), undefined, `${list(safe.map((q) => q.name))}, ${safe.length > 1 ? "estáis" : "estás"} a salvo.`);
+          bottom = A.slice(A.length - 2);
+        } else bottom = A.slice(2);
+        s.q(bottom.map((q) => q.name), "red", `${list(bottom.map((q) => q.name))}... lo siento, queridas, pero estáis en peligro de eliminación.`);
+        top2.forEach((q) => { q.lipstick = lipstickOf(A); });
+      } else {
+        s.b("Mis reinas eliminadas, condragulations, ¡sois el equipo ganador!");
+        top2 = [E[0], E[1]];
+        s.q(top2.map((q) => q.name), "cyan", `${top2[0].name} y ${top2[1].name}, sois las dos All Stars top de la semana.`);
+        E.slice(2).forEach((e) => this.setCell(e, col, "OUT "));
+        bottom = A.slice();
+        s.q(bottom.map((q) => q.name), "red", "Estáis todas en peligro de eliminación.");
+        top2.forEach((q) => { q.lipstick = rnd(0, 100) <= 45 ? A[A.length - 1] : pick(A); });
+      }
+      s.hr();
+      s.big("Tras deliberar...");
+      top2.forEach((q) => s.q([q.name, q.lipstick.name], "cyan", `¡${q.name} eligió el pintalabios de ${q.lipstick.name}!`));
+      const r = this.newScreen("Es la hora de la revelación...", "Ver el resultado");
+      r.p(`Ha llegado la hora... ¡de que hagáis lip sync por vuestro ${currentWins ? "LEGADO" : "regreso"}! Buena suerte, y no la caguéis.`);
+      r.q(top2.map((q) => q.name), "tomato", `${top2[0].name} y ${top2[1].name} harán lip sync...`);
+      const song = this.duelLipsync(r, top2);
+      top2.sort((a, b) => b.lipsyncScore - a.lipsyncScore);
+      const d = this.newScreen("He tomado mi decisión...", "Continuar");
+      const both = top2[0].lipsyncScore === top2[1].lipsyncScore && top2[0].lipsyncScore > 6 && top2[1].lipsyncScore > 6;
+      const gone = [];
+      const winners = both ? top2 : [top2[0]];
+      if (both) {
+        this.addSong(top2, [], song);
+        d.q(top2.map((q) => q.name), "darkblue", "¡Condragulations, sois las dos ganadoras, baby!");
+        if (top2[0].lipstick === top2[1].lipstick) gone.push(top2[0].lipstick);
+        else { top2[0].lipstick.rankP = "tie1"; top2[1].lipstick.rankP = "tie2"; gone.push(top2[0].lipstick, top2[1].lipstick); }
+      } else {
+        this.addSong([top2[0]], [top2[1]], song);
+        d.q([top2[0].name], "royalblue", `${top2[0].name}, ¡eres una ganadora, baby!`);
+        gone.push(top2[0].lipstick);
+      }
+      winners.forEach((w) => { w.favoritism += 5; w.ppe += 5; });
+      if (currentWins) {
+        if (both) top2.forEach((w) => this.setCell(w, col, " WIN"));
+        else { this.setCell(top2[0], col, "WIN"); this.setCell(top2[1], col, "WIN "); top2[1].ppe += 5; }
+      } else {
+        winners.forEach((w) => { w.episodesOn++; this.setCell(w, col, "RTRN+WIN"); });
+        if (!both) { this.setCell(top2[1], col, "OUT"); top2[1].ppe += 5; top2[1].episodesOn++; d.q([top2[1].name], "red", `${top2[1].name}, sashay away.`); }
+      }
+      d.hr();
+      gone.forEach((q) => {
+        d.q([q.name], "red", `${q.name}, siempre serás una All Star, ahora... sashay away...`);
+        this.exitLine(d, q);
+        this.eliminateNow(q, col);
+        bottom.splice(bottom.indexOf(q), 1);
+      });
+      if (currentWins) {
+        // las ganadoras eligen qué eliminada vuelve
+        d.hr();
+        d.b(both ? "Ahora... ¿qué reinas habéis elegido para volver a la competición?" : "Ahora... ¿qué reina has elegido para volver a la competición?");
+        const picks = [];
+        winners.forEach((w) => {
+          let p = this.bestSister(w, E);
+          if (!E.includes(p)) p = pick(E);
+          picks.push(p);
+          d.q([w.name, p.name], "green", `${w.name} ha elegido a ${p.name} para volver a la competición.`);
+        });
+        const backs = picks.filter((p, i) => picks.indexOf(p) === i);
+        backs.forEach((p) => this.setCell(p, col, "RTRN "));
+        E.forEach((e) => { if (!backs.includes(e)) this.setCell(e, col, "OUT "); });
+        backs.forEach((p) => this.bringBack(p, false));
+      } else {
+        winners.forEach((w) => this.bringBack(w, false));
+        E.forEach((e) => { if (e.trackRecord[col] === undefined || e.trackRecord[col] === "") this.setCell(e, col, "OUT "); });
+      }
+      bottom.forEach((b) => { this.setCell(b, col, this.btmLabel(bottom.length)); b.unfavoritism += 3; b.ppe += 1; });
+      this.ggr = null;
+      return this.untucked();
+    }
+
     // "Contestants Votes": las reinas que siguen votan cuál de las eliminadas vuelve.
     returnByVote(elim) {
       const s = this.newScreen("Una grata sorpresa...", "Continuar");
@@ -1151,6 +1343,7 @@
       let fn;
       if (this.conj && this.conj.pending) { this.conj.pending = false; this.conj.active = true; fn = "conjoined"; }
       else if (this.qoc && this.qoc.pending) fn = "qoc";
+      else if (this.ggr && this.ggr.pending) fn = "ggr";
       else if (this.tour) fn = this.tournamentChallenge();
       else if (this.opts.winners) fn = this.winnersChallenge();
       else if (this.opts.teams) fn = this.teamChallenge();
@@ -1266,6 +1459,7 @@
           break;
         }
         case "qoc": this.comedyMaxi(s, cast); break;
+        case "ggr": this.ggrMaxi(s, cast); break;
         case "conjoined": {
           // Conjoined Queens Makeover: cada reina que sigue elige a una eliminada como pareja de cambio de look
           const elim = this.conj.elim.slice();
@@ -1714,6 +1908,8 @@
           describe(w);
           describe(l);
         });
+      } else if (this.skipPerfDescription) {
+        this.skipPerfDescription = false;
       } else {
         const by = (lo, hi) => cast.filter((q) => q.performanceScore >= lo && q.performanceScore < hi);
         const slay = by(-Infinity, 6), great = by(6, 16), good = by(16, 26), bad = by(26, 31), flop = by(31, Infinity);
@@ -1853,6 +2049,7 @@
 
       // Normal Premiere (No Elimination): el episodio 1 tiene siempre 3 arriba y 3 abajo.
       if (this.qoc && this.qoc.active) return this.qocJudging();
+      if (this.ggr && this.ggr.active) return this.ggrJudging();
       if (this.premiereHalf && this.opts.raq) return this.raqPremiereJudging();
       if (this.premiereHalf && !this.opts.porkchopElim && (this.opts.doubleNoElim || this.opts.globalAS)) return this.doubleNoElimJudging();
       if (this.lateNow()) return this.lateJudging();
@@ -5150,9 +5347,9 @@
     ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
   // Regresos copiados (el resto de regresos de la lista siguen con el motor propio)
-  const IMPLEMENTED_RETURNS = ["RETURN_NONE", "RETURN_CHOOSE", "RETURN_CHOOSE2", "RETURN_CHOOSE5", "RETURN_RANDOM", "RETURN_VOTE", "RETURN_SMACKDOWN", "RETURN_HELLBOUND", "RETURN_LALAPARUZA", "RETURN_RANDOM_PICK", "RETURN_READING", "RETURN_CONJOINED", "RETURN_QOC", "RETURN_REINAS"];
+  const IMPLEMENTED_RETURNS = ["RETURN_NONE", "RETURN_CHOOSE", "RETURN_CHOOSE2", "RETURN_CHOOSE5", "RETURN_RANDOM", "RETURN_VOTE", "RETURN_SMACKDOWN", "RETURN_HELLBOUND", "RETURN_LALAPARUZA", "RETURN_RANDOM_PICK", "RETURN_READING", "RETURN_CONJOINED", "RETURN_QOC", "RETURN_REINAS", "RETURN_KITTY", "RETURN_ATTENTION"];
   // "Random return" (ranop): se sortea entre los regresos copiados (menos Hellbound), como en el original
-  const RANDOM_RETURN_POOL = ["RETURN_RANDOM", "RETURN_CHOOSE", "RETURN_VOTE", "RETURN_CONJOINED", "RETURN_LALAPARUZA", "RETURN_SMACKDOWN", "RETURN_READING", "RETURN_CHOOSE2", "RETURN_CHOOSE5"];
+  const RANDOM_RETURN_POOL = ["RETURN_RANDOM", "RETURN_CHOOSE", "RETURN_VOTE", "RETURN_CONJOINED", "RETURN_LALAPARUZA", "RETURN_SMACKDOWN", "RETURN_READING", "RETURN_QOC", "RETURN_KITTY", "RETURN_REINAS", "RETURN_ATTENTION", "RETURN_CHOOSE2", "RETURN_CHOOSE5"];
   const RANDOM_PREMIERES = [
     ["PREMIERE_NORMAL", 3, "Estreno normal"], ["PREMIERE_NORMAL_NOELIM", 3, "Estreno normal (sin eliminación)"],
     ["PREMIERE_SLAYERS", 3, "Estreno normal (Slayers / Top 2)"], ["PREMIERE_UK3", 4, "Estreno UK3 (Top 2 y Bottom 2)"],
