@@ -1289,7 +1289,7 @@ function renderSeasonScreen() {
   const actions = el("div", { class: "toolbar", style: "justify-content:flex-start; margin-top:1.2rem;" });
   actions.appendChild(el("button", { class: "btn btn--accent", text: screen.button, onclick: isLast ? exitSeason : () => go(index + 1) }));
   if (!isLast) {
-    actions.appendChild(el("span", { class: "muted small", text: "Tip: usa las flechas ← → del teclado" }));
+    actions.appendChild(el("span", { class: "muted small", text: "Tip: usa la flecha → del teclado" }));
     actions.appendChild(el("button", { class: "btn btn--ghost", text: "Saltar al final", onclick: () => go(screens.length - 1) }));
     actions.appendChild(el("button", { class: "btn btn--ghost", text: "Salir", onclick: exitSeason }));
   }
@@ -1882,7 +1882,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Flechas del teclado para pasar de pantalla en una temporada (como en los simuladores de
-// referencia): → avanza, ← retrocede. Solo actúan mientras se está viendo una temporada.
+// referencia): → avanza. Solo actúan mientras se está viendo una temporada.
 document.addEventListener("keydown", (e) => {
   if (!seasonPlayer || e.altKey || e.ctrlKey || e.metaKey) return;
   const tag = (e.target && e.target.tagName) || "";
@@ -1890,8 +1890,6 @@ document.addEventListener("keydown", (e) => {
   const { screens, index } = seasonPlayer;
   if (e.key === "ArrowRight" && index < screens.length - 1) {
     seasonPlayer.index = index + 1;
-  } else if (e.key === "ArrowLeft" && index > 0) {
-    seasonPlayer.index = index - 1;
   } else return;
   e.preventDefault();
   render();
