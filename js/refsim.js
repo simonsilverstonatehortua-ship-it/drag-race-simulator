@@ -276,7 +276,7 @@
     const m = k.match(/^WIN(SAFE|HIGH|LOW|WIN|BTM\d|TOP2|ELIM|QUIT)$/);
     if (k === "WIN" || m) {
       const p = pal[k] || { bg: /BTM/.test(k) ? "mediumorchid" : "cornflowerblue", fg: "#000" };
-      return { text: k === "WIN" || k === "WINSAFE" ? "WIN" : "WIN\n+\n" + k.slice(3), bg: p.bg, fg: p.fg, bold: true };
+      return { text: k === "WIN" || k === "WINSAFE" || k === "WINWIN" ? "WIN" : "WIN\n+\n" + k.slice(3), bg: p.bg, fg: p.fg, bold: true };
     }
     return null;
   }
