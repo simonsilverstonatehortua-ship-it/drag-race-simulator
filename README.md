@@ -629,3 +629,9 @@ Bajo el buscador de "Simular temporada" hay un campo numérico y el botón «�
 Una vez por temporada vuelve una eliminada a la competición: cada episodio hay un 5% × nº de episodio de probabilidad (y seguro al quedar 5 reinas) siempre que queden menos reinas que el reparto menos 3. Antes de empezar, en «¡Conoce a las concursantes!», puedes elegir qué concursante regresa: volverá cuando la eliminen; si no la eliminan, regresa una eliminada al azar (las descalificadas o que abandonaron no pueden). Aparece una pantalla «Una grata sorpresa...», su casilla de regreso se ve como `RTRN+HIGH` (con los colores del original: SAFE naranja, LOW salmón, HIGH verde, BTM naranja fuerte) y su puesto original aparece como «(Orig. 9º)». No aplica a los formatos por equipos ni All Winners.
 
 También corregí un fallo del Split Format: las reinas eliminadas en un estreno seguían contando como vivas y salían duplicadas en la tabla.
+
+## Regreso «Random Queen Returns»
+
+Igual que el regreso Choose (mismo momento, pantalla «Una grata sorpresa...», casilla `RTRN+...` y «(Orig. Nº)»), pero la reina que vuelve se elige al azar entre las eliminadas (no valen las descalificadas ni las que abandonaron) y hay un 5% de probabilidad de que vuelva una segunda reina en la misma pantalla.
+
+Corregí además un fallo de los juicios de Lipsync Assassin, Lipsync For Your Legacy, Slaysian Royale y Fatal Selection: tras un reto por equipos la bandera de equipo se quedaba puesta y en un episodio posterior podía meter en el bottom a una reina ya eliminada (aparecía duplicada en la tabla en ~1 de cada 5 temporadas de Assassin).

@@ -474,17 +474,39 @@
       this.finalScreens();
     }
 
-    // Regreso "Choose": una vez por temporada vuelve una eliminada, elegida de antemano por el usuario (si ya se ha ido) o al azar.
+    // Regresos "Choose" (la elegida de antemano por el usuario si ya se ha ido) y "Random": una vez por temporada vuelve una eliminada.
     // Cada episodio hay un 5% x nº de episodio de probabilidad de que ocurra, y seguro al llegar a 5 reinas.
     maybeReturn() {
-      if (this.opts.return !== "RETURN_CHOOSE" || this.returned || this.opts.teams || this.opts.winners) return;
+      const mode = this.opts.return;
+      if ((mode !== "RETURN_CHOOSE" && mode !== "RETURN_RANDOM") || this.returned || this.opts.teams || this.opts.winners) return;
       const pool = this.eliminated.filter((q) => !q.queenDisqOrDept);
       if (!pool.length || this.current.length >= this.queens.length - 3) return;
-      const want = this.opts.returnPick ? pool.find((q) => q.name === this.opts.returnPick) : null;
-      const waiting = this.opts.returnPick && !want && this.current.some((q) => q.name === this.opts.returnPick);
+      const pickName = mode === "RETURN_CHOOSE" ? this.opts.returnPick : "";
+      const want = pickName ? pool.find((q) => q.name === pickName) : null;
+      const waiting = pickName && !want && this.current.some((q) => q.name === pickName);
       if (!(this.current.length === 5 || (!waiting && rnd(0, 100) < 5 * this.episode))) return;
       const q = want || pick(pool);
       this.returned = true;
+      const s = this.newScreen("Una grata sorpresa...", "Continuar");
+      s.b("He decidido que una de mis reinas se ha ido demasiado pronto... Me gustaría dar la bienvenida de nuevo a...");
+      this.bringBack(q);
+      s.q([q.name], "aquamarine", `¡${q.name}!`);
+      s.p(`${q.name} vuelve a la competición.`);
+      // Regreso al azar: con un 5% de probabilidad vuelve una segunda reina
+      if (mode === "RETURN_RANDOM" && rnd(0, 1000) >= 950) {
+        const rest = this.eliminated.filter((e) => !e.queenDisqOrDept);
+        if (rest.length) {
+          const q2 = pick(rest);
+          s.b("¡Todavía no he acabado, dad la bienvenida también a...!");
+          this.bringBack(q2);
+          s.q([q2.name], "aquamarine", `¡${q2.name}!`);
+          s.p(`${q2.name} también vuelve a la competición.`);
+        }
+      }
+    }
+
+    // Saca a una eliminada de la lista de eliminadas y la devuelve a la competición (con su puesto original anotado).
+    bringBack(q) {
       q.ogPlace = this.current.length + 1 + this.eliminated.indexOf(q);
       this.eliminated.splice(this.eliminated.indexOf(q), 1);
       if (q.rankP === "tie1" || q.rankP === "tie2") {
@@ -496,10 +518,6 @@
       q.trackRecord.length = this.episodeChallenges.length; // fuera la casilla vacía de la próxima columna
       q.retCols.push(this.episodeChallenges.length);
       this.current.push(q);
-      const s = this.newScreen("Una grata sorpresa...", "Continuar");
-      s.b("He decidido que una de mis reinas se ha ido demasiado pronto... Me gustaría dar la bienvenida de nuevo a...");
-      s.q([q.name], "aquamarine", `¡${q.name}!`);
-      s.p(`${q.name} vuelve a la competición.`);
     }
 
     // Split Format: tres estrenos con un tercio del reparto cada uno (cada grupo con su eliminación) y después
@@ -3136,6 +3154,7 @@
 
     // ---------- "¡Que vuelvan mis chicas!": ganadora, tops y bottoms ----------
     winAndBtm2() {
+      if (this.opts.assassin || this.opts.fatal || this.opts.legacy || (this.opts.slaysian && this.current.length > 6)) { this.flag.isTeam = false; this.flag.isPair = false; } // estos juicios no usan equipos: no dejar la bandera puesta
       if (this.opts.assassin) return this.assassinJudging();
       if (this.opts.fatal) { const fr = this.fatalJudging(); if (fr !== false) return fr; }
       if (this.opts.legacy || (this.opts.slaysian && this.current.length > 6)) return this.legacyJudging();
@@ -4703,7 +4722,7 @@
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
       && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
-      && (formatChoice.return === "RETURN_NONE" || formatChoice.return === "RETURN_CHOOSE")
+      && (formatChoice.return === "RETURN_NONE" || formatChoice.return === "RETURN_CHOOSE" || formatChoice.return === "RETURN_RANDOM")
       && (!formatChoice.twists || formatChoice.twists.length === 0);
   }
 
