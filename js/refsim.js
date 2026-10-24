@@ -343,6 +343,7 @@
     // TEMPORADA
     // ======================================================================================
     play() {
+      if (this.opts.randomSeasonLabel) this.newScreen("Formato al azar", "Empezar").p(`Formato aleatorio: esta temporada se juega con «${this.opts.randomSeasonLabel}».`);
       if (this.opts.tournament && this.current.length >= 6) this.playTournament();
       else this.opts.tournament = null;
       if (this.opts.winners && this.current.length >= 6) {
@@ -4630,6 +4631,12 @@
   // ======================================================================================
   const FINALE_SIZE = { FINALE_TOP2: 2, FINALE_TOP3: 3, FINALE_TOP4: 4, FINALE_TOP5: 5, FINALE_TEAMS: 4, FINALE_LIPSYNC_CROWN: 4, FINALE_LIPSYNC_FINALE: 4, FINALE_JURY_VOTE: 4, FINALE_JURY_TOP5: 5, FINALE_TOP6_AS11: 6, FINALE_TOP8: 8, FINALE_TOP8_LFTC: 8, FINALE_TOP8_WILDCARD: 7 };
   // [id, mínimo de reinas, nombre] de los estrenos que puede sortear "Estreno al azar".
+  // Formato de temporada al azar: [id, mínimo de reinas, etiqueta]; "Por equipos" necesita un número par.
+  const RANDOM_SEASONS = [
+    ["SEASON_REGULAR", 3, "Regular"], ["SEASON_THAILAND", 6, "Thailand (temporadas 1 y 2)"], ["SEASON_TEAMS", 6, "Por equipos"],
+    ["SEASON_LIPSYNC_LEGACY", 6, "Lipsync For Your Legacy"], ["SEASON_LIPSYNC_ASSASSIN", 6, "Lipsync Assassin"], ["SEASON_ALL_WINNERS", 6, "All Winners"],
+    ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
+  ];
   const RANDOM_PREMIERES = [
     ["PREMIERE_NORMAL", 3, "Estreno normal"], ["PREMIERE_NORMAL_NOELIM", 3, "Estreno normal (sin eliminación)"],
     ["PREMIERE_SLAYERS", 3, "Estreno normal (Slayers / Top 2)"], ["PREMIERE_UK3", 4, "Estreno UK3 (Top 2 y Bottom 2)"],
@@ -4656,7 +4663,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -4730,6 +4737,17 @@
       finale = pool.length ? pool[rnd(0, pool.length - 1)] : "FINALE_TOP2";
       randomLabel = FINALE_NAME[finale];
     }
+    // Formato de temporada al azar: se sortea entre los formatos copiados que caben en el reparto y en la final.
+    let randomSeasonLabel = null;
+    if (formatChoice.season === "SEASON_RANDOM") {
+      const fin = FINALE_SIZE[finale] || 2;
+      const fits = RANDOM_SEASONS.filter(([id, min]) => names.length >= min
+        && (id !== "SEASON_TEAMS" || names.length % 2 === 0)
+        && (id !== "SEASON_SPLIT" || names.length >= fin + 8));
+      const [sid, , slabel] = pick(fits);
+      formatChoice = Object.assign({}, formatChoice, { season: sid });
+      randomSeasonLabel = slabel;
+    }
     // Estreno al azar: se sortea entre los estrenos copiados que caben en el reparto.
     let premiere = formatChoice.season === "SEASON_TOURNAMENT" ? "PREMIERE_NORMAL" : formatChoice.premiere;
     let randomPremiereLabel = null;
@@ -4752,6 +4770,7 @@
       jury: finale === "FINALE_JURY_VOTE" || finale === "FINALE_JURY_TOP5",
       randomLabel,
       randomPremiereLabel,
+      randomSeasonLabel,
       triple: premiere === "PREMIERE_TRIPLE",
       premiereNoElim: premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: premiere === "PREMIERE_SLAYERS",

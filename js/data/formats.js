@@ -53,6 +53,8 @@ const DEFAULT_FORMATS = [
   // --- Formato de temporada ---
   { id: "SEASON_REGULAR", group: "season", label: "Regular", custom: false,
     description: "Formato estándar: reto semanal, top/bottom, lip sync, eliminación." },
+  { id: "SEASON_RANDOM", group: "season", label: "Formato al azar", custom: false,
+    description: "Se sortea el formato de temporada entre los disponibles que caben en el reparto." },
   { id: "SEASON_THAILAND", group: "season", label: "Thailand (temporadas 1 y 2)", custom: false,
     description: "Cada episodio: un maxi reto (solo gana una) y un reto de pasarela que es el que se juzga." },
   { id: "SEASON_TEAMS", group: "season", label: "Por equipos", custom: false,

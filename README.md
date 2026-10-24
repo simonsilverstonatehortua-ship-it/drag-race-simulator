@@ -611,3 +611,7 @@ Copia del formato de esopare: la ganadora del reto y las de arriba se salvan; la
 ## Elegir qué reinas van en cada grupo
 
 En el paso "¡Conoce a las concursantes!" aparece un panel **Grupos** cuando el formato forma grupos: grupos del torneo, los tres estrenos del Split Format, las parejas del formato por equipos y los estrenos doble y triple. Cada concursante tiene un desplegable (Al azar o el grupo que quieras) y se ve cuántas hay en cada grupo frente a las plazas. Las que se dejan "Al azar" rellenan los huecos que queden.
+
+## Formato de temporada al azar
+
+La opción «Formato al azar» sortea la temporada entre Regular, Thailand, Por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale, Split Format, Fatal Selection y Tournament of All Stars, sólo entre los que caben en el reparto (p. ej. Por equipos necesita un número par y el Split o el torneo, 12 o más). La lista es `RANDOM_SEASONS` en `js/refsim.js`; al empezar se anuncia el formato que ha salido.
