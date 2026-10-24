@@ -599,3 +599,7 @@ Las casillas usan los textos en una sola línea de la wiki: `WIN+HIGH`, `WIN+ELI
 ## Formato tras la ronda de grupos (merge) del torneo
 
 El desplegable del merge ahora incluye todos los formatos de temporada ya hechos: Regular, Rate-A-Queen, Thailand, Por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners y Slaysian Royale. La lista sale de `MERGE_FORMATS` en `js/refsim.js` (`RefSim.mergeFormats`), así que un formato nuevo solo necesita una entrada ahí. Si quedan menos de 6 reinas (o un número impar en "Por equipos") se juega el formato regular.
+
+## Split Format
+
+Copia del formato de esopare: el reparto se divide en tres estrenos (un tercio cada uno, cada grupo con su eliminación) y después dos rondas de grupos A y B que juegan por separado (el segundo reparto es nuevo); la que no juega ese episodio deja la casilla en blanco. Luego siguen todas juntas como en una temporada normal. Hacen falta al menos 9 reinas y 8 más que las de la final; si no, se juega el formato regular. También está disponible como formato de merge del torneo.

@@ -382,6 +382,7 @@
         this.late = pick(this.current);
         this.current = this.current.filter((q) => q !== this.late);
       }
+      if (this.opts.split && this.current.length >= 9 && this.current.length >= this.finaleSize + 8) this.playSplit();
       // Triple estreno (12 o más reinas): tres grupos al azar hacen los episodios 1, 2 y 3, cada uno con su
       // eliminación; en el episodio 4 siguen todas las que quedan.
       if (this.opts.triple && this.current.length >= 12) {
@@ -465,6 +466,49 @@
       this.reunion();
       this.finale();
       this.finalScreens();
+    }
+
+    // Split Format: tres estrenos con un tercio del reparto cada uno (cada grupo con su eliminación) y después
+    // dos rondas de dos grupos (A y B) que juegan por separado; la que no juega ese episodio no puntúa.
+    // Después siguen todas las que quedan, como en una temporada normal.
+    playSplit() {
+      const colors = ["#FE5007", "#EA00B7", "#8203D0"];
+      let alive = shuffle(this.current.slice());
+      const a = Math.ceil(alive.length / 3), b = Math.floor((alive.length - a) / 2);
+      const premieres = [alive.slice(0, a), alive.slice(a, a + b), alive.slice(a + b)];
+      const intro = this.newScreen("¡Estrenos divididos!", "Empezar");
+      intro.p("El reparto se divide en tres grupos: cada uno tiene su propio estreno, con su eliminación.");
+      intro.add(this.cardsBlock(premieres.map((g, i) => ({ title: `Estreno ${i + 1}`, color: colors[i], names: g.map((q) => q.name) }))));
+      this.splitNow = true;
+      // un episodio de un subgrupo; el resto de reinas vivas se quedan con la casilla en blanco
+      const run = (group) => {
+        group = group.filter((q) => alive.includes(q));
+        if (group.length < 3 || alive.length <= this.finaleSize + 1) return false;
+        alive.filter((q) => !group.includes(q)).forEach((q) => q.addTR(""));
+        this.current = group;
+        this.playEpisode();
+        this.flag.isTeam = false; this.flag.isPair = false;
+        const left = this.current;
+        alive = alive.filter((q) => !group.includes(q) || left.includes(q));
+        this.current = alive.slice();
+        this.trackRecordScreen(false);
+        return true;
+      };
+      premieres.forEach((g) => run(g));
+      // dos rondas de grupos A y B (el segundo reparto es nuevo y al azar)
+      for (let round = 0; round < 2; round++) {
+        const mix = shuffle(alive.slice());
+        const A = [], B = [];
+        mix.forEach((q) => { (A.length <= B.length ? A : B).push(q); });
+        if (alive.length <= this.finaleSize + 3) break;
+        const s = this.newScreen(round ? "¡Los grupos se mezclan!" : "¡Se forman los grupos!", "Empezar");
+        s.p(round ? "Las reinas se reparten en dos nuevos grupos que vuelven a jugar por separado." : "Las reinas restantes se reparten en dos grupos que jugarán por separado.");
+        s.add(this.cardsBlock([{ title: "Grupo A", color: colors[0], names: A.map((q) => q.name) }, { title: "Grupo B", color: colors[2], names: B.map((q) => q.name) }]));
+        run(A);
+        run(B);
+      }
+      this.splitNow = false;
+      this.current = alive;
     }
 
     // ---------- un episodio ----------
@@ -3393,7 +3437,7 @@
       }
       // Con una reina más que las de la final, un doble shantay puede ampliar la final en una
       // reina (Top 2 -> Top 3 -> Top 4), como en los originales.
-      const atFinaleEdge = !this.premiereHalf && this.current.length === this.finaleSize + 1;
+      const atFinaleEdge = !this.premiereHalf && !this.splitNow && this.current.length === this.finaleSize + 1;
       if (score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay) {
         if (atFinaleEdge && (this.finaleSize <= 3 || this.opts.lftc) && rnd(0, 10) >= 6) {
           this.finaleSize++;
@@ -4496,7 +4540,7 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
@@ -4513,6 +4557,7 @@
     { id: "assassin", label: "Lipsync Assassin", opt: "assassin" },
     { id: "winners", label: "All Winners (estrellas, sin eliminaciones)", opt: "winners" },
     { id: "slaysian", label: "Slaysian Royale", opt: "slaysian" },
+    { id: "split", label: "Split Format (estrenos y grupos separados)", opt: "split" },
   ];
 
   // Ajustes del torneo (grupos, episodios por grupo, reinas que pasan y segunda ronda opcional).
@@ -4568,6 +4613,7 @@
       legacy: formatChoice.season === "SEASON_LIPSYNC_LEGACY",
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
+      split: formatChoice.season === "SEASON_SPLIT",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
       tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
       uk3: premiere === "PREMIERE_UK3",
