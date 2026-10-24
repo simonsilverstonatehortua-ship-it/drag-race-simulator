@@ -67,6 +67,8 @@ const DEFAULT_FORMATS = [
     description: "Como el Legacy, con un torneo de lip syncs (LaLaPaRUza) al llegar a 6 reinas." },
   { id: "SEASON_SPLIT", group: "season", label: "Split Format", custom: false,
     description: "Tres estrenos con un tercio del reparto cada uno y después dos rondas de grupos A y B que juegan por separado, antes de que sigan todas juntas." },
+  { id: "SEASON_FATAL", group: "season", label: "Fatal Selection", custom: false,
+    description: "Las reinas del bottom eligen pintalabios; la ganadora elige a quién enfrenta a la asesina del lip sync por su vida." },
   { id: "SEASON_TOURNAMENT", group: "season", label: "Tournament of All Stars (grupos a medida)", custom: false,
     description: "El reparto se divide en grupos que juegan varios episodios con puntos MVQ; pasan las mejores de cada grupo, con segunda ronda opcional." },
 

@@ -390,12 +390,12 @@ function startRelationshipSetup() {
 }
 
 function runSimulation() {
-  const { names, relationships } = relationshipSetup;
+  const { names, relationships, groups } = relationshipSetup;
   relationshipSetup = null;
   if (window.RefSim && window.RefSim.canRun(formatChoice)) {
     // Estreno normal + regular + Top 2 + sin regresos: copia del simulador de referencia
     // (js/refsim.js), con sus propias pantallas.
-    const result = window.RefSim.simulate(names, formatChoice, buildStatsByName(), relationships);
+    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {} }), buildStatsByName(), relationships);
     seasonPlayer = {
       result,
       screens: result.screens.map((s) => ({ title: s.title, button: s.button, body: () => renderRefBlocks(s.blocks) })),
@@ -409,6 +409,42 @@ function runSimulation() {
   window.scrollTo(0, 0);
 }
 
+// Panel para decidir qué reinas van en cada grupo (estrenos, grupos del torneo, parejas...). Las que se dejan "Al azar"
+// se reparten donde quede sitio.
+function groupAssignPanel(setup, plan, refresh) {
+  const groups = setup.groups = setup.groups || {};
+  const box = el("div", { class: "rel-overview", style: "padding:.8rem 1rem;margin:1rem 0;" });
+  box.appendChild(el("h3", { class: "group-title", text: "Grupos" }));
+  box.appendChild(el("p", { class: "muted small", text: "Elige en qué grupo juega cada concursante, o déjalo al azar: las que dejes sin elegir se reparten donde quede sitio." }));
+  const counts = plan.map(() => 0);
+  setup.names.forEach((n) => { const g = groups[n]; if (g >= 1 && g <= plan.length) counts[g - 1]++; });
+  const summary = el("div", { class: "toolbar", style: "justify-content:flex-start;flex-wrap:wrap;" });
+  plan.forEach((p, i) => {
+    const over = counts[i] > p.size;
+    summary.appendChild(el("span", { class: "season-name", style: over ? "border-color:#c0392b;color:#c0392b;" : "", text: `${p.title}: ${counts[i]}/${p.size}` }));
+  });
+  box.appendChild(summary);
+  const grid = el("div", { class: "season-names" });
+  setup.names.forEach((name) => {
+    const row = el("label", { class: "season-name", style: "gap:.4rem;" });
+    const avatar = avatarImg(name, "avatar--result");
+    if (avatar) row.appendChild(avatar);
+    row.appendChild(el("span", { text: name }));
+    const sel = el("select", { onchange: (e) => { const v = Number(e.target.value); if (v) groups[name] = v; else delete groups[name]; refresh(); } });
+    sel.appendChild(el("option", { value: "0", text: "Al azar" }));
+    plan.forEach((p, i) => {
+      const o = el("option", { value: String(i + 1), text: p.title });
+      if (groups[name] === i + 1) o.setAttribute("selected", "selected");
+      sel.appendChild(o);
+    });
+    row.appendChild(sel);
+    grid.appendChild(row);
+  });
+  box.appendChild(grid);
+  box.appendChild(el("button", { type: "button", class: "btn btn--ghost", text: "🎲 Todo al azar", onclick: () => { setup.groups = {}; refresh(); } }));
+  return box;
+}
+
 function renderRelationshipSetup() {
   const setup = relationshipSetup;
   const levels = window.SimEngine.RELATIONSHIP_LEVELS;
@@ -419,6 +455,9 @@ function renderRelationshipSetup() {
   const wrap = el("div", { class: "section season-screen" });
   wrap.appendChild(el("h2", { class: "season-screen__title", text: "¡Conoce a las concursantes!" }));
   wrap.appendChild(el("p", { class: "muted", text: "Elige cómo se lleva cada concursante con las demás (la relación es mutua, en 6 estados), o déjalo al azar. Las relaciones influyen en Untucked (pelas, alianzas y enemistades), en los equipos de los retos, en a quién votan para irse a casa, en quién gana Miss Simpatía y en a quién reta la asesina de lip sync." }));
+
+  const plan = window.RefSim && window.RefSim.canRun(formatChoice) && window.RefSim.groupPlan ? window.RefSim.groupPlan(formatChoice, setup.names.length) : null;
+  if (plan) wrap.appendChild(groupAssignPanel(setup, plan, refresh));
 
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
     el("button", { class: "btn btn--ghost", text: "🎲 Randomizar todo", onclick: () => {

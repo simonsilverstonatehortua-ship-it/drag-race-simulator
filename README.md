@@ -603,3 +603,11 @@ El desplegable del merge ahora incluye todos los formatos de temporada ya hechos
 ## Split Format
 
 Copia del formato de esopare: el reparto se divide en tres estrenos (un tercio cada uno, cada grupo con su eliminación) y después dos rondas de grupos A y B que juegan por separado (el segundo reparto es nuevo); la que no juega ese episodio deja la casilla en blanco. Luego siguen todas juntas como en una temporada normal. Hacen falta al menos 9 reinas y 8 más que las de la final; si no, se juega el formato regular. También está disponible como formato de merge del torneo.
+
+## Fatal Selection
+
+Copia del formato de esopare: la ganadora del reto y las de arriba se salvan; las reinas del bottom eligen cada una el pintalabios de otra reina del bottom. Aparece una asesina del lip sync (de fuera del reparto), la ganadora elige a qué reina del bottom enfrenta a la asesina, y hacen lip sync por su vida: si gana la asesina se va la elegida; si gana la elegida, se va la reina de su pintalabios. Con 4 reinas o menos hay 1 arriba y el resto en el bottom. También está disponible como formato de merge del torneo.
+
+## Elegir qué reinas van en cada grupo
+
+En el paso "¡Conoce a las concursantes!" aparece un panel **Grupos** cuando el formato forma grupos: grupos del torneo, los tres estrenos del Split Format, las parejas del formato por equipos y los estrenos doble y triple. Cada concursante tiene un desplegable (Al azar o el grupo que quieras) y se ve cuántas hay en cada grupo frente a las plazas. Las que se dejan "Al azar" rellenan los huecos que queden.

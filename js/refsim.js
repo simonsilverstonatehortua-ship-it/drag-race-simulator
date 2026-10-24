@@ -177,6 +177,8 @@
     "LOW": { bg: "pink" },
     "BTM2": { bg: "tomato" },
     "BTM3": { bg: "tomato" },
+    "SBTM2": { text: "BTM2", bg: "hotpink" },
+    "SBTM3": { text: "BTM3", bg: "hotpink" },
     "BTM5": { bg: "tomato" },
     "BTM6": { bg: "tomato" },
     "BTM": { bg: "tomato" },
@@ -361,11 +363,12 @@
         const s = this.newScreen("¡Hora de formar parejas!", "Empezar");
         s.p("Tras entrar en el taller, ¡las reinas deben elegir a sus parejas!");
         s.hr();
-        const pool = shuffle(this.current.slice());
+        const pairs = this.dealGroups(this.current, Array.from({ length: this.current.length / 2 }, () => 2));
         const teams = [];
         Screen.teamMap = new Map();
-        while (pool.length) {
-          const t = new Team(pool.shift(), pool.shift());
+        while (pairs.length) {
+          const pr = pairs.shift();
+          const t = new Team(pr[0], pr[1]);
           teams.push(t);
           Screen.teamMap.set(t.name, [t.QueenA.name, t.QueenB.name]);
           s.q([t.QueenA.name, t.QueenB.name], "royalblue", `${t.QueenA.name} y ${t.QueenB.name} forman ${t.name}.`);
@@ -386,9 +389,9 @@
       // Triple estreno (12 o más reinas): tres grupos al azar hacen los episodios 1, 2 y 3, cada uno con su
       // eliminación; en el episodio 4 siguen todas las que quedan.
       if (this.opts.triple && this.current.length >= 12) {
-        const all = shuffle(this.current.slice());
-        const a = Math.floor(all.length / 3), b = Math.floor((all.length - a) / 2);
-        const groups = [all.slice(0, a), all.slice(a, a + b), all.slice(a + b)];
+        const n3 = this.current.length;
+        const a = Math.floor(n3 / 3), b = Math.floor((n3 - a) / 2);
+        const groups = this.dealGroups(this.current, [a, b, n3 - a - b]);
         this.premiereHalf = true;
         const left = [];
         groups.forEach((g, k) => {
@@ -416,8 +419,7 @@
           this.trackRecordScreen(false);
           first = this.porkGroups.first; second = this.porkGroups.second;
         } else {
-          first = all.slice(0, Math.floor(all.length / 2));
-          second = all.slice(first.length);
+          [first, second] = this.dealGroups(all, [Math.floor(all.length / 2), all.length - Math.floor(all.length / 2)]);
         }
         this.premiereHalf = true;
         second.forEach((q) => q.addTR(this.opts.globalAS ? "RUN " : ""));
@@ -473,9 +475,9 @@
     // Después siguen todas las que quedan, como en una temporada normal.
     playSplit() {
       const colors = ["#FE5007", "#EA00B7", "#8203D0"];
-      let alive = shuffle(this.current.slice());
+      let alive = this.current.slice();
       const a = Math.ceil(alive.length / 3), b = Math.floor((alive.length - a) / 2);
-      const premieres = [alive.slice(0, a), alive.slice(a, a + b), alive.slice(a + b)];
+      const premieres = this.dealGroups(alive, [a, b, alive.length - a - b]);
       const intro = this.newScreen("¡Estrenos divididos!", "Empezar");
       intro.p("El reparto se divide en tres grupos: cada uno tiene su propio estreno, con su eliminación.");
       intro.add(this.cardsBlock(premieres.map((g, i) => ({ title: `Estreno ${i + 1}`, color: colors[i], names: g.map((q) => q.name) }))));
@@ -1458,7 +1460,7 @@
         if (showJudging) this.markSafeOnly(); // el único "safe" de la semana; no hay pantalla de jurado
         return this.winAndBtm2();
       }
-      if (this.opts.assassin && n <= 4) {
+      if ((this.opts.assassin || this.opts.fatal) && n <= 4) {
         byPerf();
         top.push(cast[0]);
         cast.slice(1).forEach((q) => bottom.push(q));
@@ -2127,6 +2129,104 @@
       return new Queen(name, this.statsByName[name]);
     }
 
+    // ======================================================================================
+    // FORMATO FATAL SELECTION: las reinas del bottom eligen pintalabios; la ganadora elige a quién enfrenta a una
+    // asesina del lip sync. Si la elegida gana, se va la reina de su pintalabios; si gana la asesina, se va la elegida.
+    // ======================================================================================
+    fatalJudging() {
+      const assassin = this.pickAssassin();
+      if (!assassin) return false;
+      const top = this.topQueens, bottom = this.bottomQueens;
+      const s = this.newScreen("Fatal Selection", "Continuar");
+      s.b("Chicas, he tomado algunas decisiones...");
+      top.forEach((q) => { q.performanceScore -= (q.runwayScore - q.favoritism); });
+      top.sort((a, b) => a.performanceScore - b.performanceScore);
+      const winner = top.shift();
+      winner.addTR("WIN"); winner.favoritism += 5; winner.ppe += 5;
+      s.q([winner.name], "royalblue", `${winner.name}, condragulations, ¡eres la ganadora del reto de esta semana!`);
+      if (top.length) {
+        top.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
+        s.q(top.map((q) => q.name), "lightblue", `${list(top.map((q) => q.name))}, buen trabajo esta semana, estáis a salvo.`);
+      }
+      s.hr();
+      s.q(bottom.map((q) => q.name), "tomato", `${list(bottom.map((q) => q.name))}, estáis en peligro de eliminación.`);
+      s.hr();
+      s.big("Antes de deliberar...");
+      s.p("cada reina del bottom debe elegir el pintalabios de la reina que quiere eliminar.");
+
+      // pintalabios de las reinas del bottom
+      const l = this.newScreen("Fatal Selection", "Continuar");
+      l.big("Las reinas del bottom eligen sus pintalabios...");
+      bottom.forEach((q) => {
+        const choices = bottom.filter((o) => o !== q);
+        q.lipstick = choices.length === 1 ? choices[0] : this.worstSister(q, choices);
+        if (!choices.includes(q.lipstick)) q.lipstick = pick(choices);
+        l.b(`${q.name} ha elegido un pintalabios.`);
+      });
+
+      // la asesina y la elegida de la ganadora
+      const chosen = this.worstSister(winner, bottom);
+      const a = this.newScreen("¡Pero espera, hay más!", "Continuar");
+      a.b("Es la hora de presentar a la ASESINA del lip sync de esta semana... ¡¡¡QUE SE REVELE!!!");
+      a.q([assassin.name], "royalblue", `La asesina del lip sync de esta semana es... ¡${assassin.name}!`);
+      a.hr();
+      a.q([winner.name], "cyan", `${winner.name}, como ganadora del reto de esta semana, debes elegir a una reina del bottom para que se enfrente a la asesina por su VIDA.`);
+      a.p("Si la asesina gana el lip sync, la reina elegida será eliminada. Pero si gana la reina elegida, la reina cuyo nombre lleve escrito en su pintalabios será... ELIMINADA.");
+      a.reveal("Revelar la elección", [
+        { t: "hr" },
+        { t: "q", names: [chosen.name], color: "tomato", text: `${winner.name} ha elegido a ${chosen.name} para enfrentarse a la asesina del lip sync.` },
+      ]);
+
+      // lip sync
+      const two = [chosen, assassin];
+      const e = this.newScreen("Es la hora de la revelación...", "Ver el resultado");
+      e.q(two.map((q) => q.name), "tomato", `${chosen.name}, te han elegido para hacer lip sync por tu vida contra la asesina de esta semana...`);
+      e.p("Poneos frente a mí.");
+      e.p("Ha llegado la hora... ¡de que hagáis lip sync por vuestra VIDA! Buena suerte, y no la caguéis.");
+      two.forEach((q) => q.getASLipsync());
+      const song = this.pickSong(e);
+      e.hr();
+      this.lipsyncEvent(e, two);
+      const raw = two.map((q) => q.lipsyncScore);
+      this.lipsyncGroups(e, two, song);
+      two.forEach((q, i) => { q.lipsyncScore = raw[i]; });
+
+      const r = this.newScreen("He tomado mi decisión...", "Continuar");
+      let gone;
+      let survived = false;
+      if ((chosen.lipsyncScore || 0) > (assassin.lipsyncScore || 0)) {
+        survived = true;
+        this.addSong([chosen], [assassin], song);
+        r.q([chosen.name], "green", `${chosen.name}, shantay, te quedas. ¡Has luchado con éxito por tu vida!`);
+        r.q([assassin.name], "royalblue", `${assassin.name}, gracias por tu maravilloso tiempo.`);
+        chosen.favoritism += 3; chosen.ppe += 1;
+        const remaining = bottom.filter((q) => q !== chosen);
+        gone = remaining.includes(chosen.lipstick) ? chosen.lipstick : pick(remaining);
+        r.hr();
+        r.p("Un gran poder conlleva una gran responsabilidad... ¿a qué reina has elegido para que reciba el hachazo?");
+        r.q([gone.name], "red", `${chosen.name} ha elegido a ${gone.name} para ser eliminada.`);
+      } else {
+        this.addSong([assassin], [chosen], song);
+        r.q([assassin.name], "royalblue", `${assassin.name}, ¡eres una ganadora, baby!`);
+        r.hr();
+        r.p("Eso significa...");
+        r.q([chosen.name], "red", `${chosen.name}, siempre serás una All Star... ahora, sashay away...`);
+        this.exitLine(r, chosen);
+        gone = chosen;
+      }
+      gone.addTR("ELIM"); gone.unfavoritism += 5; gone.votes = 0;
+      this.eliminated.unshift(gone);
+      bottom.splice(bottom.indexOf(gone), 1);
+      this.current.splice(this.current.indexOf(gone), 1);
+      const label = this.current.length > 4 ? "BTM3" : "BTM2";
+      bottom.forEach((q) => {
+        q.addTR(q === chosen && survived ? "S" + label : label);
+        q.unfavoritism += 2; q.ppe += 1; q.votes = 0;
+      });
+      this.topQueens = []; this.bottomQueens = [];
+      return this.untucked();
+    }
+
     assassinJudging() {
       const top = this.topQueens, bottom = this.bottomQueens;
       const cast = this.current;
@@ -2548,6 +2648,21 @@
     // varios episodios cada uno; dentro de un grupo se juntan puntos MVQ y pasan las que más tengan.
     // Opcionalmente hay una segunda ronda de grupos y luego el resto de la temporada es regular.
     // ======================================================================================
+    // Reparte las reinas en grupos de los tamaños dados respetando las que el usuario ha asignado a mano
+    // (opts.assign: nombre -> nº de grupo); las demás se reparten al azar donde quede sitio.
+    dealGroups(queens, sizes, ignoreAssign = false) {
+      const assign = ignoreAssign ? {} : (this.opts.assign || {});
+      const groups = sizes.map(() => []);
+      const rest = [];
+      shuffle(queens.slice()).forEach((q) => {
+        const g = assign[q.name];
+        if (g >= 1 && g <= sizes.length && groups[g - 1].length < sizes[g - 1]) groups[g - 1].push(q); else rest.push(q);
+      });
+      groups.forEach((gr, i) => { while (gr.length < sizes[i] && rest.length) gr.push(rest.shift()); });
+      rest.forEach((q) => groups[groups.length - 1].push(q));
+      return groups;
+    }
+
     tourSizes(n, groups) {
       const base = Math.floor(n / groups), extra = n % groups;
       return Array.from({ length: groups }, (_, i) => base + (i < extra ? 1 : 0));
@@ -2563,12 +2678,12 @@
         const entering = queens.slice();
         const groups = Math.max(2, Math.min(rc.groups, Math.floor(entering.length / 2)));
         const sizes = this.tourSizes(entering.length, groups);
-        const pool = shuffle(entering.slice());
+        const dealt = this.dealGroups(entering, sizes, ri > 0);
         const intro = this.newScreen(ri === 0 ? "¡Comienza el torneo!" : "¡Segunda ronda del torneo!", "Empezar");
         intro.b(`${entering.length} reinas se dividen en ${groups} grupos. Cada grupo juega ${rc.episodes} ${rc.episodes === 1 ? "episodio" : "episodios"} y pasan ${rc.passers} de cada uno.`);
         const bracketList = [];
         sizes.forEach((sz, gi) => {
-          const g = pool.splice(0, sz);
+          const g = dealt[gi];
           bracketList.push(g);
           intro.hr();
           intro.big(`Grupo ${gi + 1}`);
@@ -2989,6 +3104,7 @@
     // ---------- "¡Que vuelvan mis chicas!": ganadora, tops y bottoms ----------
     winAndBtm2() {
       if (this.opts.assassin) return this.assassinJudging();
+      if (this.opts.fatal) { const fr = this.fatalJudging(); if (fr !== false) return fr; }
       if (this.opts.legacy || (this.opts.slaysian && this.current.length > 6)) return this.legacyJudging();
       const f = this.flag;
       const s = this.newScreen("¡Que vuelvan mis chicas!", "Lip sync por la vida");
@@ -4540,10 +4656,40 @@
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && formatChoice.return === "RETURN_NONE"
       && (!formatChoice.twists || formatChoice.twists.length === 0);
+  }
+
+  // Grupos que el formato elegido va a formar con este número de reinas (para que el usuario pueda decidir quién va en cada
+  // uno). Devuelve null si el formato no forma grupos.
+  function groupPlan(fc, n) {
+    const fin = FINALE_SIZE[fc.finale] || 2;
+    const even = (k) => { const b = Math.floor(n / k), x = n % k; return Array.from({ length: k }, (_, i) => b + (i < x ? 1 : 0)); };
+    if (fc.season === "SEASON_TOURNAMENT") {
+      const cfg = tournamentCfg(fc.tournament);
+      if (n < 6) return null;
+      return even(Math.max(2, Math.min(cfg.groups, Math.floor(n / 2)))).map((size, i) => ({ title: `Grupo ${i + 1}`, size }));
+    }
+    if (fc.season === "SEASON_SPLIT") {
+      if (n < 9 || n < fin + 8) return null;
+      const a = Math.ceil(n / 3), b = Math.floor((n - a) / 2);
+      return [a, b, n - a - b].map((size, i) => ({ title: `Estreno ${i + 1}`, size }));
+    }
+    if (fc.season === "SEASON_TEAMS") {
+      if (n < 6 || n % 2) return null;
+      return Array.from({ length: n / 2 }, (_, i) => ({ title: `Pareja ${i + 1}`, size: 2 }));
+    }
+    if (fc.premiere === "PREMIERE_TRIPLE" && n >= 12) {
+      const a = Math.floor(n / 3), b = Math.floor((n - a) / 2);
+      return [a, b, n - a - b].map((size, i) => ({ title: `Estreno ${i + 1}`, size }));
+    }
+    if (["PREMIERE_DOUBLE", "PREMIERE_DOUBLE_NOELIM", "PREMIERE_DOUBLE_TALENT", "PREMIERE_DOUBLE_GG", "PREMIERE_RATE_A_QUEEN", "PREMIERE_GLOBAL_AS"].includes(fc.premiere) && n >= 10) {
+      const a = Math.floor(n / 2);
+      return [a, n - a].map((size, i) => ({ title: `Estreno ${i + 1}`, size }));
+    }
+    return null;
   }
 
   // Formatos que pueden seguir a la ronda de grupos del torneo. Para añadir uno nuevo basta con una entrada aquí
@@ -4558,6 +4704,7 @@
     { id: "winners", label: "All Winners (estrellas, sin eliminaciones)", opt: "winners" },
     { id: "slaysian", label: "Slaysian Royale", opt: "slaysian" },
     { id: "split", label: "Split Format (estrenos y grupos separados)", opt: "split" },
+    { id: "fatal", label: "Fatal Selection (asesina del lip sync y pintalabios)", opt: "fatal" },
   ];
 
   // Ajustes del torneo (grupos, episodios por grupo, reinas que pasan y segunda ronda opcional).
@@ -4614,6 +4761,8 @@
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       split: formatChoice.season === "SEASON_SPLIT",
+      fatal: formatChoice.season === "SEASON_FATAL",
+      assign: formatChoice.groupAssign || {},
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
       tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
       uk3: premiere === "PREMIERE_UK3",
@@ -4636,5 +4785,5 @@
     };
   }
 
-  window.RefSim = { canRun, simulate, mergeFormats: MERGE_FORMATS.map((m) => ({ id: m.id, label: m.label })) };
+  window.RefSim = { canRun, simulate, groupPlan, mergeFormats: MERGE_FORMATS.map((m) => ({ id: m.id, label: m.label })) };
 })();
