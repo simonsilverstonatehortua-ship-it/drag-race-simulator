@@ -30,6 +30,13 @@ const DEFAULT_TWISTS = [
     description: "Cuando una reina pierde un lip sync tiene una última oportunidad: tira de una palanca del Badonka Dunk Tank. Dos de las diez palancas salvan a una reina (casilla BDNK); las palancas ganadoras son al azar." },
   { id: "BADONKA_CHOOSABLE", label: "Badonka Dunk (elegible)", custom: false, section: "Twists",
     description: "Como el Badonka Dunk, pero eliges tú cuáles son las dos palancas ganadoras." },
+  { id: "FAME_GAMES", label: "Fame Games", custom: false, section: "Twists",
+    description: "Las eliminadas hacen cada semana una pasarela (en Untucked) para ganar votos de los fans; antes de la final vuelven al escenario y las dos mejores hacen lip sync para multiplicar sus votos. Los fans eligen a la Reina de los Fame Games entre las eliminadas." },
+  // --- Episodios extra ---
+  { id: "PICK_POISON", label: "Pick Your Poison (CAN6)", custom: false, section: "Episodios extra",
+    description: "Una vez por temporada (con 9 reinas o más) la mitad de la clase hace el Snatch Game y la otra mitad un reto de diseño; cada grupo tiene su ganadora y su bottom, y las dos peores hacen lip sync por su vida." },
+  { id: "SNATCH_RUSICAL", label: "Snatch Game: The Rusical", custom: false, section: "Episodios extra",
+    description: "El Snatch Game pasa a ser un rusical basado en el Snatch Game (se puntúa con la habilidad del rusical)." },
   // --- Retos de lip sync ---
   { id: "LIPSYNC_CHALLENGE", label: "LaLaPaRUza Smackdown (reto de lip sync)", custom: false, section: "Retos de lip sync",
     description: "A mitad de temporada el maxi reto es un torneo de lip syncs: las ganadoras de cada ronda se salvan y la última que queda se va a casa." },

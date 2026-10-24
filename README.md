@@ -661,3 +661,10 @@ Las opciones elegibles (reclamar, barra dorada, palancas) se rellenan en «¡Con
 - **Retos de lip sync**: *LaLaPaRUza Smackdown* (a mitad de temporada el maxi reto es un torneo de lip syncs: las ganadoras de cada ronda se salvan, `SAFE (Ronda n)`, y la última se va), *Slay Off Extravaganza* (con 8 reinas, dos rondas y una final de lip syncs; los perdedores de la primera ronda van al bottom), *Slaysian Lipsync LaLaPaRUza* (con 6 reinas, el torneo con Golden Balut en cualquier temporada) y *Reunion Smackdown* (antes de la reunión, torneo de lip syncs entre todas las eliminadas por el título de Reina de SDADHH).
 - **Títulos** de la reunión (tras Miss Simpatía): Bota de Oro, Favorita del público, Miss Villana (voto), Miss Robada, Estrella del Pop Drag, Magnate de la Moda, Miss Peor Look, Miss Look Perdido y Miss Ladrillo (voto). Si la ganadora está eliminada, su casilla de invitada pasa a mostrar el título.
 - Corregí además la lectura de *Reading is Fundamental*: leen las eliminadas a las reinas que siguen (no entre ellas).
+- **Fame Games**: mientras compiten las demás, las eliminadas hacen cada semana una pasarela en Untucked; antes de la final hay un episodio «Fame Games» en el que vuelven al escenario (lectura de todas, las dos mejores hacen lip sync y multiplican por 2-5 sus votos de los fans) y los fans eligen a la Reina de los Fame Games entre las eliminadas (casilla `FAME GAMES WINNER`).
+- **Pick Your Poison (CAN6)**: una vez por temporada (con 9 reinas o más) la mitad de la clase hace el Snatch Game y la otra mitad un reto de diseño; cada grupo tiene su ganadora, sus altas y su bottom, y la peor de cada grupo hace lip sync por su vida (con Golden Beaver las dos ganadoras regalan los beavers).
+- **Snatch Game: The Rusical**: el Snatch Game se puntúa como un rusical.
+
+«Custom brackets» ya estaba hecho (ajustes del Tournament of All Stars). «Reunion Before Finale» figura como N/A (sin implementar) en la propia web de esopare, así que no se ha copiado.
+
+Arreglos en esta tanda: en Thailand con el estreno Slayers (y 9 reinas) el juicio fallaba ~1 de cada 6 veces; ahora usa el juicio normal.
