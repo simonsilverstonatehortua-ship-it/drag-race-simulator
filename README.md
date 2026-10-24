@@ -370,7 +370,7 @@ en peligro ("nadie está a salvo") para que no se vaya nadie.
   1 nadie se va. Si la tercera peor reina rinde mal, hay 3 arriba y 3 abajo (las de abajo se
   salvan con LOW); si no, la mitad mejor está arriba. Las dos mejores hacen lip sync por la victoria
   (WIN y TOP2) y las demás de arriba quedan HIGH.
-- Las temporadas del simulador se pueden recorrer con **→** (siguiente pantalla) y **←** (anterior),
+- Las temporadas del simulador se pueden recorrer con **→** (siguiente pantalla),
   igual que en los simuladores de referencia, sin tener que pulsar el botón de cada pantalla.
 
 ### Normal Premiere (Late Entry)
