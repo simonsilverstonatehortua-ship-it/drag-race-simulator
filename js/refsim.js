@@ -97,6 +97,8 @@
       this.starMain = []; // ... ganados por el reto y el lip sync
       this.starGift = []; // ... recibidos de otra reina
       this.bracket = 0;
+      this.retCols = []; // columnas del track record en las que regresó a la competición
+      this.ogPlace = 0; // puesto con el que se fue antes de regresar
       this.blocked = false;
       this.lipstick = null;
     }
@@ -459,6 +461,7 @@
       while (this.current.length > this.finaleSize) {
         this.playEpisode();
         this.trackRecordScreen(false);
+        this.maybeReturn();
       }
       if (this.opts.teams) {
         // Quedan dos equipos: pasan a ser cuatro reinas individuales (ordenadas por la puntuación final de su equipo).
@@ -469,6 +472,34 @@
       this.reunion();
       this.finale();
       this.finalScreens();
+    }
+
+    // Regreso "Choose": una vez por temporada vuelve una eliminada, elegida de antemano por el usuario (si ya se ha ido) o al azar.
+    // Cada episodio hay un 5% x nº de episodio de probabilidad de que ocurra, y seguro al llegar a 5 reinas.
+    maybeReturn() {
+      if (this.opts.return !== "RETURN_CHOOSE" || this.returned || this.opts.teams || this.opts.winners) return;
+      const pool = this.eliminated.filter((q) => !q.queenDisqOrDept);
+      if (!pool.length || this.current.length >= this.queens.length - 3) return;
+      const want = this.opts.returnPick ? pool.find((q) => q.name === this.opts.returnPick) : null;
+      const waiting = this.opts.returnPick && !want && this.current.some((q) => q.name === this.opts.returnPick);
+      if (!(this.current.length === 5 || (!waiting && rnd(0, 100) < 5 * this.episode))) return;
+      const q = want || pick(pool);
+      this.returned = true;
+      q.ogPlace = this.current.length + 1 + this.eliminated.indexOf(q);
+      this.eliminated.splice(this.eliminated.indexOf(q), 1);
+      if (q.rankP === "tie1" || q.rankP === "tie2") {
+        const other = this.eliminated.find((e) => e.rankP === (q.rankP === "tie1" ? "tie2" : "tie1"));
+        if (other) other.rankP = 0;
+      }
+      q.rankP = 0;
+      while (q.trackRecord.length < this.episodeChallenges.length) q.addTR("");
+      q.trackRecord.length = this.episodeChallenges.length; // fuera la casilla vacía de la próxima columna
+      q.retCols.push(this.episodeChallenges.length);
+      this.current.push(q);
+      const s = this.newScreen("Una grata sorpresa...", "Continuar");
+      s.b("He decidido que una de mis reinas se ha ido demasiado pronto... Me gustaría dar la bienvenida de nuevo a...");
+      s.q([q.name], "aquamarine", `¡${q.name}!`);
+      s.p(`${q.name} vuelve a la competición.`);
     }
 
     // Split Format: tres estrenos con un tercio del reparto cada uno (cada grupo con su eliminación) y después
@@ -488,11 +519,12 @@
         group = group.filter((q) => alive.includes(q));
         if (group.length < 3 || alive.length <= this.finaleSize + 1) return false;
         alive.filter((q) => !group.includes(q)).forEach((q) => q.addTR(""));
+        const members = group.slice();
         this.current = group;
         this.playEpisode();
         this.flag.isTeam = false; this.flag.isPair = false;
         const left = this.current;
-        alive = alive.filter((q) => !group.includes(q) || left.includes(q));
+        alive = alive.filter((q) => !members.includes(q) || left.includes(q));
         this.current = alive.slice();
         this.trackRecordScreen(false);
         return true;
@@ -3741,13 +3773,14 @@
       if (blockedCell) raw = raw.slice(0, -8);
       const tourMark = typeof raw === "string" && (raw.endsWith("+ADV") || raw.endsWith("+ELIM")) ? (raw.endsWith("+ADV") ? "ADV" : "ELIM") : null; // Torneo
       if (tourMark) raw = raw.slice(0, -(tourMark.length + 1));
+      if (queen.retCols && queen.retCols.includes(col) && typeof raw === "string" && raw !== "" && !raw.startsWith("RTRN")) raw = "RTRN+" + raw; // primer episodio tras regresar
       const returned = typeof raw === "string" && raw.startsWith("RTRN+"); // comodín que vuelve
       if (returned) raw = raw.slice(5);
       const wild = typeof raw === "string" && raw.startsWith("RTRN + ");
       const style = CELL_STYLE[wild ? raw.slice(7) : raw] || { text: raw };
       let baseText = style.text !== undefined ? style.text : (wild ? raw.slice(7) : raw);
       let bg = style.bg, fg = style.fg, bold = style.bold;
-      if (returned) baseText = "RTRN+" + baseText;
+      if (returned) { baseText = "RTRN+" + baseText; bg = { SAFE: "orange", LOW: "#ffb18a", HIGH: "#a0eeb4", BTM2: "#FF7D2B", BTM3: "#FF7D2B", BTM4: "#FF7D2B" }[raw] || bg; }
       if (blockedCell) { baseText += "+BLOCKED"; bg = "#f4a6a6"; fg = "#202122"; bold = true; }
       if (tourMark === "ADV") { baseText += "+ADV"; bold = true; }
       if (tourMark === "ELIM") {
@@ -3776,6 +3809,7 @@
       const mkRow = (queen, rankHtml) => {
         const cells = [];
         for (let i = 0; i < columns.length; i++) cells.push(this.cellFor(queen.trackRecord[i] !== undefined ? queen.trackRecord[i] : "", queen, i));
+        if (queen.ogPlace) rankHtml += `\n(Orig. ${ordinal(queen.ogPlace)})`;
         const row = { name: queen.name, rank: rankHtml, cells, ppe: queen.episodesOn ? (queen.ppe / queen.episodesOn * 2).toFixed(2) : "0.00" };
         if (mvq) row.mvq = queen.starLog.reduce((a, b) => a + (b || 0), 0);
         if (this.opts.tournament && queen.bracket) {
@@ -4669,7 +4703,7 @@
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
       && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
-      && formatChoice.return === "RETURN_NONE"
+      && (formatChoice.return === "RETURN_NONE" || formatChoice.return === "RETURN_CHOOSE")
       && (!formatChoice.twists || formatChoice.twists.length === 0);
   }
 
@@ -4786,6 +4820,8 @@
       split: formatChoice.season === "SEASON_SPLIT",
       fatal: formatChoice.season === "SEASON_FATAL",
       assign: formatChoice.groupAssign || {},
+      return: formatChoice.return,
+      returnPick: formatChoice.returnPick || "",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
       tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,
       uk3: premiere === "PREMIERE_UK3",

@@ -623,3 +623,9 @@ Cuando el torneo tiene segunda ronda de grupos, la casilla del nombre de las rei
 ## Añadir una cantidad de concursantes al azar
 
 Bajo el buscador de "Simular temporada" hay un campo numérico y el botón «🎲 Añadir»: añade esa cantidad de concursantes al azar (sin repetir) a las que ya tengas elegidas.
+
+## Regreso «Eligen quién regresa» (Choose)
+
+Una vez por temporada vuelve una eliminada a la competición: cada episodio hay un 5% × nº de episodio de probabilidad (y seguro al quedar 5 reinas) siempre que queden menos reinas que el reparto menos 3. Antes de empezar, en «¡Conoce a las concursantes!», puedes elegir qué concursante regresa: volverá cuando la eliminen; si no la eliminan, regresa una eliminada al azar (las descalificadas o que abandonaron no pueden). Aparece una pantalla «Una grata sorpresa...», su casilla de regreso se ve como `RTRN+HIGH` (con los colores del original: SAFE naranja, LOW salmón, HIGH verde, BTM naranja fuerte) y su puesto original aparece como «(Orig. 9º)». No aplica a los formatos por equipos ni All Winners.
+
+También corregí un fallo del Split Format: las reinas eliminadas en un estreno seguían contando como vivas y salían duplicadas en la tabla.

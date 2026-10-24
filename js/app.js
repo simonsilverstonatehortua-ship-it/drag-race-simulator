@@ -240,7 +240,7 @@ function renderSimulate() {
   const updateRefNote = () => {
     refNote.textContent = window.RefSim && window.RefSim.canRun(formatChoice)
       ? "✓ Este formato usa la copia del simulador de referencia (myrainboww + esopare): mini retos, equipos, Untucked, relaciones, reunión y final paso a paso."
-      : "Este formato todavía usa el motor propio. La copia del simulador de referencia cubre todos los estrenos normales y sus variantes (doble, triple, Porkchop, Rate A Queen, UK3, entrada tardía, al azar...), las temporadas Regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale y Tournament of All Stars, y todas las finales, siempre sin regresos ni opciones extra.";
+      : "Este formato todavía usa el motor propio. La copia del simulador de referencia cubre todos los estrenos normales y sus variantes (doble, triple, Porkchop, Rate A Queen, UK3, entrada tardía, al azar...), las temporadas Regular, Thailand, por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners, Slaysian Royale y Tournament of All Stars, y todas las finales, con regreso «Eligen quién regresa» o sin regresos, y sin opciones extra.";
   };
   // Ajustes del Tournament of All Stars: grupos, episodios por grupo, reinas que pasan y segunda ronda.
   const tourBox = el("div", { class: "section", style: "margin-top:.6rem;" });
@@ -411,12 +411,12 @@ function startRelationshipSetup() {
 }
 
 function runSimulation() {
-  const { names, relationships, groups } = relationshipSetup;
+  const { names, relationships, groups, returnPick } = relationshipSetup;
   relationshipSetup = null;
   if (window.RefSim && window.RefSim.canRun(formatChoice)) {
     // Estreno normal + regular + Top 2 + sin regresos: copia del simulador de referencia
     // (js/refsim.js), con sus propias pantallas.
-    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {} }), buildStatsByName(), relationships);
+    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {}, returnPick: returnPick || "" }), buildStatsByName(), relationships);
     seasonPlayer = {
       result,
       screens: result.screens.map((s) => ({ title: s.title, button: s.button, body: () => renderRefBlocks(s.blocks) })),
@@ -479,6 +479,21 @@ function renderRelationshipSetup() {
 
   const plan = window.RefSim && window.RefSim.canRun(formatChoice) && window.RefSim.groupPlan ? window.RefSim.groupPlan(formatChoice, setup.names.length) : null;
   if (plan) wrap.appendChild(groupAssignPanel(setup, plan, refresh));
+
+  if (formatChoice.return === "RETURN_CHOOSE" && window.RefSim && window.RefSim.canRun(formatChoice)) {
+    const rbox = el("div", { class: "rel-overview", style: "padding:.8rem 1rem;margin:1rem 0;" });
+    rbox.appendChild(el("h3", { class: "group-title", text: "Regreso" }));
+    rbox.appendChild(el("p", { class: "muted small", text: "Elige qué concursante quieres que regrese a la competición. Volverá cuando la eliminen (en un episodio al azar, y seguro al quedar 5 reinas); si no la eliminan, regresa una eliminada al azar." }));
+    const rsel = el("select", { onchange: (e) => { setup.returnPick = e.target.value; } });
+    rsel.appendChild(el("option", { value: "", text: "Al azar" }));
+    setup.names.forEach((n) => {
+      const o = el("option", { value: n, text: n });
+      if (setup.returnPick === n) o.setAttribute("selected", "selected");
+      rsel.appendChild(o);
+    });
+    rbox.appendChild(rsel);
+    wrap.appendChild(rbox);
+  }
 
   wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
     el("button", { class: "btn btn--ghost", text: "🎲 Randomizar todo", onclick: () => {

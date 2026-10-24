@@ -42,7 +42,7 @@ const DEFAULT_FORMATS = [
   { id: "RETURN_NONE", group: "return", label: "Sin regreso", custom: false,
     description: "Ninguna eliminada regresa a la competición." },
   { id: "RETURN_CHOOSE", group: "return", label: "Eligen quién regresa", custom: false,
-    description: "Las concursantes que quedan votan quién regresa." },
+    description: "Una eliminada regresa a la competición, elegida de antemano por ti (o al azar)." },
   { id: "RETURN_RANDOM", group: "return", label: "Regreso al azar", custom: false,
     description: "Una eliminada regresa elegida al azar." },
   { id: "RETURN_LALAPARUZA", group: "return", label: "LaLaParUza", custom: false,
