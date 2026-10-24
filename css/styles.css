@@ -769,3 +769,6 @@ footer {
 .rmvq th, .rmvq td { border: 1px solid #a2a9b1; padding: 3px 6px; white-space: pre-line; }
 .rmvq th { background: #e9dfe9; }
 .rmvq__name { font-weight: 700; text-align: left; }
+
+/* Opción "Fondo liso": quita la decoración del fondo mientras se ve la temporada. */
+body.solid-bg { background-image: none; }

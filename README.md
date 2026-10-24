@@ -649,3 +649,12 @@ Corregí además un fallo de los juicios de Lipsync Assassin, Lipsync For Your L
 - **Kitty Girl Group** y **Attention Girl Group**: a mitad de temporada el siguiente episodio es un grupo de chicas (Rumix) en el que compiten las reinas que siguen contra las eliminadas. En *Kitty* gana el equipo con menor suma de puntuaciones: si ganan las que siguen, sus dos mejores hacen lip sync por su legado (la perdedora de la reina del pintalabios se va) y las ganadoras eligen qué eliminada vuelve; si ganan las eliminadas, sus dos mejores eligen pintalabios entre todas las que siguen y hacen lip sync por volver. En *Attention* ganan las 4 mejores de las que siguen y la peor hace lip sync contra la mejor eliminada.
 
 Con esto están copiados todos los regresos de las dos webs (Choose, Choose 2, Choose 5, Random, Votos, Reading is Fundamental, Conjoined Queens Makeover, Queens of Comedy, Reinas de la Comedia, Kitty Girl Group, Attention Girl Group, Lip-Sync Smackdown, LaLaPaRUza, Hellbound Showdown y el regreso aleatorio).
+
+## Opciones / twists copiados de myrainboww y esopare (tanda 1)
+
+En «Opciones» de la pestaña Simular (ahora agrupadas por sección) están:
+- **Desactivar**: sin dobles shantay/sashay ni empates; sin reunión en la final.
+- **Activar**: *Riggory de reto* (gana quien mejor lo hace en el reto y la pasarela, sin favoritismo), *Riggory de lip sync* (gana el lip sync quien mejor lo hace) y *Reclamar una reina* (anotas qué jugador reclama a cada concursante y su nombre sale en la tabla).
+- **Twists**: *Inmunidad* (la ganadora de las primeras semanas no puede estar en el bottom la semana siguiente), *Golden Beaver* (la ganadora salva a una del bottom: casilla LOW con borde dorado), *Barra de chocolate* (al azar o elegible: la primera vez que una reina se iría por el lip sync, se salva si tiene la barra dorada: `CHOC`) y *Badonka Dunk* (al azar o con las dos palancas elegidas: las reinas que pierden tiran de una palanca de diez y dos salvan: `BDNK`).
+- **Estilo**: *Fondo liso* quita la decoración del fondo mientras ves la temporada.
+Las opciones elegibles (reclamar, barra dorada, palancas) se rellenan en «¡Conoce a las concursantes!».

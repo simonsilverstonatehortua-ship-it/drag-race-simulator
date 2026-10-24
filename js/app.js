@@ -102,6 +102,7 @@ function el(tag, attrs = {}, children = []) {
 }
 
 function render() {
+  document.body.classList.toggle("solid-bg", !!(seasonPlayer && seasonPlayer.solid));
   renderTabs();
   const root = document.getElementById("panel");
   root.innerHTML = "";
@@ -343,7 +344,12 @@ function renderSimulate() {
   wrap.appendChild(el("h3", { class: "group-title", text: "Opciones" }));
   wrap.appendChild(el("p", { class: "muted small", text: "Puedes activar varias a la vez." }));
   const twistsWrap = el("div", { class: "chip-list" });
+  let lastSection = null;
   DB.twists.forEach((t) => {
+    if (t.section && t.section !== lastSection) {
+      lastSection = t.section;
+      twistsWrap.appendChild(el("div", { class: "muted small", style: "flex-basis:100%;font-weight:700;margin-top:.4rem;", text: t.section }));
+    }
     const checkbox = el("input", { type: "checkbox" });
     checkbox.checked = selectedTwists.has(t.id);
     checkbox.addEventListener("change", () => {
@@ -411,15 +417,17 @@ function startRelationshipSetup() {
 }
 
 function runSimulation() {
-  const { names, relationships, groups, returnPick } = relationshipSetup;
+  const { names, relationships, groups, returnPick, claims, chocolatePick, badonkaLevers } = relationshipSetup;
   relationshipSetup = null;
   if (window.RefSim && window.RefSim.canRun(formatChoice)) {
     // Estreno normal + regular + Top 2 + sin regresos: copia del simulador de referencia
     // (js/refsim.js), con sus propias pantallas.
-    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {}, returnPick: returnPick || [] }), buildStatsByName(), relationships);
+    const extra = { claims: claims || {}, chocolatePick: chocolatePick || "", badonkaLevers: (badonkaLevers || []).filter(Boolean) };
+    const result = window.RefSim.simulate(names, Object.assign({}, formatChoice, { groupAssign: groups || {}, returnPick: returnPick || [] }, extra), buildStatsByName(), relationships);
     seasonPlayer = {
       result,
       screens: result.screens.map((s) => ({ title: s.title, button: s.button, body: () => renderRefBlocks(s.blocks) })),
+      solid: (formatChoice.twists || []).includes("SOLID_BACKGROUND"),
       index: 0,
     };
   } else {
@@ -479,6 +487,48 @@ function renderRelationshipSetup() {
 
   const plan = window.RefSim && window.RefSim.canRun(formatChoice) && window.RefSim.groupPlan ? window.RefSim.groupPlan(formatChoice, setup.names.length) : null;
   if (plan) wrap.appendChild(groupAssignPanel(setup, plan, refresh));
+
+  // Opciones (twists) que necesitan datos antes de empezar: quién reclama a cada reina, quién tiene la barra de chocolate
+  // dorada y cuáles son las palancas ganadoras del Badonka Dunk.
+  const tws = formatChoice.twists || [];
+  if (window.RefSim && window.RefSim.canRun(formatChoice) && tws.some((t) => ["CLAIM_QUEEN", "CHOCOLATE_CHOOSABLE", "BADONKA_CHOOSABLE"].includes(t))) {
+    const tbox = el("div", { class: "rel-overview", style: "padding:.8rem 1rem;margin:1rem 0;" });
+    tbox.appendChild(el("h3", { class: "group-title", text: "Opciones de la temporada" }));
+    if (tws.includes("CLAIM_QUEEN")) {
+      tbox.appendChild(el("p", { class: "muted small", text: "Reclamar una reina: escribe quién (jugador) reclama a cada concursante; su nombre saldrá junto al de la reina en la tabla." }));
+      const claims = setup.claims = setup.claims || {};
+      const grid = el("div", { class: "season-names" });
+      setup.names.forEach((n) => {
+        const row = el("label", { class: "season-name", style: "gap:.4rem;" });
+        const av = avatarImg(n, "avatar--result");
+        if (av) row.appendChild(av);
+        row.appendChild(el("span", { text: n }));
+        const inp = el("input", { type: "text", class: "name-input", placeholder: "Jugador", value: claims[n] || "", style: "width:8rem;" });
+        inp.addEventListener("input", () => { if (inp.value.trim()) claims[n] = inp.value.trim(); else delete claims[n]; });
+        row.appendChild(inp);
+        grid.appendChild(row);
+      });
+      tbox.appendChild(grid);
+    }
+    if (tws.includes("CHOCOLATE_CHOOSABLE")) {
+      tbox.appendChild(el("p", { class: "muted small", text: "Barra de chocolate: elige qué concursante tiene la barra dorada." }));
+      const sel = el("select", { onchange: (e) => { setup.chocolatePick = e.target.value; } });
+      sel.appendChild(el("option", { value: "", text: "Al azar" }));
+      setup.names.forEach((n) => { const o = el("option", { value: n, text: n }); if (setup.chocolatePick === n) o.setAttribute("selected", "selected"); sel.appendChild(o); });
+      tbox.appendChild(sel);
+    }
+    if (tws.includes("BADONKA_CHOOSABLE")) {
+      tbox.appendChild(el("p", { class: "muted small", text: "Badonka Dunk: elige las dos palancas (de 1 a 10) que salvan a una reina." }));
+      const lev = setup.badonkaLevers = setup.badonkaLevers || [];
+      for (let i = 0; i < 2; i++) {
+        const sel = el("select", { style: "margin-right:.4rem;", onchange: (e) => { lev[i] = e.target.value ? Number(e.target.value) : 0; } });
+        sel.appendChild(el("option", { value: "", text: "Al azar" }));
+        for (let k = 1; k <= 10; k++) { const o = el("option", { value: String(k), text: `Palanca ${k}` }); if (lev[i] === k) o.setAttribute("selected", "selected"); sel.appendChild(o); }
+        tbox.appendChild(sel);
+      }
+    }
+    wrap.appendChild(tbox);
+  }
 
   const pickCount = { RETURN_CHOOSE: 1, RETURN_CHOOSE2: 2, RETURN_CHOOSE5: 5 }[formatChoice.return];
   if (pickCount && window.RefSim && window.RefSim.canRun(formatChoice)) {
@@ -1103,6 +1153,10 @@ function refTrackRecord(block) {
       nameTd.appendChild(document.createElement("br"));
       nameTd.appendChild(el("small", { class: "rtr-sub", text: groupText }));
     }
+    if (row.claimedBy) {
+      nameTd.appendChild(document.createElement("br"));
+      nameTd.appendChild(el("small", { class: "rtr-sub", text: `🖈 ${row.claimedBy}` }));
+    }
     tr.appendChild(nameTd);
     const src = contestantImage(row.name);
     tr.appendChild(el("td", {
@@ -1115,6 +1169,7 @@ function refTrackRecord(block) {
       if (cell.fg) style += `color:${cell.fg};`;
       if (cell.bold) style += "font-weight:700;";
       if (cell.immune) style += `box-shadow:inset 0 0 0 3px ${IMMUNITY_BORDER_COLOR};`;
+      if (cell.border) style += `border:${cell.border};box-sizing:border-box;`;
       const td = el("td", { class: "placement", style });
       refTextWithBreaks(td, cell.text);
       if (cell.sub) {
