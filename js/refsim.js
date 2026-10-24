@@ -2711,13 +2711,13 @@ this.plan = this.makePlan();
         byPerf();
         f.isTeam = false; f.isPair = false; f.isNoTeam = false;
         const r = rnd(0, 100);
-        const tc = n >= 7 && r < 35 ? 3 : 2;
+        const tc = n >= 10 && r < 25 ? 4 : n >= 7 && r < 65 ? 3 : n >= 5 && r < 35 ? 3 : 2;
         const rb = rnd(0, 100);
-        let bc = rb < 50 ? 2 : rb < 85 ? 3 : 4;
-        bc = Math.min(bc, n <= 6 ? 3 : 4, n - tc);
+        let bc = rb < 30 ? 2 : rb < 70 ? 3 : 4;
+        bc = Math.min(bc, n <= 6 ? 3 : 4, n - tc - (n <= 4 ? 0 : 0));
         for (let i = 0; i < tc; i++) top.push(cast[i]);
         for (let i = 0; i < bc; i++) bottom.push(cast[n - (i + 1)]);
-        f.lftwJ = { threeWay: tc === 3 && rnd(0, 100) < 45 };
+        f.lftwJ = { threeWay: tc === 3 && rnd(0, 100) < 25 };
         return this.judgingScreen();
       }
       if (this.tour) return this.tournamentJudging();
@@ -2899,12 +2899,12 @@ this.plan = this.makePlan();
       const s = this.newScreen("¡Traed de vuelta a mis chicas!", "Ir al lip sync");
       s.b("Chicas, he tomado algunas decisiones...");
       let contenders = top.slice(0, 2);
-      if (top.length === 3) {
+      if (top.length >= 3) {
         if (cfg.threeWay) contenders = top.slice();
         else {
-          const high = top[2];
-          high.addTR("HIGH"); high.favoritism += 1; high.ppe += 4;
-          s.q([high.name], "lightblue", `${high.name}, buen trabajo esta semana, estás a salvo.`);
+          const highs = top.slice(2);
+          highs.forEach((q) => { q.addTR("HIGH"); q.favoritism += 1; q.ppe += 4; });
+          s.q(highs.map((q) => q.name), "lightblue", `${list(highs.map((q) => q.name))}, buen trabajo esta semana, ${highs.length > 1 ? "estáis" : "estás"} a salvo.`);
         }
       }
       s.q(contenders.map((q) => q.name), "cyan", `${list(contenders.map((q) => q.name))}, condragulations, ¡${contenders.length === 3 ? "sois el Top 3" : "sois el Top 2"} de la semana!`);
