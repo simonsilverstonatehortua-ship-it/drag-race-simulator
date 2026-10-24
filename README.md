@@ -686,3 +686,7 @@ Temporada nueva (opción *Formato de temporada*): el estreno UK3 pero **todas la
 - Doble shantay y doble sashay funcionan como siempre (también el número de capítulos elegido).
 
 Solo con 3 reinas en la carrera se usa el juicio normal. También entra en «Formato al azar».
+
+## Casillas de Thailand copiadas de la wiki
+
+En el formato Thailand (temporadas 1 y 2) las casillas copian las de la wiki de las dos temporadas: la reina que gana **solo la pasarela** lleva un `WIN` suelto, y la que gana **el maxi reto** lleva `WIN + resultado` apilado (`WIN + SAFE`, `+ HIGH`, `+ LOW`, `+ WIN`, `+ BTM2`, `+ ELIM`...), con colores distintos. Cada simulación usa la paleta de una de las dos temporadas (al azar), y la leyenda explica cada casilla.

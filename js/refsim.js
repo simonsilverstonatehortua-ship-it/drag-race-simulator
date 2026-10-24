@@ -127,7 +127,6 @@
       // Thailand: tras un maxi reto ganado, el resultado del jurado se une a la misma casilla (WIN + HIGH...)
       if (this.maxiT) {
         this.maxiT = false;
-        if (placement === "SAFE") return;
         this.trackRecord[this.trackRecord.length - 1] += String(placement).trim();
         return;
       }
@@ -258,6 +257,30 @@
     "BTM2+QUIT": { text: "BTM2\n+\nABANDONO", bg: "firebrick", fg: "white" },
     "": { text: "", bg: "gray" },
   };
+
+  // Casillas de Drag Race Thailand copiadas de la wiki (temporada 1 y 2). Devuelve null si la casilla no es de las
+  // que cambian: "WIN" suelto = ganó solo la pasarela; "WIN + X" = ganó también el maxi reto.
+  function ThaiCell(raw, season) {
+    const k = String(raw).trim().replace("HIGH TEAM", "HIGH");
+    const S1 = season === 1;
+    const pal = {
+      WIN: S1 ? { bg: "darkblue", fg: "white" } : { bg: "deepskyblue", fg: "#000" },
+      WINSAFE: S1 ? { bg: "royalblue", fg: "white" } : { bg: "darkblue", fg: "white" },
+      WINHIGH: { bg: "cornflowerblue", fg: "#000" },
+      WINLOW: { bg: "violet", fg: "#000" },
+      WINWIN: { bg: "mediumblue", fg: "white" },
+      WINBTM2: { bg: "mediumorchid", fg: "#000" },
+      WINBTM3: { bg: "mediumorchid", fg: "#000" },
+      WINELIM: { bg: "#9400D3", fg: "white" },
+    };
+    if (k === "LOW") return { text: "LOW", bg: "lightpink", fg: "#000", bold: false };
+    const m = k.match(/^WIN(SAFE|HIGH|LOW|WIN|BTM\d|TOP2|ELIM|QUIT)$/);
+    if (k === "WIN" || m) {
+      const p = pal[k] || { bg: /BTM/.test(k) ? "mediumorchid" : "cornflowerblue", fg: "#000" };
+      return { text: k === "WIN" ? "WIN" : "WIN\n+\n" + k.slice(3), bg: p.bg, fg: p.fg, bold: true };
+    }
+    return null;
+  }
 
   // ======================================================================================
   class Sim {
@@ -4378,6 +4401,17 @@ this.plan = this.makePlan();
         const style = CELL_STYLE[label === "RTRN+" ? "WIN" : label.startsWith("+") ? (label === "+ADV" ? "WIN" : "ELIMINATED") : label];
         items.push({ color: (style && style.bg) || "white", text });
       });
+      if (this.opts.thailand) {
+        const S = this.thaiS || 1;
+        const win = items.find((i) => i.text.startsWith("La concursante ganó el reto"));
+        if (win) win.text = "La concursante ganó la pasarela (pero no el maxi reto).";
+        [["WINSAFE", "WIN + SAFE", "Ganó el maxi reto y quedó a salvo en la pasarela."], ["WINHIGH", "WIN + HIGH", "Ganó el maxi reto y estuvo arriba en la pasarela."],
+          ["WINLOW", "WIN + LOW", "Ganó el maxi reto y estuvo abajo, pero se salvó."], ["WINWIN", "WIN + WIN", "Ganó el maxi reto y también la pasarela."],
+          ["WINBTM2", "WIN + BTM2", "Ganó el maxi reto, pero estuvo en peligro de eliminación y ganó el lip sync."], ["WINBTM3", "WIN + BTM3", "Ganó el maxi reto, pero estuvo en peligro de eliminación y se salvó."],
+          ["WINELIM", "WIN + ELIM", "Ganó el maxi reto, pero perdió el lip sync y fue eliminada."]].forEach(([code, , text]) => {
+          if (used.has(code)) items.push({ color: ThaiCell(code, S).bg, text });
+        });
+      }
       return { t: "legend", items };
     }
 
@@ -5215,6 +5249,16 @@ this.allianceTick(s);
         baseText += "+ELIM";
         bg = /^WIN/.test(String(raw).trim()) ? (style.bg === "deepskyblue" ? "#C64FFF" : "#9400D3") : "sienna";
         fg = "#FFF"; bold = true;
+      }
+      // Thailand (wiki de las temporadas 1 y 2): la ganadora del maxi reto lleva "WIN + resultado" apilado y la que solo
+      // gana la pasarela, un "WIN" suelto. Cada simulación copia los colores de una de las dos temporadas.
+      if (this.opts.thailand && typeof raw === "string") {
+        if (this.thaiS === undefined) this.thaiS = rnd(1, 2);
+        const t = ThaiCell(raw, this.thaiS);
+        if (t) {
+          if (returned) { baseText = "RTRN+" + t.text; } else baseText = t.text;
+          bg = returned ? bg : t.bg; fg = t.fg; bold = t.bold;
+        }
       }
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg, fg, bold, border: style.border };
       if (queen.starLog[col]) cell.sub = `+${queen.starLog[col]} MVQ`;
