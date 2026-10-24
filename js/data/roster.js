@@ -103,6 +103,7 @@ const FRANCHISE_FLAGS = {
   "Etiopía": "🇪🇹",
   "Rumanía": "🇷🇴",
   "Malasia": "🇲🇾",
+  "Irlanda": "🇮🇪",
 };
 
 const ALL_SEASONS = [
@@ -4385,6 +4386,33 @@ const ALL_SEASONS = [
         image: "img/malasia-s1-placeholder.svg", stats: { acting: 1, comedy: 13, dance: 10, design: 5, improv: 14, runway: 6, lipsync: 15, makeup: 4, singing: 14, verses: 5, strategy: 4, charisma: 3, uniqueness: 1, nerve: 8, talent: 0 } },
       { name: "Santubong", finalPlacement: "Por determinar",
         image: "img/malasia-s1-placeholder.svg", stats: { acting: 7, comedy: 15, dance: 1, design: 4, improv: 2, runway: 4, lipsync: 4, makeup: 0, singing: 4, verses: 1, strategy: 1, charisma: 0, uniqueness: 8, nerve: 1, talent: 5 } },
+    ],
+  },
+  {
+    id: "IE_S1",
+    seasonName: "Drag Race Irlanda — Temporada 1",
+    franchise: "Irlanda",
+    contestants: [
+      { name: "Aoife O'Hara", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 9, comedy: 11, dance: 14, design: 7, improv: 15, runway: 9, lipsync: 2, makeup: 1, singing: 1, verses: 2, strategy: 11, charisma: 6, uniqueness: 13, nerve: 7, talent: 6 } },
+      { name: "Banshee", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 4, comedy: 6, dance: 3, design: 12, improv: 0, runway: 0, lipsync: 6, makeup: 6, singing: 2, verses: 4, strategy: 1, charisma: 12, uniqueness: 10, nerve: 10, talent: 9 } },
+      { name: "Brigid Blaze", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 14, comedy: 14, dance: 5, design: 7, improv: 4, runway: 8, lipsync: 15, makeup: 6, singing: 7, verses: 13, strategy: 11, charisma: 9, uniqueness: 1, nerve: 15, talent: 12 } },
+      { name: "Clodagh Clover", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 12, comedy: 6, dance: 6, design: 13, improv: 4, runway: 7, lipsync: 12, makeup: 7, singing: 1, verses: 6, strategy: 0, charisma: 13, uniqueness: 5, nerve: 1, talent: 12 } },
+      { name: "Emer Éire", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 12, comedy: 1, dance: 7, design: 0, improv: 6, runway: 15, lipsync: 9, makeup: 8, singing: 6, verses: 7, strategy: 12, charisma: 6, uniqueness: 13, nerve: 4, talent: 4 } },
+      { name: "Fionn Fox", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 10, comedy: 2, dance: 13, design: 4, improv: 3, runway: 2, lipsync: 1, makeup: 5, singing: 12, verses: 12, strategy: 6, charisma: 9, uniqueness: 5, nerve: 1, talent: 1 } },
+      { name: "Mademoiselle Minuit", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 7, comedy: 2, dance: 5, design: 4, improv: 10, runway: 4, lipsync: 11, makeup: 2, singing: 3, verses: 7, strategy: 12, charisma: 6, uniqueness: 14, nerve: 14, talent: 9 } },
+      { name: "Niamh", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 12, comedy: 11, dance: 2, design: 7, improv: 2, runway: 1, lipsync: 3, makeup: 11, singing: 10, verses: 12, strategy: 8, charisma: 10, uniqueness: 9, nerve: 6, talent: 15 } },
+      { name: "Púca Punk", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 3, comedy: 13, dance: 0, design: 12, improv: 7, runway: 14, lipsync: 11, makeup: 5, singing: 9, verses: 12, strategy: 6, charisma: 5, uniqueness: 10, nerve: 3, talent: 4 } },
+      { name: "Róisín Riot", finalPlacement: "Por determinar",
+        image: "img/irlanda-s1-placeholder.svg", stats: { acting: 0, comedy: 5, dance: 1, design: 7, improv: 0, runway: 4, lipsync: 14, makeup: 9, singing: 13, verses: 14, strategy: 7, charisma: 4, uniqueness: 1, nerve: 15, talent: 14 } },
     ],
   },
 ];
