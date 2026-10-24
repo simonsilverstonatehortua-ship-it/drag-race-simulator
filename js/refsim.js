@@ -2616,6 +2616,15 @@
       this.raqMerge = cfg.merge === "raq";
       this.current = queens;
       this.total = queens.length;
+      // el resto de formatos de temporada también pueden seguir a la ronda de grupos (merge)
+      const mf = MERGE_FORMATS.find((m) => m.id === cfg.merge && m.opt);
+      if (mf) {
+        const ok = mf.opt === "teams" ? queens.length % 2 === 0 && queens.length >= 6 : queens.length >= 6;
+        if (ok) {
+          this.opts[mf.opt] = true;
+          if (mf.opt === "winners") queens.forEach((q) => { q.stars = 0; });
+        }
+      }
     }
 
     // añade un marcador a la última casilla del grupo ("WIN" -> "WIN+ADV")
@@ -4493,11 +4502,24 @@
       && (!formatChoice.twists || formatChoice.twists.length === 0);
   }
 
+  // Formatos que pueden seguir a la ronda de grupos del torneo. Para añadir uno nuevo basta con una entrada aquí
+  // (si es una temporada con su propia bandera `opts.<opt>`, se activa sola al terminar los grupos).
+  const MERGE_FORMATS = [
+    { id: "regular", label: "Regular (eliminación normal)" },
+    { id: "raq", label: "Rate-A-Queen (S11: se puntúan entre ellas)" },
+    { id: "thailand", label: "Thailand (temporadas 1 y 2)", opt: "thailand" },
+    { id: "teams", label: "Por equipos (parejas)", opt: "teams" },
+    { id: "legacy", label: "Lipsync For Your Legacy", opt: "legacy" },
+    { id: "assassin", label: "Lipsync Assassin", opt: "assassin" },
+    { id: "winners", label: "All Winners (estrellas, sin eliminaciones)", opt: "winners" },
+    { id: "slaysian", label: "Slaysian Royale", opt: "slaysian" },
+  ];
+
   // Ajustes del torneo (grupos, episodios por grupo, reinas que pasan y segunda ronda opcional).
   function tournamentCfg(t) {
     const num = (v, d, min) => Math.max(min, Math.floor(Number(v)) || d);
     const base = t || {};
-    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null, wildcards: Math.max(0, Math.floor(Number(base.wildcards)) || 0), merge: base.merge === "raq" ? "raq" : "regular", seq: base.seq === "s11" ? "s11" : "default", colors: Array.isArray(base.colors) ? base.colors : [] };
+    const cfg = { groups: num(base.groups, 3, 2), episodes: num(base.episodes, 3, 1), passers: num(base.passers, 3, 1), second: null, wildcards: Math.max(0, Math.floor(Number(base.wildcards)) || 0), merge: MERGE_FORMATS.some((m) => m.id === base.merge) ? base.merge : "regular", seq: base.seq === "s11" ? "s11" : "default", colors: Array.isArray(base.colors) ? base.colors : [] };
     if (base.second && base.second.groups) cfg.second = { groups: num(base.second.groups, 2, 2), episodes: num(base.second.episodes, 3, 1), passers: num(base.second.passers, 2, 1) };
     return cfg;
   }
@@ -4568,5 +4590,5 @@
     };
   }
 
-  window.RefSim = { canRun, simulate };
+  window.RefSim = { canRun, simulate, mergeFormats: MERGE_FORMATS.map((m) => ({ id: m.id, label: m.label })) };
 })();

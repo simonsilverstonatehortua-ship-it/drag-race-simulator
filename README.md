@@ -595,3 +595,7 @@ Como en la wiki del fandom, el torneo y All Winners muestran:
 ## Casillas del track record al estilo de la wiki
 
 Las casillas usan los textos en una sola línea de la wiki: `WIN+HIGH`, `WIN+ELIM`, `SAFE+ADV`, `SAFE+ELIM`, `OUT` y `RTRN+SAFE`. En el torneo, la comodín elegida pasa de `X+ELIM` a `RTRN+X` y las candidatas que no vuelven quedan como `OUT` (morado). La leyenda incluye las nuevas entradas.
+
+## Formato tras la ronda de grupos (merge) del torneo
+
+El desplegable del merge ahora incluye todos los formatos de temporada ya hechos: Regular, Rate-A-Queen, Thailand, Por equipos, Lipsync For Your Legacy, Lipsync Assassin, All Winners y Slaysian Royale. La lista sale de `MERGE_FORMATS` en `js/refsim.js` (`RefSim.mergeFormats`), así que un formato nuevo solo necesita una entrada ahí. Si quedan menos de 6 reinas (o un número impar en "Por equipos") se juega el formato regular.

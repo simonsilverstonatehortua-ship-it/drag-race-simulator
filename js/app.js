@@ -257,7 +257,7 @@ function renderSimulate() {
     const row3 = el("div", { class: "grid grid--formats" });
     row3.appendChild(numField("Comodines que vuelven (0 = ninguno)", t, "wildcards", 0));
     const mergeSel = el("select", { onchange: (e) => { t.merge = e.target.value; } });
-    [["regular", "Regular (eliminación normal)"], ["raq", "Rate-A-Queen (S11: se puntúan entre ellas)"]].forEach(([v, label]) => {
+    (window.RefSim.mergeFormats || []).map((m) => [m.id, m.label]).forEach(([v, label]) => {
       const o = el("option", { value: v, text: label });
       if (t.merge === v) o.setAttribute("selected", "selected");
       mergeSel.appendChild(o);
