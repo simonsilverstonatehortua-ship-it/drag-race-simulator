@@ -668,3 +668,9 @@ Las opciones elegibles (reclamar, barra dorada, palancas) se rellenan en «¡Con
 «Custom brackets» ya estaba hecho (ajustes del Tournament of All Stars). «Reunion Before Finale» figura como N/A (sin implementar) en la propia web de esopare, así que no se ha copiado.
 
 Arreglos en esta tanda: en Thailand con el estreno Slayers (y 9 reinas) el juicio fallaba ~1 de cada 6 veces; ahora usa el juicio normal.
+
+## Alianzas (Estrategia), capítulo extra antes de la final y número de capítulos
+
+- **Estrategia = alianzas**: tras cada episodio (en Untucked) cada reina puede aliarse con una compañera con la que se lleva bien, con más probabilidad cuanta más Estrategia tenga (≈3% por punto). Las alianzas (de 2 a 4 reinas) se anuncian en Untucked con su objetivo (la reina con la que peor se llevan). Las aliadas se prefieren entre sí al elegir (Miss Simpatía, regresos, pintalabios), votan juntas contra el objetivo (85% de las veces), se llevan cada vez mejor entre ellas y peor con el objetivo. Si se van reinas, la alianza se rompe cuando queda una sola.
+- **Doble shantay antes de la final** (con cualquier final de Top 3 o más): al eliminar a la que queda justo por encima de la final hay un 12% de probabilidad de que haya un capítulo extra en el que las dos de abajo se salvan (doble shantay) y entonces se pasa a la final.
+- **Número de capítulos** (opcional, en «Formato» de Simular): con la final incluida. Si pides más capítulos de los normales se añaden dobles shantay repartidos por la temporada (y los que sobren van en capítulos antes de la final); si pides menos, dobles sashay. Si no lo usas, no cambia nada. Disponible en las temporadas con juicio y lip sync normales (Regular, Split, etc.), no en Thailand, equipos, Legacy, Assassin, All Winners, Slaysian, Fatal Selection ni torneo.

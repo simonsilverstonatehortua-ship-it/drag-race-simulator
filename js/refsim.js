@@ -66,7 +66,7 @@
       this.name = name;
       this.st = {
         acting: g("acting"), comedy: g("comedy"), dance: g("dance"), design: g("design"),
-        improv: g("improv"), runway: g("runway"), lipsync: g("lipsync"),
+        improv: g("improv"), runway: g("runway"), lipsync: g("lipsync"), strategy: g("strategy"),
       };
       this.trackRecord = [];
       this.miniEpisode = [];
@@ -273,6 +273,8 @@
       this.episodeChallenges = [];
       this.screens = [];
       this.opts = opts || {};
+      this.alliances = [];
+      this.plan = null;
       this.tw = new Set((opts && opts.twists) || []);
       this.songs = D.songs.slice();
       this.sgPool = D.snatchCharacters.slice();
@@ -337,20 +339,70 @@
       else if (r > 8) { a.allies.add(b); b.allies.add(a); }
       else if (r <= -6) { a.enemies.add(b); b.enemies.add(a); }
     }
+    // ---------- Alianzas (según la Estrategia de cada reina) ----------
+    // Cuanta más Estrategia tenga una reina, más alianzas hace. Las aliadas se prefieren entre ellas (se salvan, se votan
+    // bien) y votan juntas contra su objetivo (con quien peor se llevan), perjudicando a quien se lleva mal con ellas.
+    allianceOf(q) { return this.alliances.find((a) => a.members.includes(q)) || null; }
+
+    allied(a, b) { const al = this.allianceOf(a); return !!al && al.members.includes(b); }
+
+    allianceTick(s) {
+      if (this.opts.teams) return;
+      const cast = this.current;
+      this.alliances.forEach((a) => { a.members = a.members.filter((m) => cast.includes(m)); });
+      this.alliances = this.alliances.filter((a) => a.members.length >= 2);
+      const fresh = [];
+      shuffle(cast.slice()).forEach((q) => {
+        const strat = q.st && typeof q.st.strategy === "number" ? q.st.strategy : 7;
+        if (cast.length < 4 || rnd(0, 100) >= strat * 3.2) return; // más estrategia, más probabilidad de aliarse
+        const own = this.allianceOf(q);
+        const free = cast.filter((o) => o !== q && !this.allianceOf(o) && this.rel(q, o) >= 2);
+        if (!own) {
+          if (!free.length) return;
+          const partner = this.bestSister(q, free);
+          const al = { members: [q, partner], target: null };
+          this.alliances.push(al); fresh.push(al);
+        } else if (own.members.length < 4 && free.length) {
+          const cand = this.bestSister(q, free);
+          if (own.members.every((m) => this.rel(cand, m) >= 0)) { own.members.push(cand); if (!fresh.includes(own)) fresh.push(own); }
+        }
+      });
+      this.alliances.forEach((a) => {
+        // el objetivo es la reina con la que peor se lleva la alianza
+        if (!a.target || !cast.includes(a.target) || a.members.includes(a.target)) {
+          const rivals = cast.filter((o) => !a.members.includes(o));
+          a.target = rivals.length ? rivals.slice().sort((x, y) => a.members.reduce((t, m) => t + this.rel(m, x), 0) - a.members.reduce((t, m) => t + this.rel(m, y), 0))[0] : null;
+        }
+        // las aliadas se llevan cada vez mejor y peor con su objetivo
+        for (let i = 0; i < a.members.length; i++) for (let j = i + 1; j < a.members.length; j++) this.addRel(a.members[i], a.members[j], 1);
+        if (a.target) a.members.forEach((m) => this.addRel(m, a.target, -1));
+      });
+      if (fresh.length) {
+        s.hr();
+        s.big("Alianzas");
+        fresh.forEach((a) => s.q(a.members.map((m) => m.name), "slateblue", `${list(a.members.map((m) => m.name))} forman una alianza${a.target ? ` (su objetivo: ${a.target.name})` : ""}.`));
+      }
+    }
+
     bestSister(queen, cast) {
       const others = cast.filter((q) => q !== queen);
       let best = others[0];
+      const eff = (q) => this.rel(queen, q) + (this.allied(queen, q) ? 8 : 0);
       others.forEach((q) => {
-        const r = this.rel(queen, q), rb = this.rel(queen, best);
+        const r = eff(q), rb = eff(best);
         if (rb === r) { if (rnd(0, 100) <= 50) best = q; } else if (rb < r) best = q;
       });
       return best;
     }
     worstSister(queen, cast) {
       const others = cast.filter((q) => q !== queen);
+      // la alianza vota unida contra su objetivo (con un pequeño margen para la traición de las más estratégicas)
+      const al = this.allianceOf(queen);
+      if (al && al.target && others.includes(al.target) && rnd(0, 100) < 85) return al.target;
       let worst = others[0];
+      const eff = (q) => this.rel(queen, q) + (this.allied(queen, q) ? 12 : 0);
       others.forEach((q) => {
-        const r = this.rel(queen, q), rw = this.rel(queen, worst);
+        const r = eff(q), rw = eff(worst);
         if (rw === r) { if (rnd(0, 100) <= 50) worst = q; } else if (rw > r) worst = q;
       });
       if (this.rel(queen, worst) > -3) {
@@ -483,11 +535,25 @@
           }
         }
       }
+this.plan = this.makePlan();
       while (this.current.length > this.finaleSize) {
         this.playEpisode();
         this.trackRecordScreen(false);
         this.returnHook();
         if (this.tw.has("FAME_GAMES") && !this.flag.fgCheck && this.current.length === this.finaleSize && this.eliminated.filter((q) => !q.queenDisqOrDept).length >= 2 && !this.opts.teams) this.fameEpisode();
+      }
+      // Capítulos extra con doble shantay antes de la final (aunque hubiera final elegida: puede que tras eliminar a la
+      // quinta haya un capítulo en el que las dos de abajo se salvan y entonces se pasa a la final).
+      if (this.standardSeason() && this.finaleSize >= 3 && this.current.length === this.finaleSize) {
+        let extras = this.plan ? this.plan.s : (rnd(0, 100) < 12 ? 1 : 0);
+        while (extras-- > 0) {
+          this.flag.forceShantay = true;
+          this.playEpisode();
+          this.flag.forceShantay = false;
+          if (this.plan) this.plan.s--;
+          this.trackRecordScreen(false);
+          if (this.current.length !== this.finaleSize) break;
+        }
       }
       if (this.opts.teams) {
         // Quedan dos equipos: pasan a ser cuatro reinas individuales (ordenadas por la puntuación final de su equipo).
@@ -1666,6 +1732,23 @@
       s.q(bottom.map((q) => q.name), "tomato", `${bottom[0].name}, ${bottom[1].name}, lo siento, queridas, pero estáis en riesgo de eliminación.`);
       this.bottomQueens = bottom;
       this.lipsyncDesc();
+    }
+
+    // ¿La temporada usa el juicio y el lip sync normales (donde caben los dobles shantay/sashay forzados)?
+    standardSeason() {
+      const o = this.opts;
+      return !(o.assassin || o.legacy || o.fatal || o.thailand || o.slaysian || o.teams || o.winners || this.raqMerge || this.tw.has("DISABLE_DOUBLE"));
+    }
+
+    // Número de capítulos pedido por el usuario (incluida la final): calcula cuántos dobles shantay (capítulos de más)
+    // o dobles sashay (capítulos de menos) hacen falta. Sin número pedido no hay plan y todo funciona como siempre.
+    makePlan() {
+      const want = Math.floor(Number(this.opts.episodes));
+      if (!want || !this.standardSeason()) return null;
+      const base = this.current.length - this.finaleSize;
+      const extra = (want - 1 - this.episode) - base;
+      if (!extra) return null;
+      return extra > 0 ? { s: Math.min(extra, Math.max(1, base)), d: 0 } : { s: 0, d: Math.min(-extra, Math.max(0, base - 1)) };
     }
 
     // Split Format: tres estrenos con un tercio del reparto cada uno (cada grupo con su eliminación) y después
@@ -4827,14 +4910,24 @@
       }
       // Con una reina más que las de la final, un doble shantay puede ampliar la final en una
       // reina (Top 2 -> Top 3 -> Top 4), como en los originales.
+      // Número de capítulos pedido (opcional): los dobles shantay / sashay que faltan se reparten por la temporada.
+      const plan = this.plan;
+      const left = this.current.length - this.finaleSize; // episodios de eliminación que quedan
+      let forceShantay = !!f.forceShantay, forceSashay = false;
+      if (plan && !this.premiereHalf && !forceShantay) {
+        if (plan.s > 0 && left >= 1 && Math.random() < plan.s / Math.max(1, this.finaleSize >= 3 ? left - plan.d + plan.s : left)) forceShantay = true;
+        else if (plan.d > 0 && left >= 2 && Math.random() < plan.d / Math.max(1, left - plan.d + plan.s)) forceSashay = true;
+      }
       const atFinaleEdge = !this.premiereHalf && !this.splitNow && this.current.length === this.finaleSize + 1;
-      if (score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay && !this.tw.has("DISABLE_DOUBLE")) {
-        if (atFinaleEdge && (this.finaleSize <= 3 || this.opts.lftc) && rnd(0, 10) >= 6) {
+      if (forceShantay || (!plan && score1 > 7 && score2 > 7 && rnd(0, 100) <= 50 && !f.doubleShantay && !this.tw.has("DISABLE_DOUBLE"))) {
+        if (forceShantay && plan && !f.forceShantay) plan.s--;
+        f.forceShantay = false;
+        if (!forceShantay && atFinaleEdge && (this.finaleSize <= 3 || this.opts.lftc) && rnd(0, 10) >= 6) {
           this.finaleSize++;
           this.opts.lftc = false; // el Lip-Sync For The Crown pasa a ser una final Top 5
         }
         let kandy = false;
-        if (rnd(0, 100) >= 95) {
+        if (!forceShantay && rnd(0, 100) >= 95) {
           s.q([bottom[0].name], "tomato", `${bottom[0].name}, shantay, te quedas.`);
           s.q([bottom[1].name], "red", `${bottom[1].name}, sashay away...`);
           kandy = true;
@@ -4846,7 +4939,8 @@
         this.addSong(bottom, [], song);
         return kandy ? this.kandyFO() : this.untucked();
       }
-      if (score1 < 2 && score2 < 2 && rnd(0, 100) <= 8 && !f.doubleSashay && this.current.length > 6 && !this.tw.has("DISABLE_DOUBLE")) {
+      if (forceSashay || (!plan && score1 < 2 && score2 < 2 && rnd(0, 100) <= 8 && !f.doubleSashay && this.current.length > 6 && !this.tw.has("DISABLE_DOUBLE"))) {
+        if (forceSashay) plan.d--;
         s.q([bottom[0].name, bottom[1].name], "darkred");
         this.addSong([], bottom, song);
         s.b("Lo siento, pero ninguna de las dos ha mostrado el fuego que hace falta para quedarse. Las dos... sashay away.");
@@ -4927,6 +5021,7 @@
         const group = shuffle(cast.slice()).slice(0, hm);
         this.interaction(s, group);
       }
+this.allianceTick(s);
       s.reveal("Mostrar relaciones", this.relationshipBlocks());
       if (this.tw.has("FAME_GAMES")) this.fameShowcase(s);
     }
@@ -6052,6 +6147,16 @@
       && (formatChoice.twists || []).every((t) => IMPLEMENTED_TWISTS.includes(t));
   }
 
+  // Capítulos de la temporada (incluida la final): el normal con este reparto y el mínimo y máximo que se pueden pedir
+  // (más capítulos = dobles shantay; menos = dobles sashay). null si el formato no admite elegirlos.
+  function episodeInfo(fc, n) {
+    const fin = FINALE_SIZE[fc.finale];
+    if (!fin || n <= fin + 1) return null;
+    if (["SEASON_THAILAND", "SEASON_TEAMS", "SEASON_LIPSYNC_LEGACY", "SEASON_LIPSYNC_ASSASSIN", "SEASON_ALL_WINNERS", "SEASON_SLAYSIAN", "SEASON_FATAL", "SEASON_RANDOM", "SEASON_TOURNAMENT"].includes(fc.season)) return null;
+    const base = n - fin;
+    return { normal: base + 1, min: 2, max: base * 2 + 1 };
+  }
+
   // Grupos que el formato elegido va a formar con este número de reinas (para que el usuario pueda decidir quién va en cada
   // uno). Devuelve null si el formato no forma grupos.
   function groupPlan(fc, n) {
@@ -6166,6 +6271,7 @@
       fatal: formatChoice.season === "SEASON_FATAL",
       assign: formatChoice.groupAssign || {},
       twists: formatChoice.twists || [],
+      episodes: formatChoice.episodes || 0,
       chocolatePick: formatChoice.chocolatePick || "",
       badonkaLevers: formatChoice.badonkaLevers || [],
       claims: (formatChoice.twists || []).includes("CLAIM_QUEEN") ? (formatChoice.claims || {}) : {},
@@ -6193,5 +6299,5 @@
     };
   }
 
-  window.RefSim = { canRun, simulate, groupPlan, mergeFormats: MERGE_FORMATS.map((m) => ({ id: m.id, label: m.label })) };
+  window.RefSim = { canRun, simulate, groupPlan, episodeInfo, mergeFormats: MERGE_FORMATS.map((m) => ({ id: m.id, label: m.label })) };
 })();

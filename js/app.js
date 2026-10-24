@@ -340,6 +340,23 @@ function renderSimulate() {
   });
   wrap.appendChild(el("label", { class: "form-row", style: "max-width:260px;" }, [el("span", { text: "Reto de estreno" }), openingSelect]));
 
+  // Número de capítulos de la temporada (opcional): si se pide uno distinto del normal, se añaden dobles shantay (más capítulos)
+  // o dobles sashay (menos). Sin rellenar no cambia nada.
+  const epInfo = window.RefSim && window.RefSim.episodeInfo ? window.RefSim.episodeInfo(formatChoice, simSelection.size) : null;
+  if (epInfo) {
+    const epInput = el("input", { type: "number", class: "name-input", min: String(epInfo.min), max: String(epInfo.max), placeholder: `Normal: ${epInfo.normal}`, style: "width:8rem;" });
+    if (formatChoice.episodes) epInput.value = String(formatChoice.episodes);
+    epInput.addEventListener("input", () => {
+      const v = Math.floor(Number(epInput.value));
+      formatChoice.episodes = v >= epInfo.min && v <= epInfo.max ? v : 0;
+    });
+    wrap.appendChild(el("label", { class: "form-row", style: "max-width:420px;" }, [
+      el("span", { text: `Capítulos de la temporada, con la final (opcional: de ${epInfo.min} a ${epInfo.max}; normal ${epInfo.normal})` }),
+      epInput,
+    ]));
+    wrap.appendChild(el("p", { class: "muted small", text: "Con más capítulos de los normales habrá dobles shantay; con menos, dobles sashay. Déjalo vacío para que todo funcione como siempre." }));
+  } else formatChoice.episodes = 0;
+
   // 2b. Opciones/twists: un panel desplegable con un desplegable por grupo (como en los simuladores de referencia)
   const twistsPanel = el("details", { class: "twist-panel" });
   const twistsTitle = el("summary", { class: "twist-panel__title" });
