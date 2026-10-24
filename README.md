@@ -619,3 +619,7 @@ La opción «Formato al azar» sortea la temporada entre Regular, Thailand, Por 
 ## Segunda ronda del torneo en la casilla del nombre
 
 Cuando el torneo tiene segunda ronda de grupos, la casilla del nombre de las reinas que llegan a ella se parte en diagonal en dos triángulos (el color de su grupo de la primera ronda y el de la segunda) y debajo se indican los dos grupos.
+
+## Añadir una cantidad de concursantes al azar
+
+Bajo el buscador de "Simular temporada" hay un campo numérico y el botón «🎲 Añadir»: añade esa cantidad de concursantes al azar (sin repetir) a las que ya tengas elegidas.

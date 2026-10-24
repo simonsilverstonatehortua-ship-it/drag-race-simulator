@@ -3,6 +3,7 @@ let DB = window.RulesStore.loadDB();
 const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
+let randomCount = 12;
 let seasonPlayer = null;
 let relationshipSetup = null;
 let rosterSeasonTab = {};
@@ -178,6 +179,26 @@ function renderSimulate() {
   searchRow.appendChild(searchInput);
   searchRow.appendChild(el("button", { class: "btn btn--ghost", text: "🎲 Al azar", onclick: addRandomOne }));
   wrap.appendChild(searchRow);
+
+  // Añadir de golpe una cantidad elegida de concursantes al azar (se suman a las ya elegidas).
+  const remainingCount = allPool.filter((c) => !simSelection.has(c.name)).length;
+  const countInput = el("input", { type: "number", class: "name-input", min: "1", max: String(Math.max(1, remainingCount)), value: String(randomCount), style: "width:5.5rem;", "aria-label": "Cantidad de concursantes al azar" });
+  countInput.addEventListener("input", () => { randomCount = Math.max(1, Math.floor(Number(countInput.value)) || 1); });
+  const addRandomMany = () => {
+    const remaining = allPool.filter((c) => !simSelection.has(c.name));
+    const n = Math.min(Math.max(1, Math.floor(Number(countInput.value)) || 1), remaining.length);
+    for (let i = 0; i < n; i++) {
+      const j = Math.floor(Math.random() * remaining.length);
+      simSelection.add(remaining.splice(j, 1)[0].name);
+    }
+    render();
+  };
+  wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;align-items:center;gap:.5rem;" }, [
+    el("span", { class: "muted small", text: "Añadir" }),
+    countInput,
+    el("span", { class: "muted small", text: "concursantes al azar" }),
+    el("button", { class: "btn btn--ghost", text: "🎲 Añadir", onclick: addRandomMany }),
+  ]));
 
   const resultsWrap = el("div", { class: "search-results" });
   wrap.appendChild(resultsWrap);
