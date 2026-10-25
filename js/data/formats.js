@@ -13,6 +13,8 @@ const DEFAULT_FORMATS = [
     description: "Nadie se va: el Top 2 hace lip sync por la victoria y las peores se salvan." },
   { id: "PREMIERE_UK3", group: "premiere", label: "Estreno UK3 (Top 2 y Bottom 2)", custom: false,
     description: "Pasarela con dos looks; el Top 2 hace lip sync por la victoria y las dos de abajo por su vida." },
+  { id: "PREMIERE_TEAMS3", group: "premiere", label: "Estreno por equipos (3 capítulos)", custom: false,
+    description: "Tres equipos y tres capítulos sin eliminación: cada semana un Top 2 hace lip sync por la victoria y suma puntos para su equipo; al final, el equipo con menos puntos queda en riesgo y sus dos peores hacen lip sync por su vida." },
   { id: "PREMIERE_DOUBLE", group: "premiere", label: "Doble estreno", custom: false,
     description: "El grupo se divide en dos; cada mitad hace su propio reto y eliminación." },
   { id: "PREMIERE_DOUBLE_NOELIM", group: "premiere", label: "Doble estreno (sin eliminación)", custom: false,
