@@ -3,6 +3,7 @@ let DB = window.RulesStore.loadDB();
 const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
+let simSeasonStats = null; // stats de la temporada precargada con «Simular esta temporada» (las versiones imaginarias solo se usan así)
 let randomCount = 12;
 let seasonPlayer = null;
 let relationshipSetup = null;
@@ -418,7 +419,7 @@ function renderSimulate() {
 
   if (simSelection.size) {
     wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
-      el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); render(); } }),
+      el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); simSeasonStats = null; render(); } }),
     ]));
   }
 
@@ -432,7 +433,9 @@ function renderSimulate() {
 
 function buildStatsByName() {
   const map = {};
-  window.ALL_CONTESTANTS.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
+  const imaginary = new Set(window.ALL_SEASONS.filter((s) => s.imaginary).map((s) => s.id));
+  window.ALL_CONTESTANTS.forEach((c) => { if (c.stats && !imaginary.has(c.seasonId)) map[c.name] = c.stats; });
+  if (simSeasonStats) Object.entries(simSeasonStats).forEach(([name, stats]) => { map[name] = stats; }); // temporada precargada (p.ej. una versión imaginaria)
   DB.customContestants.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
   Object.entries(DB.contestantOverrides).forEach(([name, stats]) => { map[name] = stats; });
   return map;
@@ -1683,6 +1686,8 @@ function simulateSeasonPreset(season) {
   seasonPlayer = null;
   relationshipSetup = null;
   simSelection = new Set(season.contestants.map((c) => c.name));
+  simSeasonStats = {};
+  season.contestants.forEach((c) => { if (c.stats) simSeasonStats[c.name] = c.stats; });
   selectedTwists = new Set((season.preset && season.preset.twists) || []);
   formatChoice.twists = [...selectedTwists];
   currentTab = "simulate";

@@ -699,3 +699,7 @@ Nueva opción de *Estreno* (con cualquier formato de temporada menos All Winners
 - **Capítulo 3:** el equipo con menos puntos queda en riesgo: todas sus reinas reciben LOW (combinado con su resultado: `WIN+LOW`, `TOP2+LOW`, `HIGH+LOW`) y las dos peores hacen lip sync for your life (`WIN+BTM2`, `HIGH+ELIM`...). Se elimina una.
 - El nombre de cada reina lleva el color de su equipo en el track record.
 - En el track record, las casillas de todas las integrantes del equipo al que le quitan el punto ese capítulo llevan un **borde #980000**.
+
+## Global All Stars imaginario (temporada 1)
+
+Temporada imaginaria con 15 reinas de varias franquicias (Année Maywong, BenDeLaCreme, Biddiiw Bu Ñuul, Divina De Campo, Isla Bonita, Laksamana, Ma'Ma Queen, Miss Camé Rouge, Nirvana Nyai, Noor El Nil, Sânziana Soare, Scarlett BoBo, Tizita, Voahangy Bleu y Zubaida Aapa-la). Sus stats son variaciones de las originales (hoja de cálculo) y solo se usan al pulsar «Simular esta temporada» en esa temporada: las fichas originales de cada reina no cambian. Las fotos son las de la ficha original de cada una.
