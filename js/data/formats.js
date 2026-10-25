@@ -87,6 +87,8 @@ const DEFAULT_FORMATS = [
     description: "Sistema de puntos All Stars: WIN=3, TOP2=2, resto según reglas; se acumulan puntos para llegar a la final." },
   { id: "SEASON_LIPSYNC_ASSASSIN", group: "season", label: "Lipsync Assassin", custom: false,
     description: "Una concursante es nombrada 'asesina' y reta a otra a un lip sync sin reto de por medio." },
+  { id: "SEASON_THAILAND_LEGACY", group: "season", label: "Thailand + Lipsync For Your Legacy", custom: false,
+    description: "Fusión: cada capítulo tiene un maxi reto (solo se elige a la ganadora) y una pasarela que se juzga con el Lipsync For Your Legacy: el Top 2 hace lip sync por su legado y la ganadora elimina a la reina del pintalabios que eligió." },
   { id: "SEASON_ALL_WINNERS", group: "season", label: "All Winners", custom: false,
     description: "Todas las concursantes son ganadoras previas de su temporada." },
   { id: "SEASON_SLAYSIAN", group: "season", label: "Slaysian Royale", custom: false,

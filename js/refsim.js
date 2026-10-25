@@ -4384,6 +4384,7 @@ this.plan = this.makePlan();
         const ok = mf.opt === "teams" ? queens.length % 2 === 0 && queens.length >= 6 : queens.length >= 6;
         if (ok) {
           this.opts[mf.opt] = true;
+          if (mf.opt2) this.opts[mf.opt2] = true;
           if (mf.opt === "winners") queens.forEach((q) => { q.stars = 0; });
         }
       }
@@ -5411,14 +5412,14 @@ this.allianceTick(s);
       }
       // Estreno por equipos: resultado del reto + el del equipo (WIN+LOW, TOP2+BTM2, HIGH+ELIM...), apilado como en la wiki.
       if (this.opts.tpOn && typeof raw === "string") {
-        const m = raw.trim().match(/^(WIN|TOP2|HIGH)(LOW|BTM2|ELIM)$/);
+        const m = raw.trim().match(/^(?:WIN)?(WIN|TOP2|HIGH)(LOW|BTM2|ELIM)$/);
         if (m) {
           const P = {
             LOW: { WIN: ["violet", "#000"], TOP2: ["plum", "#000"], HIGH: ["thistle", "#000"] },
             BTM2: { WIN: ["mediumorchid", "#000"], TOP2: ["orchid", "#000"], HIGH: ["#d68ae8", "#000"] },
             ELIM: { WIN: ["#9400D3", "#FFF"], TOP2: ["#B452CD", "#FFF"], HIGH: ["#C86EDD", "#000"] },
           }[m[2]][m[1]];
-          baseText = `${m[1]}\n+\n${m[2]}`; bg = P[0]; fg = P[1]; bold = true;
+          baseText = raw.trim().match(/WIN|TOP2|HIGH|LOW|BTM2|ELIM/g).join("\n+\n"); bg = P[0]; fg = P[1]; bold = true;
         }
       }
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg, fg, bold, border: style.border };
@@ -6406,7 +6407,7 @@ this.allianceTick(s);
   const RANDOM_SEASONS = [
     ["SEASON_REGULAR", 3, "Regular"], ["SEASON_THAILAND", 6, "Thailand (temporadas 1 y 2)"], ["SEASON_TEAMS", 6, "Por equipos"],
     ["SEASON_LIPSYNC_LEGACY", 6, "Lipsync For Your Legacy"], ["SEASON_LIPSYNC_ASSASSIN", 6, "Lipsync Assassin"], ["SEASON_ALL_WINNERS", 6, "All Winners"],
-    ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_LFTW", 6, "Lipsync for the win"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
+    ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_LFTW", 6, "Lipsync for the win"], ["SEASON_THAILAND_LEGACY", 6, "Thailand + Lipsync For Your Legacy"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
   // Twists copiados (los demás twists de la lista siguen con el motor propio)
   const IMPLEMENTED_TWISTS = ["DISABLE_DOUBLE", "DISABLE_REUNION", "RIGGORY", "RIGGORY_LIPSYNC", "CLAIM_QUEEN", "IMMUNITY", "BEAVER", "CHOCOLATE_RANDOM", "CHOCOLATE_CHOOSABLE", "BADONKA_RANDOM", "BADONKA_CHOOSABLE", "SOLID_BACKGROUND", "TITLE_GOLDEN_BOOT", "TITLE_FAN_FAVORITE", "TITLE_VILLAIN", "TITLE_ROBBED", "TITLE_POPSTAR", "TITLE_MOGUL", "TITLE_WORST_LOOK", "TITLE_LOST_LOOK", "TITLE_BRICK", "LIPSYNC_CHALLENGE", "SLAY_OFF", "SLAYSIAN_LALA", "REUNION_SMACKDOWN", "FAME_GAMES", "PICK_POISON", "SNATCH_RUSICAL"];
@@ -6440,7 +6441,7 @@ this.allianceTick(s);
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_TEAMS3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_LFTW" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_LFTW" || formatChoice.season === "SEASON_THAILAND_LEGACY" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && IMPLEMENTED_RETURNS.includes(formatChoice.return)
       && (formatChoice.twists || []).every((t) => IMPLEMENTED_TWISTS.includes(t));
@@ -6451,7 +6452,7 @@ this.allianceTick(s);
   function episodeInfo(fc, n) {
     const fin = FINALE_SIZE[fc.finale];
     if (!fin || n <= fin + 1 || fc.premiere === "PREMIERE_TEAMS3") return null;
-    if (["SEASON_THAILAND", "SEASON_TEAMS", "SEASON_LIPSYNC_LEGACY", "SEASON_LIPSYNC_ASSASSIN", "SEASON_ALL_WINNERS", "SEASON_SLAYSIAN", "SEASON_FATAL", "SEASON_RANDOM", "SEASON_TOURNAMENT"].includes(fc.season)) return null;
+    if (["SEASON_THAILAND", "SEASON_THAILAND_LEGACY", "SEASON_TEAMS", "SEASON_LIPSYNC_LEGACY", "SEASON_LIPSYNC_ASSASSIN", "SEASON_ALL_WINNERS", "SEASON_SLAYSIAN", "SEASON_FATAL", "SEASON_RANDOM", "SEASON_TOURNAMENT"].includes(fc.season)) return null;
     const base = n - fin;
     return { normal: base + 1, min: 2, max: base * 2 + 1 };
   }
@@ -6495,6 +6496,7 @@ this.allianceTick(s);
     { id: "regular", label: "Regular (eliminación normal)" },
     { id: "raq", label: "Rate-A-Queen (S11: se puntúan entre ellas)" },
     { id: "thailand", label: "Thailand (temporadas 1 y 2)", opt: "thailand" },
+    { id: "thailegacy", label: "Thailand + Lipsync For Your Legacy", opt: "thailand", opt2: "legacy" },
     { id: "teams", label: "Por equipos (parejas)", opt: "teams" },
     { id: "legacy", label: "Lipsync For Your Legacy", opt: "legacy" },
     { id: "assassin", label: "Lipsync Assassin", opt: "assassin" },
@@ -6566,9 +6568,9 @@ this.allianceTick(s);
       triple: premiere === "PREMIERE_TRIPLE",
       premiereNoElim: premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: premiere === "PREMIERE_SLAYERS",
-      thailand: formatChoice.season === "SEASON_THAILAND",
+      thailand: formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_THAILAND_LEGACY",
       teams: formatChoice.season === "SEASON_TEAMS",
-      legacy: formatChoice.season === "SEASON_LIPSYNC_LEGACY",
+      legacy: formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_THAILAND_LEGACY",
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
       split: formatChoice.season === "SEASON_SPLIT",

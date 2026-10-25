@@ -707,3 +707,7 @@ Temporada imaginaria con 15 reinas de varias franquicias (Année Maywong, BenDeL
 ## Drag Race Indonesia All Stars (temporada 1)
 
 12 reinas de varias temporadas de Indonesia (Agnez Mo-rning Star, Ayu Kahyangan, BaliWood, Boroboujee, Cempaka Nusantara, Crimson Ruby, Fobru Kubqi, Ibu Hai-ography, Jakarta Sunset, Krisdayanti Kartini, Ratih Senja y Ratna Rembulan). Sus stats (hoja de cálculo) solo se usan con «Simular esta temporada»; su foto nueva (fondo #883955, letras #1a1a1a) sustituye a la original en toda la web.
+
+## Formato «Thailand + Lipsync For Your Legacy»
+
+Fusión de los dos formatos (también disponible como formato tras la ronda de grupos del Tournament of All Stars y en «Formato al azar»). Cada capítulo tiene un **maxi reto** en el que solo se elige a la ganadora (como en Thailand, con sus casillas `WIN` / `WIN + resultado`) y una **pasarela** que se juzga con el **Lipsync For Your Legacy**: el Top 2 hace lip sync por su legado, cada una elige el pintalabios de una reina del bottom y la ganadora elimina a la del pintalabios que eligió.
