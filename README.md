@@ -693,8 +693,9 @@ En el formato Thailand (temporadas 1 y 2) las casillas copian las de la wiki de 
 
 ## Estreno por equipos (3 capítulos)
 
-Nueva opción de *Estreno* (con temporada Regular o Lipsync for the win y 9 o más reinas). El reparto se divide en 3 equipos (al azar o como elijas en el panel de grupos), pero **cada reina compite por su cuenta** y puede hacer alianzas con quien quiera. Durante 3 capítulos nadie se va a casa:
+Nueva opción de *Estreno* (con cualquier formato de temporada menos All Winners, Tournament, Split y Por equipos, y con 9 o más reinas; los episodios 1 a 3 usan este estreno y después sigue el formato elegido: Legacy, Assassin, Thailand...). El reparto se divide en 3 equipos (al azar o como elijas en el panel de grupos), pero **cada reina compite por su cuenta** y puede hacer alianzas con quien quiera. Durante 3 capítulos nadie se va a casa:
 
 - **Cada capítulo:** 1 WIN + 1 TOP2 (lip sync for the win), 4 HIGH y el resto SAFE. La ganadora suma 3 puntos a su equipo y **resta 1 punto al equipo que elija** (el que va ganando y con el que peor se lleva, según su Estrategia y sus relaciones), la otra del Top 2 suma 2 y cada HIGH suma 1.
 - **Capítulo 3:** el equipo con menos puntos queda en riesgo: todas sus reinas reciben LOW (combinado con su resultado: `WIN+LOW`, `TOP2+LOW`, `HIGH+LOW`) y las dos peores hacen lip sync for your life (`WIN+BTM2`, `HIGH+ELIM`...). Se elimina una.
 - El nombre de cada reina lleva el color de su equipo en el track record.
+- En el track record, las casillas de todas las integrantes del equipo al que le quitan el punto ese capítulo llevan un **borde #980000**.

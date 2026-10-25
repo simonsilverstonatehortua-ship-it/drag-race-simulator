@@ -2926,7 +2926,7 @@ this.plan = this.makePlan();
       const teams = this.dealGroups(this.current, this.tourSizes(n, 3));
       const colors = TOUR_COLORS.slice(0, 3);
       const names = ["Equipo 1", "Equipo 2", "Equipo 3"];
-      this.tp = { teams, pts: [0, 0, 0], names, colors, ep: 0, active: true };
+      this.tp = { teams, pts: [0, 0, 0], names, colors, ep: 0, active: true, hitCols: {} };
       teams.forEach((t, i) => t.forEach((q) => { q.tpTeam = i + 1; }));
       const s = this.newScreen("¡Estreno por equipos!", "Empezar");
       s.b("El reparto se divide en tres equipos, pero cada reina compite por su cuenta y puede hacer alianzas con quien quiera.");
@@ -2972,7 +2972,8 @@ this.plan = this.makePlan();
     // Añade LOW a la casilla que ya tiene la reina este capítulo (WIN+LOW, TOP2+LOW, HIGH+LOW; si estaba SAFE, solo LOW).
     tpMarkLow(q) {
       const i = q.trackRecord.length - 1, cur = q.trackRecord[i];
-      q.trackRecord[i] = cur === "SAFE" ? "LOW" : String(cur).trim() + "LOW";
+      const base = String(cur).trim().replace(/SAFE$/, "");
+      q.trackRecord[i] = (base ? base : "") + "LOW";
       q.unfavoritism += 1; q.ppe += 2;
     }
 
@@ -3011,6 +3012,7 @@ this.plan = this.makePlan();
       const t = this.tpTarget(w);
       if (t >= 0) {
         tp.pts[t] -= 1;
+        tp.hitCols[this.episodeChallenges.length - 1] = t;
         r.q([w.name], tp.colors[t], `Y tienes el poder de restar un punto a otro equipo... ${w.name} se lo quita a ${tp.names[t]}.`);
         tp.teams[t].filter((q) => this.current.includes(q) && q !== w).forEach((q) => this.modRelation(3, [w, q]));
       }
@@ -3040,7 +3042,8 @@ this.plan = this.makePlan();
       sc.q(pair.map((q) => q.name), "tomato", `${pair[0].name}, ${pair[1].name}, sois las peores de vuestro equipo: haréis lip sync por vuestra vida.`);
       pair.forEach((q) => {
         const cur = q.trackRecord[q.trackRecord.length - 1];
-        if (cur === "SAFE") q.trackRecord.pop(); else q.maxiT = true;
+        const base = String(cur).trim().replace(/SAFE$/, "");
+        if (!base) q.trackRecord.pop(); else { q.trackRecord[q.trackRecord.length - 1] = base; q.maxiT = true; }
       });
       this.bottomQueens = pair;
       const res = this.lipsyncDesc();
@@ -4541,6 +4544,7 @@ this.plan = this.makePlan();
         items.push({ color: (style && style.bg) || "white", text });
       });
       if (this.opts.tpOn) {
+        if (this.tp && Object.keys(this.tp.hitCols).length) items.push({ color: "#980000", text: "Borde granate: el equipo al que le quitaron un punto en ese capítulo." });
         [["LOW", "violet", "Su equipo quedó el último: resultado del reto + LOW (a salvo, pero en riesgo)."], ["BTM2", "mediumorchid", "Su equipo quedó el último y fue de las dos peores: resultado del reto + BTM2 (ganó el lip sync por su vida)."],
           ["ELIM", "#9400D3", "Su equipo quedó el último y perdió el lip sync por su vida: resultado del reto + ELIM."]].forEach(([code, color, text]) => {
           if ([...used].some((u) => new RegExp("^(WIN|TOP2|HIGH)" + code + "$").test(String(u).trim()))) items.push({ color, text });
@@ -4601,7 +4605,7 @@ this.plan = this.makePlan();
     }
 
     judgingScreen() {
-      if (this.opts.thailand && !this.slayNow()) return this.thaiJudgingScreen();
+      if (this.opts.thailand && !this.slayNow() && !this.flag.tpJ) return this.thaiJudgingScreen();
       const f = this.flag;
       const s = this.newScreen("¡El jurado!", "Ver las decisiones");
       // Presentación del jurado (versión de esopare): RuPaul, 3 jueces del panel y un invitado.
@@ -5418,6 +5422,8 @@ this.allianceTick(s);
         }
       }
       const cell = { text: wild ? "REGRESO\n+\n" + baseText : baseText, bg, fg, bold, border: style.border };
+      // Estreno por equipos: borde granate en las casillas del equipo al que le quitaron un punto ese capítulo.
+      if (this.tp && queen.tpTeam && this.tp.hitCols[col] === queen.tpTeam - 1) cell.border = "3px solid #980000";
       if (queen.starLog[col]) cell.sub = `+${queen.starLog[col]} MVQ`;
       if (queen.immuneCols.includes(col)) cell.immune = true; // salvada por una poción de inmunidad
       if (queen.miniEpisode.includes(col + 1)) {
@@ -6469,7 +6475,7 @@ this.allianceTick(s);
       if (n < 6 || n % 2) return null;
       return Array.from({ length: n / 2 }, (_, i) => ({ title: `Pareja ${i + 1}`, size: 2 }));
     }
-    if (fc.premiere === "PREMIERE_TEAMS3" && n >= 9 && ["SEASON_REGULAR", "SEASON_LFTW"].includes(fc.season)) {
+    if (fc.premiere === "PREMIERE_TEAMS3" && n >= 9 && !["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS"].includes(fc.season)) {
       return even(3).map((size, i) => ({ title: `Equipo ${i + 1}`, size }));
     }
     if (fc.premiere === "PREMIERE_TRIPLE" && n >= 12) {
@@ -6541,8 +6547,8 @@ this.allianceTick(s);
       premiere = id;
       randomPremiereLabel = label;
     }
-    // El estreno por equipos solo funciona con una temporada regular (o Lipsync for the win) y 9 o más reinas.
-    if (premiere === "PREMIERE_TEAMS3" && (!["SEASON_REGULAR", "SEASON_LFTW"].includes(formatChoice.season) || names.length < 9)) premiere = "PREMIERE_NORMAL";
+    // El estreno por equipos funciona con cualquier formato de temporada menos All Winners, Tournament, Split y Por equipos (9 o más reinas).
+    if (premiere === "PREMIERE_TEAMS3" && (["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS"].includes(formatChoice.season) || names.length < 9)) premiere = "PREMIERE_NORMAL";
     const sim = new Sim(names, statsByName, relNumeric, {
       opening: formatChoice.openingChallenge,
       finaleSize: FINALE_SIZE[finale] || 2,
