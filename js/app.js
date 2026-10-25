@@ -4,6 +4,7 @@ const TABS = ["simulate", "challenges", "formats", "roster"];
 let currentTab = "simulate";
 let simSelection = new Set();
 let simSeasonStats = null; // stats de la temporada precargada con «Simular esta temporada» (las versiones imaginarias solo se usan así)
+let simSeasonImages = null; // fotos propias de la temporada precargada (versiones imaginarias)
 let randomCount = 12;
 let seasonPlayer = null;
 let relationshipSetup = null;
@@ -31,6 +32,12 @@ const NO_IMAGE_URL = "https://myrainboww.github.io/Drag-Race-Simulator/image/que
 // la entrada de esa temporada exacta; si no, se cae a la primera que se encuentre (mismo
 // comportamiento de siempre para el 99% de los casos sin colisión de nombre).
 function contestantImage(name, seasonId) {
+  if (seasonId) {
+    const sn = window.ALL_SEASONS.find((x) => x.id === seasonId);
+    const own = sn && sn.contestants.find((c) => c.name === name && c.seasonImage);
+    if (own) return own.seasonImage;
+  }
+  if (simSeasonImages && simSeasonImages[name]) return simSeasonImages[name];
   const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.image);
   const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   if (real) return real.image;
@@ -419,7 +426,7 @@ function renderSimulate() {
 
   if (simSelection.size) {
     wrap.appendChild(el("div", { class: "toolbar", style: "justify-content:flex-start;" }, [
-      el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); simSeasonStats = null; render(); } }),
+      el("button", { class: "btn btn--ghost", text: "Vaciar selección", onclick: () => { simSelection = new Set(); simSeasonStats = null; simSeasonImages = null; render(); } }),
     ]));
   }
 
@@ -1687,6 +1694,8 @@ function simulateSeasonPreset(season) {
   relationshipSetup = null;
   simSelection = new Set(season.contestants.map((c) => c.name));
   simSeasonStats = {};
+  simSeasonImages = {};
+  season.contestants.forEach((c) => { if (c.seasonImage) simSeasonImages[c.name] = c.seasonImage; });
   season.contestants.forEach((c) => { if (c.stats) simSeasonStats[c.name] = c.stats; });
   selectedTwists = new Set((season.preset && season.preset.twists) || []);
   formatChoice.twists = [...selectedTwists];
