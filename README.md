@@ -711,3 +711,4 @@ Temporada imaginaria con 15 reinas de varias franquicias (Année Maywong, BenDeL
 ## Formato «Thailand + Lipsync For Your Legacy»
 
 Fusión de los dos formatos (también disponible como formato tras la ronda de grupos del Tournament of All Stars y en «Formato al azar»). Cada capítulo tiene un **maxi reto** en el que solo se elige a la ganadora (como en Thailand, con sus casillas `WIN` / `WIN + resultado`) y una **pasarela** que se juzga con el **Lipsync For Your Legacy**: el Top 2 hace lip sync por su legado, cada una elige el pintalabios de una reina del bottom y la ganadora elimina a la del pintalabios que eligió.
+- En esta fusión, la que gana el lip sync por su legado lleva un `WIN` azul más oscuro (`#0077b6`) que la otra del Top 2, que pierde el lip sync (`WIN` en `#00bfff`).
