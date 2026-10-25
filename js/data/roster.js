@@ -4440,6 +4440,28 @@ const ALL_SEASONS = [
       { name: "Zubaida Aapa-la", finalPlacement: "Por determinar", seasonImage: "img/global-all-stars-imaginario-s1-placeholder.svg", stats: { acting: 4, comedy: 15, dance: 3, design: 7, improv: 9, runway: 9, lipsync: 11, makeup: 4, singing: 4, verses: 2, strategy: 5, charisma: 0, uniqueness: 15, nerve: 15, talent: 9 } },
     ],
   },
+  {
+    id: "IND_AS1",
+    seasonName: "Drag Race Indonesia All Stars — Temporada 1",
+    franchise: "Indonesia",
+    tabLabel: "Indonesia AS 1",
+    imaginary: true,
+    // Reparto de reinas de varias temporadas de Indonesia; stats (hoja de cálculo) y foto propias de esta temporada.
+    contestants: [
+      { name: "Agnez Mo-rning Star", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 3, comedy: 15, dance: 9, design: 15, improv: 13, runway: 7, lipsync: 7, makeup: 8, singing: 11, verses: 15, strategy: 7, charisma: 5, uniqueness: 9, nerve: 3, talent: 15 } },
+      { name: "Ayu Kahyangan", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 11, comedy: 9, dance: 4, design: 12, improv: 12, runway: 13, lipsync: 10, makeup: 11, singing: 6, verses: 4, strategy: 8, charisma: 10, uniqueness: 8, nerve: 13, talent: 13 } },
+      { name: "BaliWood", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 12, comedy: 11, dance: 5, design: 15, improv: 5, runway: 10, lipsync: 0, makeup: 14, singing: 10, verses: 10, strategy: 15, charisma: 10, uniqueness: 5, nerve: 6, talent: 0 } },
+      { name: "Boroboujee", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 15, dance: 1, design: 15, improv: 13, runway: 13, lipsync: 9, makeup: 11, singing: 10, verses: 8, strategy: 7, charisma: 0, uniqueness: 6, nerve: 15, talent: 1 } },
+      { name: "Cempaka Nusantara", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 6, comedy: 15, dance: 15, design: 8, improv: 0, runway: 0, lipsync: 1, makeup: 3, singing: 0, verses: 14, strategy: 9, charisma: 0, uniqueness: 1, nerve: 7, talent: 11 } },
+      { name: "Crimson Ruby", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 11, comedy: 0, dance: 3, design: 9, improv: 15, runway: 15, lipsync: 14, makeup: 10, singing: 13, verses: 9, strategy: 0, charisma: 10, uniqueness: 9, nerve: 14, talent: 15 } },
+      { name: "Fobru Kubqi", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 8, comedy: 9, dance: 8, design: 0, improv: 8, runway: 7, lipsync: 3, makeup: 0, singing: 8, verses: 13, strategy: 15, charisma: 4, uniqueness: 7, nerve: 15, talent: 10 } },
+      { name: "Ibu Hai-ography", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 5, comedy: 12, dance: 12, design: 7, improv: 14, runway: 2, lipsync: 13, makeup: 11, singing: 9, verses: 6, strategy: 2, charisma: 5, uniqueness: 0, nerve: 5, talent: 5 } },
+      { name: "Jakarta Sunset", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 6, comedy: 15, dance: 9, design: 4, improv: 2, runway: 7, lipsync: 1, makeup: 12, singing: 3, verses: 5, strategy: 9, charisma: 5, uniqueness: 13, nerve: 8, talent: 12 } },
+      { name: "Krisdayanti Kartini", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 9, dance: 11, design: 13, improv: 15, runway: 13, lipsync: 11, makeup: 15, singing: 9, verses: 3, strategy: 15, charisma: 0, uniqueness: 10, nerve: 15, talent: 13 } },
+      { name: "Ratih Senja", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 9, dance: 15, design: 5, improv: 13, runway: 7, lipsync: 14, makeup: 15, singing: 0, verses: 0, strategy: 9, charisma: 3, uniqueness: 8, nerve: 9, talent: 12 } },
+      { name: "Ratna Rembulan", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 8, comedy: 10, dance: 13, design: 8, improv: 1, runway: 7, lipsync: 10, makeup: 3, singing: 7, verses: 15, strategy: 13, charisma: 15, uniqueness: 6, nerve: 8, talent: 0 } },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su

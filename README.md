@@ -703,3 +703,7 @@ Nueva opción de *Estreno* (con cualquier formato de temporada menos All Winners
 ## Global All Stars imaginario (temporada 1)
 
 Temporada imaginaria con 15 reinas de varias franquicias (Année Maywong, BenDeLaCreme, Biddiiw Bu Ñuul, Divina De Campo, Isla Bonita, Laksamana, Ma'Ma Queen, Miss Camé Rouge, Nirvana Nyai, Noor El Nil, Sânziana Soare, Scarlett BoBo, Tizita, Voahangy Bleu y Zubaida Aapa-la). Sus stats son variaciones de las originales (hoja de cálculo) y solo se usan al pulsar «Simular esta temporada» en esa temporada: las fichas originales de cada reina no cambian. Su foto nueva (fondo #04568b, letras #bf1600) sustituye a la original en toda la web; las fichas originales conservan su imagen en los datos por si se quiere volver atrás (basta con quitar `seasonImage` de esa temporada).
+
+## Drag Race Indonesia All Stars (temporada 1)
+
+12 reinas de varias temporadas de Indonesia (Agnez Mo-rning Star, Ayu Kahyangan, BaliWood, Boroboujee, Cempaka Nusantara, Crimson Ruby, Fobru Kubqi, Ibu Hai-ography, Jakarta Sunset, Krisdayanti Kartini, Ratih Senja y Ratna Rembulan). Sus stats (hoja de cálculo) solo se usan con «Simular esta temporada»; su foto nueva (fondo #883955, letras #1a1a1a) sustituye a la original en toda la web.
