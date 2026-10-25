@@ -32,12 +32,9 @@ const NO_IMAGE_URL = "https://myrainboww.github.io/Drag-Race-Simulator/image/que
 // la entrada de esa temporada exacta; si no, se cae a la primera que se encuentre (mismo
 // comportamiento de siempre para el 99% de los casos sin colisión de nombre).
 function contestantImage(name, seasonId) {
-  if (seasonId) {
-    const sn = window.ALL_SEASONS.find((x) => x.id === seasonId);
-    const own = sn && sn.contestants.find((c) => c.name === name && c.seasonImage);
-    if (own) return own.seasonImage;
-  }
-  if (simSeasonImages && simSeasonImages[name]) return simSeasonImages[name];
+  // Las 15 reinas del Global All Stars imaginario usan su foto nueva (seasonImage) en toda la web, no solo en esa temporada.
+  const swapped = window.ALL_CONTESTANTS.find((c) => c.name === name && c.seasonImage);
+  if (swapped) return swapped.seasonImage;
   const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.image);
   const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   if (real) return real.image;
