@@ -89,6 +89,8 @@ const DEFAULT_FORMATS = [
     description: "Una concursante es nombrada 'asesina' y reta a otra a un lip sync sin reto de por medio." },
   { id: "SEASON_THAILAND_LEGACY", group: "season", label: "Thailand + Lipsync For Your Legacy", custom: false,
     description: "Fusión: cada capítulo tiene un maxi reto (solo se elige a la ganadora) y una pasarela que se juzga con el Lipsync For Your Legacy: el Top 2 hace lip sync por su legado y la ganadora elimina a la reina del pintalabios que eligió." },
+  { id: "SEASON_THAILAND_LFTW", group: "season", label: "Thailand + Lipsync for the win", custom: false,
+    description: "Fusión: cada capítulo tiene un maxi reto (solo se elige a la ganadora) y una pasarela que se juzga con el Lipsync for the win: un Top 2 hace lip sync por la victoria y un Bottom 2 (o 3, 4, 5) por su vida, con muchos HIGH y LOW." },
   { id: "SEASON_ALL_WINNERS", group: "season", label: "All Winners", custom: false,
     description: "Todas las concursantes son ganadoras previas de su temporada." },
   { id: "SEASON_SLAYSIAN", group: "season", label: "Slaysian Royale", custom: false,
