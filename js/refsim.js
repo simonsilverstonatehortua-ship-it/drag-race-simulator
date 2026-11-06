@@ -5396,6 +5396,13 @@ this.allianceTick(s);
     // TRACK RECORD
     // ======================================================================================
     cellFor(raw, queen, col) {
+      // Varios títulos en la misma casilla: texto apilado y un color por título (franjas de arriba abajo).
+      if (typeof raw === "string" && raw.startsWith("T:")) {
+        const sts = raw.slice(2).split("|").map((p) => CELL_STYLE[p] || { text: p });
+        const n = sts.length;
+        const stops = sts.map((st, i) => `${st.bg || "#ccc"} ${(i * 100 / n).toFixed(1)}% ${((i + 1) * 100 / n).toFixed(1)}%`).join(", ");
+        return { text: sts.map((st) => (st.text !== undefined ? st.text : "")).join("\n+\n"), bg: `linear-gradient(180deg, ${stops})`, fg: "#000", bold: true, shadow: "0 0 2px #fff, 0 0 3px #fff" };
+      }
       // "RTRN + X": la reina comodín que regresó (el estilo es el de X con el prefijo "REGRESO +")
       // Resultados combinados al estilo de la wiki: una sola línea "WIN+ELIM", "SAFE+ADV", "RTRN+SAFE"...
       const blockedCell = typeof raw === "string" && raw.endsWith("+BLOCKED"); // All Winners: bloqueada por el desatascador
@@ -5536,13 +5543,13 @@ this.allianceTick(s);
     titlesBlock(s) {
       const tw = this.tw;
       const mark = (winner, code, label) => {
-        if (this.eliminated.includes(winner)) winner.trackRecord[winner.trackRecord.length - 1] = code;
+        this.addTitle(winner, code);
         winner.minqdd = winner.minqdd ? winner.minqdd + `\n(${label})` : `(${label})`;
       };
       const whole = () => this.current.concat(this.eliminated);
       const voteFor = (title, color, pickTarget) => {
         const all = shuffle(whole());
-        this.eliminated.forEach((q) => { q.votes = 0; q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
+        this.eliminated.forEach((q) => { q.votes = 0; if (!(q.titleCodes && q.titleCodes.length)) q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
         this.current.forEach((q) => { q.votes = 0; });
         all.forEach((q) => {
           q.lipstick = pickTarget(q, all);
@@ -5627,10 +5634,19 @@ this.allianceTick(s);
       }
     }
 
+    // Una reina eliminada puede ganar varios títulos (Miss Simpatía, Miss Villana...): su casilla los muestra todos
+    // ("T:código|código"), con un color por título. Con uno solo, la casilla es la de siempre.
+    addTitle(q, code) {
+      if (!this.eliminated.includes(q)) return;
+      q.titleCodes = q.titleCodes || [];
+      if (!q.titleCodes.includes(code)) q.titleCodes.push(code);
+      q.trackRecord[q.trackRecord.length - 1] = q.titleCodes.length > 1 ? "T:" + q.titleCodes.join("|") : q.titleCodes[0];
+    }
+
     missCongeniality(s) {
       s.big("¡Las concursantes votarán a Miss Simpatía! (solo se puede votar a las eliminadas)");
       const whole = shuffle([...this.current, ...this.eliminated]);
-      this.eliminated.forEach((q) => { q.votes = 0; q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
+      this.eliminated.forEach((q) => { q.votes = 0; q.titleCodes = []; q.trackRecord[q.trackRecord.length - 1] = "GUEST"; });
       this.current.forEach((q) => { q.votes = 0; });
       whole.forEach((q) => {
         const options = this.eliminated.filter((e) => e !== q);
@@ -5647,7 +5663,7 @@ this.allianceTick(s);
         ? `Hay un empate: las ganadoras de Miss Simpatía de esta temporada son... ¡${list(names)}!`
         : `La ganadora de Miss Simpatía de esta temporada es... ¡${names[0]}!`);
       winners.forEach((winner) => {
-        winner.trackRecord[winner.trackRecord.length - 1] = "MISS CON";
+        this.addTitle(winner, "MISS CON");
         winner.minqdd = winner.minqdd ? winner.minqdd + "\n(Miss Simpatía)" : "(Miss Simpatía)";
       });
       this.missCongName = names.join(" y ");
@@ -6165,9 +6181,10 @@ this.allianceTick(s);
         const w = this.newScreen("¡La gran final!", "Ir al Rate-A-Queen");
         const wild = this.eliminated[rnd(0, this.eliminated.length - 1)];
         const last = wild.trackRecord[wild.trackRecord.length - 1];
-        if (last === "GUEST" || last === "MISS CON") {
+        const hasCon = last === "MISS CON" || (typeof last === "string" && last.startsWith("T:") && last.includes("MISS CON"));
+        if (last === "GUEST" || last === "MISS CON" || (typeof last === "string" && last.startsWith("T:"))) {
           wild.trackRecord.pop();
-          if (last === "MISS CON") wild.mxcon = true;
+          if (hasCon) wild.mxcon = true;
         }
         wild.wildcard = true;
         this.eliminated.splice(this.eliminated.indexOf(wild), 1);

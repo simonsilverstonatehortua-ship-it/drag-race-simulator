@@ -716,3 +716,11 @@ Fusión de los dos formatos (también disponible como formato tras la ronda de g
 ## Formato «Thailand + Lipsync for the win»
 
 Fusión de los dos formatos (también disponible tras la ronda de grupos del Tournament of All Stars y en «Formato al azar»). Cada capítulo tiene un **maxi reto** en el que solo se elige a la ganadora (casillas de Thailand) y una **pasarela** que se juzga con el **Lipsync for the win**: un Top 2 (o 3) hace lip sync por la victoria, hay muchos HIGH y LOW y un Bottom 2 a 5 hace lip sync por su vida. La que gana el lip sync por la victoria lleva un `WIN` azul oscuro (`#0077b6`) y la que lo pierde un `TOP2` celeste (`#00bfff`); si además ganó el maxi reto, la casilla combina ambos (`WIN + TOP2`, `WIN + WIN`, `WIN + BTM2`...).
+
+## Títulos de la reunión: varios por reina
+
+Una reina eliminada puede ganar **varios títulos a la vez** (Miss Simpatía, Miss Villana, Magnate de la Moda...). Su casilla del track record los muestra todos apilados (`MISS SIMPATÍA + MISS VILLAIN...`) con una franja de color por título, y la columna de colocación lista todos los que ha ganado.
+
+## Drag Race Egipto All Stars (temporada 1)
+
+14 reinas de varias temporadas de Egipto. Sus stats son los originales sumando entre -3 y +5 al azar (limitados a 0-15) y solo se usan con «Simular esta temporada»; su foto nueva (fondo #fe6d73, letras #fafa31) sustituye a la original en toda la web.

@@ -1212,6 +1212,7 @@ function refTrackRecord(block) {
       if (cell.bg) style += `background:${cell.bg};`;
       if (cell.fg) style += `color:${cell.fg};`;
       if (cell.bold) style += "font-weight:700;";
+      if (cell.shadow) style += `text-shadow:${cell.shadow};`;
       if (cell.immune) style += `box-shadow:inset 0 0 0 3px ${IMMUNITY_BORDER_COLOR};`;
       if (cell.border) style += `border:${cell.border};box-sizing:border-box;`;
       const td = el("td", { class: "placement", style });

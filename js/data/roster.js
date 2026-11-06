@@ -4630,6 +4630,30 @@ const ALL_SEASONS = [
       { name: "Ratna Rembulan", finalPlacement: "Por determinar", seasonImage: "img/indonesia-all-stars-s1-placeholder.svg", stats: { acting: 8, comedy: 10, dance: 13, design: 8, improv: 1, runway: 7, lipsync: 10, makeup: 3, singing: 7, verses: 15, strategy: 13, charisma: 15, uniqueness: 6, nerve: 8, talent: 0 } },
     ],
   },
+  {
+    id: "EG_AS1",
+    seasonName: "Drag Race Egipto All Stars — Temporada 1",
+    franchise: "Egipto",
+    tabLabel: "Egipto AS 1",
+    imaginary: true,
+    // Reparto de reinas de varias temporadas de Egipto; sus stats son los originales sumando entre -3 y +5 al azar (0 a 15) y solo se usan con «Simular esta temporada».
+    contestants: [
+      { name: "Amina Surab", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 5, comedy: 3, dance: 9, design: 10, improv: 7, runway: 13, lipsync: 9, makeup: 7, singing: 15, verses: 15, strategy: 0, charisma: 3, uniqueness: 14, nerve: 3, talent: 15 } },
+      { name: "Ankh Xiety", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 2, comedy: 15, dance: 8, design: 1, improv: 8, runway: 12, lipsync: 11, makeup: 11, singing: 6, verses: 7, strategy: 15, charisma: 1, uniqueness: 14, nerve: 3, talent: 6 } },
+      { name: "Cleo Patra", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 10, dance: 15, design: 2, improv: 10, runway: 11, lipsync: 4, makeup: 15, singing: 11, verses: 13, strategy: 15, charisma: 10, uniqueness: 15, nerve: 8, talent: 10 } },
+      { name: "Dalia El Nil", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 8, comedy: 4, dance: 14, design: 8, improv: 8, runway: 3, lipsync: 6, makeup: 1, singing: 9, verses: 13, strategy: 10, charisma: 5, uniqueness: 3, nerve: 4, talent: 0 } },
+      { name: "Dina Al-Qāhira", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 13, dance: 7, design: 13, improv: 14, runway: 15, lipsync: 4, makeup: 7, singing: 2, verses: 15, strategy: 6, charisma: 7, uniqueness: 7, nerve: 4, talent: 8 } },
+      { name: "Isis Icon", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 10, comedy: 10, dance: 15, design: 5, improv: 6, runway: 10, lipsync: 6, makeup: 13, singing: 10, verses: 5, strategy: 13, charisma: 13, uniqueness: 5, nerve: 10, talent: 0 } },
+      { name: "Layla Al-Qāhira", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 7, dance: 15, design: 0, improv: 7, runway: 7, lipsync: 12, makeup: 15, singing: 12, verses: 4, strategy: 6, charisma: 15, uniqueness: 8, nerve: 11, talent: 13 } },
+      { name: "Menna Bastet", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 15, dance: 9, design: 4, improv: 12, runway: 4, lipsync: 4, makeup: 11, singing: 12, verses: 12, strategy: 13, charisma: 1, uniqueness: 2, nerve: 8, talent: 15 } },
+      { name: "Mina Dendera", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 0, comedy: 8, dance: 12, design: 0, improv: 4, runway: 6, lipsync: 5, makeup: 2, singing: 5, verses: 5, strategy: 15, charisma: 15, uniqueness: 11, nerve: 6, talent: 15 } },
+      { name: "Nermin Nefert", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 4, comedy: 15, dance: 6, design: 7, improv: 7, runway: 15, lipsync: 2, makeup: 0, singing: 6, verses: 2, strategy: 14, charisma: 14, uniqueness: 7, nerve: 15, talent: 6 } },
+      { name: "Salma El Nil", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 5, dance: 7, design: 15, improv: 0, runway: 10, lipsync: 1, makeup: 8, singing: 15, verses: 12, strategy: 9, charisma: 4, uniqueness: 13, nerve: 7, talent: 7 } },
+      { name: "Ya Sultana", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 7, comedy: 15, dance: 0, design: 10, improv: 7, runway: 15, lipsync: 5, makeup: 4, singing: 6, verses: 12, strategy: 5, charisma: 3, uniqueness: 3, nerve: 15, talent: 7 } },
+      { name: "Yara Al-Qāhira", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 3, comedy: 12, dance: 13, design: 7, improv: 8, runway: 9, lipsync: 15, makeup: 12, singing: 8, verses: 0, strategy: 13, charisma: 0, uniqueness: 9, nerve: 0, talent: 6 } },
+      { name: "Youssef Kemet", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 7, dance: 6, design: 9, improv: 10, runway: 8, lipsync: 0, makeup: 11, singing: 0, verses: 15, strategy: 3, charisma: 15, uniqueness: 11, nerve: 12, talent: 6 } },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
