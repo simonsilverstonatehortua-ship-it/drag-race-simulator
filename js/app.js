@@ -1668,6 +1668,7 @@ function renderRoster() {
       const avatar = avatarImg(c.name, "avatar--card", activeSeason.id);
       if (avatar) card.appendChild(avatar);
       card.appendChild(el("strong", { text: c.name }));
+      if (c.country) card.appendChild(el("div", { class: "muted small", text: "📍 " + c.country }));
       card.appendChild(el("div", { class: "muted small", text: statsSummaryLine(contestantStats(c.name, activeSeason.id)) }));
       if (DB.contestantOverrides[c.name]) card.appendChild(el("span", { class: "badge", text: "stats personalizadas" }));
       card.appendChild(el("div", { class: "card__actions" }, [
