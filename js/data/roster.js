@@ -3895,7 +3895,7 @@ const ALL_SEASONS = [
     contestants: [
       { name: "Ana Masreya", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 3, comedy: 9, dance: 11, design: 0, improv: 10, runway: 2, lipsync: 9, makeup: 3, singing: 11, verses: 13, strategy: 4, charisma: 4, uniqueness: 5, nerve: 13, talent: 7 } },
-      { name: "Miss Cairo", finalPlacement: "Por determinar",
+      { name: "Cairo Iman Ali", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 2, comedy: 15, dance: 3, design: 9, improv: 10, runway: 1, lipsync: 9, makeup: 13, singing: 12, verses: 9, strategy: 14, charisma: 4, uniqueness: 14, nerve: 4, talent: 2 } },
       { name: "Lenny Koshary", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 11, comedy: 11, dance: 7, design: 6, improv: 6, runway: 14, lipsync: 14, makeup: 1, singing: 12, verses: 8, strategy: 6, charisma: 10, uniqueness: 13, nerve: 2, talent: 8 } },
