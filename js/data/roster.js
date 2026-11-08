@@ -4929,6 +4929,28 @@ const ALL_SEASONS = [
       { name: "Youssef Kemet", finalPlacement: "Por determinar", seasonImage: "img/egipto-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 7, dance: 6, design: 9, improv: 10, runway: 8, lipsync: 0, makeup: 11, singing: 0, verses: 15, strategy: 3, charisma: 15, uniqueness: 11, nerve: 12, talent: 6 } },
     ],
   },
+  {
+    id: "CA_AS1",
+    seasonName: "Drag Race Centroamérica All Stars — Temporada 1",
+    franchise: "Centroamérica",
+    tabLabel: "Centroamérica AS 1",
+    imaginary: true,
+    // Reinas de varias temporadas de Centroamérica; sus stats son los originales sumando entre -3 y +5 al azar (0 a 15) y solo se usan con «Simular esta temporada».
+    contestants: [
+      { name: "Ana Maria Conda", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 8, comedy: 2, dance: 8, design: 7, improv: 5, runway: 12, lipsync: 6, makeup: 4, singing: 4, verses: 2, strategy: 1, charisma: 3, uniqueness: 15, nerve: 1, talent: 5 } },
+      { name: "Calypso Cruz", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 5, comedy: 3, dance: 13, design: 5, improv: 9, runway: 15, lipsync: 0, makeup: 0, singing: 7, verses: 9, strategy: 11, charisma: 2, uniqueness: 3, nerve: 12, talent: 11 } },
+      { name: "Diosa del Volcan", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 14, comedy: 11, dance: 11, design: 10, improv: 8, runway: 4, lipsync: 8, makeup: 2, singing: 10, verses: 0, strategy: 9, charisma: 14, uniqueness: 11, nerve: 2, talent: 4 } },
+      { name: "Garínagu", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 5, dance: 9, design: 13, improv: 0, runway: 1, lipsync: 10, makeup: 4, singing: 5, verses: 9, strategy: 6, charisma: 11, uniqueness: 4, nerve: 2, talent: 14 } },
+      { name: "Joumou Jolie", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 11, comedy: 14, dance: 14, design: 6, improv: 12, runway: 13, lipsync: 5, makeup: 3, singing: 4, verses: 0, strategy: 9, charisma: 7, uniqueness: 5, nerve: 15, talent: 15 } },
+      { name: "Liwa Mairin", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 7, comedy: 13, dance: 11, design: 15, improv: 9, runway: 14, lipsync: 13, makeup: 13, singing: 10, verses: 15, strategy: 15, charisma: 0, uniqueness: 13, nerve: 6, talent: 8 } },
+      { name: "Madame Zemi", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 15, comedy: 5, dance: 12, design: 7, improv: 5, runway: 8, lipsync: 6, makeup: 12, singing: 6, verses: 6, strategy: 15, charisma: 4, uniqueness: 14, nerve: 1, talent: 0 } },
+      { name: "Maya del MAAR", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 11, comedy: 10, dance: 7, design: 8, improv: 12, runway: 15, lipsync: 6, makeup: 7, singing: 12, verses: 10, strategy: 4, charisma: 13, uniqueness: 11, nerve: 6, talent: 2 } },
+      { name: "Míster Garífuna", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 3, comedy: 10, dance: 5, design: 8, improv: 6, runway: 11, lipsync: 5, makeup: 12, singing: 1, verses: 15, strategy: 15, charisma: 9, uniqueness: 8, nerve: 15, talent: 7 } },
+      { name: "Rey Cocobolo", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 13, comedy: 12, dance: 13, design: 0, improv: 9, runway: 13, lipsync: 6, makeup: 6, singing: 8, verses: 13, strategy: 4, charisma: 1, uniqueness: 9, nerve: 15, talent: 6 } },
+      { name: "Ruby Bella Cruz", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 2, comedy: 15, dance: 4, design: 12, improv: 7, runway: 8, lipsync: 3, makeup: 11, singing: 10, verses: 6, strategy: 14, charisma: 12, uniqueness: 9, nerve: 2, talent: 12 } },
+      { name: "Xibalbá", finalPlacement: "Por determinar", seasonImage: "img/centroamerica-all-stars-s1-placeholder.svg", stats: { acting: 9, comedy: 5, dance: 5, design: 9, improv: 12, runway: 12, lipsync: 15, makeup: 15, singing: 11, verses: 10, strategy: 6, charisma: 13, uniqueness: 5, nerve: 15, talent: 13 } },
+    ],
+  },
 ];
 
 // Lista plana de todas las concursantes de todas las temporadas cargadas, cada una con su
