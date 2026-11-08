@@ -3730,7 +3730,7 @@ const ALL_SEASONS = [
         image: "img/pakistan-s7-placeholder.svg", stats: { acting: 2, comedy: 6, dance: 13, design: 0, improv: 2, runway: 7, lipsync: 13, makeup: 0, singing: 7, verses: 1, strategy: 11, charisma: 4, uniqueness: 5, nerve: 12, talent: 4 } },
       { name: "Meena Mirza", finalPlacement: "Por determinar",
         image: "img/pakistan-s7-placeholder.svg", stats: { acting: 1, comedy: 7, dance: 4, design: 11, improv: 12, runway: 10, lipsync: 9, makeup: 8, singing: 4, verses: 5, strategy: 2, charisma: 2, uniqueness: 7, nerve: 1, talent: 5 } },
-      { name: "Paratha Perry", finalPlacement: "Por determinar",
+      { name: "Paratha Party", finalPlacement: "Por determinar",
         image: "img/pakistan-s7-placeholder.svg", stats: { acting: 8, comedy: 7, dance: 9, design: 10, improv: 10, runway: 14, lipsync: 14, makeup: 12, singing: 10, verses: 8, strategy: 7, charisma: 4, uniqueness: 8, nerve: 1, talent: 5 } },
       { name: "Rubina Jaan", finalPlacement: "Por determinar",
         image: "img/pakistan-s7-placeholder.svg", stats: { acting: 5, comedy: 11, dance: 6, design: 9, improv: 7, runway: 3, lipsync: 6, makeup: 9, singing: 8, verses: 12, strategy: 3, charisma: 6, uniqueness: 6, nerve: 14, talent: 3 } },
@@ -3758,7 +3758,7 @@ const ALL_SEASONS = [
       { name: "Nazia Zoom", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
       { name: "Nusrat Rang", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
       { name: "Shahnaz Badshah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
-      { name: "Paratha Party", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg", stats: { acting: 1, comedy: 8, dance: 5, design: 2, improv: 1, runway: 14, lipsync: 7, makeup: 14, singing: 2, verses: 9, strategy: 7, charisma: 0, uniqueness: 1, nerve: 13, talent: 4 } },
+      { name: "Paratha Party", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
     ],
   },
   {
