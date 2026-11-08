@@ -3907,7 +3907,7 @@ const ALL_SEASONS = [
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 14, comedy: 7, dance: 5, design: 11, improv: 13, runway: 6, lipsync: 15, makeup: 9, singing: 5, verses: 3, strategy: 2, charisma: 2, uniqueness: 15, nerve: 3, talent: 4 } },
       { name: "Dita Von Siwa", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 5, comedy: 11, dance: 6, design: 4, improv: 2, runway: 2, lipsync: 4, makeup: 0, singing: 7, verses: 4, strategy: 1, charisma: 7, uniqueness: 11, nerve: 3, talent: 8 } },
-      { name: "Hana Montana", finalPlacement: "Por determinar",
+      { name: "Zaira Montana", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 10, comedy: 12, dance: 9, design: 2, improv: 15, runway: 1, lipsync: 13, makeup: 3, singing: 1, verses: 13, strategy: 15, charisma: 12, uniqueness: 9, nerve: 13, talent: 10 } },
       { name: "Dua Kemet", finalPlacement: "Por determinar",
         image: "img/egipto-s6-placeholder.svg", stats: { acting: 4, comedy: 10, dance: 3, design: 3, improv: 9, runway: 11, lipsync: 1, makeup: 14, singing: 14, verses: 15, strategy: 10, charisma: 6, uniqueness: 1, nerve: 15, talent: 12 } },
