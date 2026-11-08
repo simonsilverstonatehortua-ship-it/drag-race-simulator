@@ -3743,6 +3743,25 @@ const ALL_SEASONS = [
     ],
   },
   {
+    id: "PK_AS1",
+    seasonName: "Drag Race Pakistán All Stars — Temporada 1",
+    franchise: "Pakistán",
+    tabLabel: "Pakistán AS 1",
+    // Reinas de varias temporadas de Pakistán: conservan sus stats originales; su foto nueva sustituye a la anterior en toda la web.
+    contestants: [
+      { name: "Asfand Yar", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Begum Besharam", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Falooda Bachah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Mango Malkah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Masala Malkah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Mehrunissa Badshah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Nazia Zoom", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Nusrat Rang", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Shahnaz Badshah", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg" },
+      { name: "Paratha Party", finalPlacement: "Por determinar", seasonImage: "img/pakistan-all-stars-s1-placeholder.svg", stats: { acting: 1, comedy: 8, dance: 5, design: 2, improv: 1, runway: 14, lipsync: 7, makeup: 14, singing: 2, verses: 9, strategy: 7, charisma: 0, uniqueness: 1, nerve: 13, talent: 4 } },
+    ],
+  },
+  {
     id: "EG_S1",
     seasonName: "Drag Race Egipto — Temporada 1",
     franchise: "Egipto",
