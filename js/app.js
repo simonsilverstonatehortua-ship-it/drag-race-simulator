@@ -48,7 +48,9 @@ function contestantImage(name, seasonId) {
 function contestantStats(name, seasonId) {
   if (DB.contestantOverrides[name]) return DB.contestantOverrides[name];
   const matches = window.ALL_CONTESTANTS.filter((c) => c.name === name && c.stats);
-  const real = (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
+  // Las temporadas imaginarias (All Stars con stats cambiados) mandan en cualquier temporada donde aparezca la reina.
+  const imaginary = new Set(window.ALL_SEASONS.filter((s) => s.imaginary).map((s) => s.id));
+  const real = matches.find((c) => imaginary.has(c.seasonId)) || (seasonId && matches.find((c) => c.seasonId === seasonId)) || matches[0];
   if (real) return real.stats;
   const custom = DB.customContestants.find((c) => c.name === name);
   if (custom && custom.stats) return custom.stats;
@@ -437,8 +439,8 @@ function renderSimulate() {
 
 function buildStatsByName() {
   const map = {};
-  const imaginary = new Set(window.ALL_SEASONS.filter((s) => s.imaginary).map((s) => s.id));
-  window.ALL_CONTESTANTS.forEach((c) => { if (c.stats && !imaginary.has(c.seasonId)) map[c.name] = c.stats; });
+  // Las temporadas imaginarias van al final del array, así que sus stats sustituyen a los originales en todas partes.
+  window.ALL_CONTESTANTS.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
   if (simSeasonStats) Object.entries(simSeasonStats).forEach(([name, stats]) => { map[name] = stats; }); // temporada precargada (p.ej. una versión imaginaria)
   DB.customContestants.forEach((c) => { if (c.stats) map[c.name] = c.stats; });
   Object.entries(DB.contestantOverrides).forEach(([name, stats]) => { map[name] = stats; });
