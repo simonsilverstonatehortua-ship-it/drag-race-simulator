@@ -468,7 +468,14 @@
         // Parejas al azar para toda la temporada ("¡Hora de formar parejas!").
         const s = this.newScreen("¡Hora de formar parejas!", "Empezar");
         s.p("Tras entrar en el taller, ¡las reinas deben elegir a sus parejas!");
+        if (this.opts.teamsRot) s.p("Pero ojo: las parejas cambiarán cada semana.");
         s.hr();
+        const nQueensT = this.current.length;
+        const wantF = this.finaleSize;
+        // Final impar (Top 3, Top 5...): cuando quedan una reina más que las de la final, el equipo del bottom se enfrenta entre sí.
+        this.teamsOdd = wantF % 2 === 1 && wantF >= 3 && wantF + 1 <= nQueensT;
+        this.teamsDissolved = false;
+        this.pairHist = null;
         const pairs = this.dealGroups(this.current, Array.from({ length: this.current.length / 2 }, () => 2));
         const teams = [];
         Screen.teamMap = new Map();
@@ -480,8 +487,8 @@
           s.q([t.QueenA.name, t.QueenB.name], "royalblue", `${t.QueenA.name} y ${t.QueenB.name} forman ${t.name}.`);
         }
         this.current = teams;
-        this.total = teams.length;
-        this.finaleSize = 2;
+        this.total = this.teamsOdd ? nQueensT : teams.length;
+        this.finaleSize = this.teamsOdd ? wantF : 2;
       } else {
         this.opts.teams = false;
         Screen.teamMap = new Map();
@@ -563,7 +570,8 @@
       }
       if (this.opts.tpOn && this.current.length >= 9) this.playTeamPremiere();
 this.plan = this.makePlan();
-      while (this.current.length > this.finaleSize) {
+      let teamGuard = 0;
+      while (this.teamsOdd && this.opts.teams ? (!this.teamsDissolved && teamGuard++ < 200) : this.current.length > this.finaleSize) {
         this.playEpisode();
         this.trackRecordScreen(false);
         this.returnHook();
@@ -1829,6 +1837,7 @@ this.plan = this.makePlan();
       this.bottomQueens = [];
       this.top2 = [];
       this.flag.isNoTeam = false;
+      if (this.opts.teams && this.opts.teamsRot) this.rotateTeams();
       this.miniChallenge();
       if (this.conj && this.conj.active) { const c = this.conj; this.conjoinedFinish(); this.conj = null; void c; }
     }
@@ -3476,6 +3485,50 @@ this.plan = this.makePlan();
       [team, team.QueenA, team.QueenB].forEach((q) => { q.favoritism += fav; q.unfavoritism += unfav; q.ppe += ppe; });
     }
 
+    // Parejas rotativas: cada semana las reinas que siguen en la competición se emparejan de nuevo, evitando
+    // en lo posible repetir una pareja que ya se haya formado (sobre todo la de la semana anterior).
+    rotateTeams() {
+      const key = (a, b) => (a.name < b.name ? a.name + "|" + b.name : b.name + "|" + a.name);
+      if (!this.pairHist) {
+        // primera semana: se quedan las parejas iniciales
+        this.pairHist = [new Set(this.current.map((t) => key(t.QueenA, t.QueenB)))];
+        return;
+      }
+      const qs = this.teamsFlat();
+      if (qs.length < 4 || qs.length % 2) return;
+      const last = this.pairHist[this.pairHist.length - 1];
+      const seen = new Map();
+      this.pairHist.forEach((set) => set.forEach((k) => seen.set(k, (seen.get(k) || 0) + 1)));
+      let best = null, bestCost = Infinity;
+      for (let i = 0; i < 400 && bestCost > 0; i++) {
+        const m = shuffle(qs.slice());
+        const pairs = [];
+        let cost = 0;
+        for (let j = 0; j < m.length; j += 2) {
+          const k = key(m[j], m[j + 1]);
+          pairs.push([m[j], m[j + 1]]);
+          cost += (last.has(k) ? 100 : 0) + (seen.get(k) || 0);
+        }
+        if (cost < bestCost) { bestCost = cost; best = pairs; }
+      }
+      this.pairHist.push(new Set(best.map(([a, b]) => key(a, b))));
+      const teams = best.map(([a, b]) => {
+        const t = new Team(a, b);
+        t.favoritism = (a.favoritism + b.favoritism) / 2;
+        t.unfavoritism = (a.unfavoritism + b.unfavoritism) / 2;
+        return t;
+      });
+      this.current = teams;
+      Screen.teamMap = new Map();
+      const s = this.newScreen("¡Nuevas parejas!", "Continuar");
+      s.p("Esta semana las reinas cambian de pareja.");
+      s.hr();
+      teams.forEach((t) => {
+        Screen.teamMap.set(t.name, [t.QueenA.name, t.QueenB.name]);
+        s.q([t.QueenA.name, t.QueenB.name], "royalblue", `${t.QueenA.name} y ${t.QueenB.name} forman ${t.name}.`);
+      });
+    }
+
     teamMini(s) {
       s.b("¡El mini reto de hoy pone a prueba a las parejas!");
       const w = pick(this.current);
@@ -3497,6 +3550,7 @@ this.plan = this.makePlan();
       const n = cast.length;
       cast.forEach((t) => { t.QueenA.episodesOn++; t.QueenB.episodesOn++; });
       cast.sort((a, b) => a.performanceScore - b.performanceScore);
+      if (this.teamsOdd && !this.teamsDissolved && n * 2 === this.finaleSize + 1) return this.teamIntraJudging();
       const top = [], bottom = [];
       if (n === 3) { top.push(cast[0]); bottom.push(cast[2], cast[1]); }
       else if (n === 4) { top.push(cast[0], cast[1]); bottom.push(cast[3], cast[2]); }
@@ -3532,10 +3586,119 @@ this.plan = this.makePlan();
         w.q([low.QueenA.name, low.QueenB.name], "pink", `${low.name}, estáis a salvo.`);
       }
       w.q(names(bottom), "tomato", `${bottom[0].name}, ${bottom[1].name}, lo siento, queridas, pero estáis en riesgo de eliminación.`);
+      // Golden Beaver (solo parejas rotativas): el equipo ganador salva a una de las cuatro reinas del bottom
+      if (this.opts.teamsRot && this.tw.has("BEAVER")) return this.teamBeaver(top[0], bottom);
       this.teamLipsync(bottom);
     }
 
+    // Texto del resultado de un lip sync (misma escala que el lip sync normal).
+    teamLipsyncText(e, lips) {
+      const by = (lo, hi) => lips.filter((q) => q.lipsyncScore >= lo && q.lipsyncScore < hi);
+      this.describeGroups(e, [
+        [by(12, Infinity), undefined, (l, pl) => `¡¡${l} ${pl ? "arrasaron" : "arrasó"} en el lip sync!!`],
+        [by(8, 12), undefined, (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} un gran lip sync!`],
+        [by(4, 8), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} un buen lip sync.`],
+        [by(2, 4), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} un mal lip sync...`],
+        [by(-Infinity, 2), undefined, (l, pl) => `${l} ${pl ? "fracasaron" : "fracasó"} en el lip sync...`],
+      ]);
+    }
+
+    // ¿Pueden irse dos equipos a la vez sin dejar la temporada sin equipos suficientes para la final?
+    teamDoubleSashayOk() {
+      const left = this.current.length - 2;
+      const need = this.teamsOdd ? Math.ceil((this.finaleSize + 1) / 2) : 2;
+      return left >= need && left >= 2;
+    }
+
+    // Parejas rotativas + Golden Beaver: el equipo ganador salva a una de las cuatro reinas del bottom; de las tres que
+    // quedan, una se salva en el lip sync y las otras dos se van (cada reina por su cuenta, ya que las parejas cambian).
+    teamBeaver(wt, bottom) {
+      const qs = bottom.flatMap((t) => [t.QueenA, t.QueenB]);
+      const giver = pick([wt.QueenA, wt.QueenB]);
+      const saved = this.bestSister(giver, qs);
+      const s = this.newScreen("¡El Golden Beaver!", "Ir al lip sync");
+      s.b("El equipo ganador tiene el poder del GOLDEN BEAVER: podrá salvar a una de las cuatro reinas en riesgo.");
+      s.q([wt.QueenA.name, wt.QueenB.name, saved.name], "gold", `¡${wt.name} le ha dado el Golden Beaver a... ${saved.name}!`);
+      saved.addTR("GBEAV"); saved.unfavoritism += 1; saved.ppe += 2;
+      this.modRelation(2, [giver, saved]);
+      const three = qs.filter((q) => q !== saved);
+      const e = this.newScreen("Ha llegado la hora...", "Ver el resultado");
+      e.b("Para que hagáis lip sync... ¡por vuestras vidas! Buena suerte, y no la caguéis.");
+      e.q(three.map((q) => q.name), "silver", `${list(three.map((q) => q.name))} harán lip sync. Solo una de las tres seguirá en la competición.`);
+      const song = this.pickSong(e);
+      e.hr();
+      three.forEach((q) => q.getLipsync());
+      this.lipsyncEvent(e, three);
+      this.teamLipsyncText(e, three);
+      this.noteBlot(three, song);
+      const ranked = three.slice().sort((a, b) => (b.lipsyncScore + Math.random() * 0.01) - (a.lipsyncScore + Math.random() * 0.01));
+      const stay = ranked[0], out = [ranked[1], ranked[2]];
+      const r = this.newScreen("Chicas, he tomado mi decisión...", "Continuar");
+      r.q([stay.name], "pink", `${stay.name}, shantay, te quedas.`);
+      r.q(out.map((q) => q.name), "red", `${out[0].name}, ${out[1].name}, siempre seréis All Stars, ahora... sashay away...`);
+      this.addSong([stay], out, song);
+      stay.addTR("BTM3"); stay.unfavoritism += 3; stay.ppe += 1;
+      out.forEach((q, i) => { q.addTR("ELIM"); q.unfavoritism += 5; q.rankP = i === 0 ? "tie1" : "tie2"; });
+      this.eliminated.unshift(out[0]);
+      this.eliminated.unshift(out[1]);
+      this.exitLine(r, out[0]);
+      // las dos que siguen del bottom (la salvada y la ganadora del lip sync) forman un equipo nuevo
+      const at = Math.min(...bottom.map((t) => this.current.indexOf(t)));
+      bottom.forEach((t) => this.current.splice(this.current.indexOf(t), 1));
+      const nt = new Team(saved, stay);
+      nt.favoritism = (saved.favoritism + stay.favoritism) / 2;
+      nt.unfavoritism = (saved.unfavoritism + stay.unfavoritism) / 2;
+      this.current.splice(at, 0, nt);
+    }
+
+    // Una reina menos que las de la final impar: el equipo peor de la semana hace lip sync entre sus dos integrantes,
+    // la perdedora se va y las parejas se disuelven (cada reina compite por su cuenta hasta la final).
+    teamIntraJudging() {
+      const cast = this.current, n = cast.length;
+      const top = cast[0], bot = cast[n - 1], mid = cast.slice(1, n - 1);
+      const names = (ts) => ts.flatMap((t) => [t.QueenA.name, t.QueenB.name]);
+      const s = this.newScreen("¡El jurado!", "Ver las decisiones");
+      s.b("Basándonos en las actuaciones de esta noche...");
+      s.q(names([top, bot]), "cyan", `${top.name}, ${bot.name}, representáis el top y el bottom de la semana.`);
+      s.hr();
+      mid.forEach((t) => { t.addTR("SAFE"); this.tAdd(t, { ppe: 3 }); });
+      if (mid.length) s.q(names(mid), undefined, `${list(mid.map((t) => t.name))}, ${mid.length > 1 ? "estáis" : "estás"} a salvo.`);
+      const w = this.newScreen("¡Traed de vuelta a mis reinas!", "Ir al lip sync");
+      w.b("Chicas, he tomado algunas decisiones...");
+      top.addTR("WIN"); this.tAdd(top, { fav: 5, ppe: 5 });
+      w.q([top.QueenA.name, top.QueenB.name], "royalblue", `${top.name}, condragulations, ¡sois las ganadoras del reto de esta semana!`);
+      w.hr();
+      const a = bot.QueenA, b = bot.QueenB;
+      w.q([a.name, b.name], "tomato", `${bot.name}, lo siento, queridas, pero estáis en riesgo de eliminación. Esta semana el lip sync es entre vosotras: solo una de las dos seguirá en la competición.`);
+      const e = this.newScreen("Ha llegado la hora...", "Ver el resultado");
+      e.b("Para que hagáis lip sync... ¡por vuestras vidas! Buena suerte, y no la caguéis.");
+      e.q([a.name, b.name], "silver", `${a.name} y ${b.name} harán lip sync la una contra la otra.`);
+      const song = this.pickSong(e);
+      e.hr();
+      [a, b].forEach((q) => q.getLipsync());
+      this.lipsyncEvent(e, [a, b]);
+      this.teamLipsyncText(e, [a, b]);
+      this.noteBlot([a, b], song);
+      const win = (a.lipsyncScore + Math.random() * 0.01) >= (b.lipsyncScore + Math.random() * 0.01) ? a : b;
+      const lose = win === a ? b : a;
+      const r = this.newScreen("Chicas, he tomado mi decisión...", "Continuar");
+      r.q([win.name], "pink", `${win.name}, shantay, te quedas.`);
+      r.q([lose.name], "red", `${lose.name}, siempre serás una All Star, ahora... sashay away...`);
+      this.addSong([win], [lose], song);
+      win.addTR("BTM2"); win.unfavoritism += 3; win.ppe += 1;
+      lose.addTR("ELIM"); lose.unfavoritism += 5;
+      this.eliminated.unshift(lose);
+      this.exitLine(r, lose);
+      this.current = cast.filter((t) => t !== bot).flatMap((t) => [t.QueenA, t.QueenB]).concat(win);
+      this.teamsDissolved = true;
+      this.opts.teams = false;
+      Screen.teamMap = new Map();
+      r.hr();
+      r.p("Con esto, las parejas se disuelven: ¡a partir de ahora cada reina compite por su cuenta hasta la final!");
+    }
+
     // Lip sync entre los dos equipos de abajo: de cada equipo hace lip sync una de las dos reinas (al azar).
+    // Pueden darse un doble shantay (se quedan las cuatro) o un doble sashay (se van las cuatro).
     teamLipsync(bottom) {
       const e = this.newScreen("Ha llegado la hora...", "Ver el resultado");
       e.b("Para que hagáis lip sync... ¡por vuestras vidas! Buena suerte, y no la caguéis.");
@@ -3548,14 +3711,38 @@ this.plan = this.makePlan();
       const before = lips.map((q) => q.lipsyncScore);
       this.lipsyncEvent(e, lips);
       bottom.forEach((t, i) => { t.lipsyncScore += lips[i].lipsyncScore - before[i]; });
-      const by = (lo, hi) => lips.filter((q) => q.lipsyncScore >= lo && q.lipsyncScore < hi);
-      this.describeGroups(e, [
-        [by(12, Infinity), undefined, (l, pl) => `¡¡${l} ${pl ? "arrasaron" : "arrasó"} en el lip sync!!`],
-        [by(8, 12), undefined, (l, pl) => `¡${l} ${pl ? "tuvieron" : "tuvo"} un gran lip sync!`],
-        [by(4, 8), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} un buen lip sync.`],
-        [by(2, 4), undefined, (l, pl) => `${l} ${pl ? "tuvieron" : "tuvo"} un mal lip sync...`],
-        [by(-Infinity, 2), undefined, (l, pl) => `${l} ${pl ? "fracasaron" : "fracasó"} en el lip sync...`],
-      ]);
+      this.teamLipsyncText(e, lips);
+      const rawScores = lips.map((q) => q.lipsyncScore);
+      // dobles shantay / sashay: los dos lip syncs brillan (se quedan los dos equipos) o los dos fracasan (se van los dos)
+      if (!this.tw.has("DISABLE_DOUBLE")) {
+        const all = bottom.flatMap((t) => [t.QueenA, t.QueenB]);
+        if (rawScores[0] > 7 && rawScores[1] > 7 && rnd(0, 100) <= 50) {
+          this.noteBlot(lips, song);
+          const r = this.newScreen("Chicas, he tomado mi decisión...", "Continuar");
+          r.q(all.map((q) => q.name), "magenta", "Condragulations, ¡los dos equipos os quedáis, shantay!");
+          this.addSong(lips, [], song);
+          bottom.forEach((t) => { t.addTR(" BTM2"); this.tAdd(t, { unfav: 3, ppe: 1 }); });
+          return;
+        }
+        if (rawScores[0] < 2 && rawScores[1] < 2 && rnd(0, 100) <= 8 && this.teamDoubleSashayOk()) {
+          this.noteBlot(lips, song);
+          const r = this.newScreen("Chicas, he tomado mi decisión...", "Continuar");
+          r.q(all.map((q) => q.name), "darkred");
+          r.b("Lo siento, pero ninguno de los dos equipos ha mostrado el fuego que hace falta para quedarse. Los dos equipos... sashay away.");
+          this.addSong([], lips, song);
+          bottom.forEach((t) => {
+            t.addTR(" ELIM ");
+            this.tAdd(t, { unfav: 5 });
+            this.eliminated.unshift(t.QueenA);
+            this.eliminated.unshift(t.QueenB);
+            this.current.splice(this.current.indexOf(t), 1);
+          });
+          const alive = this.teamsFlat().length;
+          all.forEach((q) => { q.rankP = `rng:${alive + 1}-${alive + 4}`; });
+          this.exitLine(r, lips[0]);
+          return;
+        }
+      }
       // "botón de she-mergency": la compañera del equipo sale a hacer el lip sync en su lugar
       bottom.forEach((t, i) => {
         if (rnd(0, 100) >= 98) {
@@ -6438,7 +6625,7 @@ this.allianceTick(s);
   // [id, mínimo de reinas, nombre] de los estrenos que puede sortear "Estreno al azar".
   // Formato de temporada al azar: [id, mínimo de reinas, etiqueta]; "Por equipos" necesita un número par.
   const RANDOM_SEASONS = [
-    ["SEASON_REGULAR", 3, "Regular"], ["SEASON_THAILAND", 6, "Thailand (temporadas 1 y 2)"], ["SEASON_TEAMS", 6, "Por equipos"],
+    ["SEASON_REGULAR", 3, "Regular"], ["SEASON_THAILAND", 6, "Thailand (temporadas 1 y 2)"], ["SEASON_TEAMS", 6, "Por equipos"], ["SEASON_TEAMS_ROT", 6, "Por equipos (parejas rotativas)"],
     ["SEASON_LIPSYNC_LEGACY", 6, "Lipsync For Your Legacy"], ["SEASON_LIPSYNC_ASSASSIN", 6, "Lipsync Assassin"], ["SEASON_ALL_WINNERS", 6, "All Winners"],
     ["SEASON_SLAYSIAN", 8, "Slaysian Royale"], ["SEASON_SPLIT", 12, "Split Format"], ["SEASON_FATAL", 4, "Fatal Selection"], ["SEASON_LFTW", 6, "Lipsync for the win"], ["SEASON_THAILAND_LEGACY", 6, "Thailand + Lipsync For Your Legacy"], ["SEASON_THAILAND_LFTW", 6, "Thailand + Lipsync for the win"], ["SEASON_TOURNAMENT", 12, "Tournament of All Stars"],
   ];
@@ -6474,7 +6661,7 @@ this.allianceTick(s);
   // sin regresos y sin opciones extra.
   function canRun(formatChoice) {
     return (formatChoice.premiere === "PREMIERE_NORMAL" || formatChoice.premiere === "PREMIERE_NORMAL_NOELIM" || formatChoice.premiere === "PREMIERE_SLAYERS" || formatChoice.premiere === "PREMIERE_UK3" || formatChoice.premiere === "PREMIERE_TEAMS3" || formatChoice.premiere === "PREMIERE_LATE_ENTRY" || formatChoice.premiere === "PREMIERE_DOUBLE" || formatChoice.premiere === "PREMIERE_DOUBLE_NOELIM" || formatChoice.premiere === "PREMIERE_DOUBLE_TALENT" || formatChoice.premiere === "PREMIERE_DOUBLE_GG" || formatChoice.premiere === "PREMIERE_PORKCHOP" || formatChoice.premiere === "PREMIERE_RATE_A_QUEEN" || formatChoice.premiere === "PREMIERE_GLOBAL_AS" || formatChoice.premiere === "PREMIERE_PORKCHOP_ELIM" || formatChoice.premiere === "PREMIERE_TRIPLE" || formatChoice.premiere === "PREMIERE_RANDOM")
-      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_LFTW" || formatChoice.season === "SEASON_THAILAND_LEGACY" || formatChoice.season === "SEASON_THAILAND_LFTW" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
+      && (formatChoice.season === "SEASON_REGULAR" || formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_TEAMS_ROT" || formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_LIPSYNC_ASSASSIN" || formatChoice.season === "SEASON_ALL_WINNERS" || formatChoice.season === "SEASON_SLAYSIAN" || formatChoice.season === "SEASON_SPLIT" || formatChoice.season === "SEASON_FATAL" || formatChoice.season === "SEASON_LFTW" || formatChoice.season === "SEASON_THAILAND_LEGACY" || formatChoice.season === "SEASON_THAILAND_LFTW" || formatChoice.season === "SEASON_RANDOM" || formatChoice.season === "SEASON_TOURNAMENT")
       && (FINALE_SIZE[formatChoice.finale] || formatChoice.finale === "FINALE_RANDOM")
       && IMPLEMENTED_RETURNS.includes(formatChoice.return)
       && (formatChoice.twists || []).every((t) => IMPLEMENTED_TWISTS.includes(t));
@@ -6485,7 +6672,7 @@ this.allianceTick(s);
   function episodeInfo(fc, n) {
     const fin = FINALE_SIZE[fc.finale];
     if (!fin || n <= fin + 1 || fc.premiere === "PREMIERE_TEAMS3") return null;
-    if (["SEASON_THAILAND", "SEASON_THAILAND_LEGACY", "SEASON_THAILAND_LFTW", "SEASON_TEAMS", "SEASON_LIPSYNC_LEGACY", "SEASON_LIPSYNC_ASSASSIN", "SEASON_ALL_WINNERS", "SEASON_SLAYSIAN", "SEASON_FATAL", "SEASON_RANDOM", "SEASON_TOURNAMENT"].includes(fc.season)) return null;
+    if (["SEASON_THAILAND", "SEASON_THAILAND_LEGACY", "SEASON_THAILAND_LFTW", "SEASON_TEAMS", "SEASON_TEAMS_ROT", "SEASON_LIPSYNC_LEGACY", "SEASON_LIPSYNC_ASSASSIN", "SEASON_ALL_WINNERS", "SEASON_SLAYSIAN", "SEASON_FATAL", "SEASON_RANDOM", "SEASON_TOURNAMENT"].includes(fc.season)) return null;
     const base = n - fin;
     return { normal: base + 1, min: 2, max: base * 2 + 1 };
   }
@@ -6505,11 +6692,11 @@ this.allianceTick(s);
       const a = Math.ceil(n / 3), b = Math.floor((n - a) / 2);
       return [a, b, n - a - b].map((size, i) => ({ title: `Estreno ${i + 1}`, size }));
     }
-    if (fc.season === "SEASON_TEAMS") {
+    if (fc.season === "SEASON_TEAMS" || fc.season === "SEASON_TEAMS_ROT") {
       if (n < 6 || n % 2) return null;
       return Array.from({ length: n / 2 }, (_, i) => ({ title: `Pareja ${i + 1}`, size: 2 }));
     }
-    if (fc.premiere === "PREMIERE_TEAMS3" && n >= 9 && !["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS"].includes(fc.season)) {
+    if (fc.premiere === "PREMIERE_TEAMS3" && n >= 9 && !["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS", "SEASON_TEAMS_ROT"].includes(fc.season)) {
       return even(3).map((size, i) => ({ title: `Equipo ${i + 1}`, size }));
     }
     if (fc.premiere === "PREMIERE_TRIPLE" && n >= 12) {
@@ -6532,6 +6719,7 @@ this.allianceTick(s);
     { id: "thailegacy", label: "Thailand + Lipsync For Your Legacy", opt: "thailand", opt2: "legacy" },
     { id: "thailftw", label: "Thailand + Lipsync for the win", opt: "thailand", opt2: "lftw" },
     { id: "teams", label: "Por equipos (parejas)", opt: "teams" },
+    { id: "teamsrot", label: "Por equipos (parejas rotativas)", opt: "teams", opt2: "teamsRot" },
     { id: "legacy", label: "Lipsync For Your Legacy", opt: "legacy" },
     { id: "assassin", label: "Lipsync Assassin", opt: "assassin" },
     { id: "winners", label: "All Winners (estrellas, sin eliminaciones)", opt: "winners" },
@@ -6568,7 +6756,7 @@ this.allianceTick(s);
     if (formatChoice.season === "SEASON_RANDOM") {
       const fin = FINALE_SIZE[finale] || 2;
       const fits = RANDOM_SEASONS.filter(([id, min]) => names.length >= min
-        && (id !== "SEASON_TEAMS" || names.length % 2 === 0)
+        && ((id !== "SEASON_TEAMS" && id !== "SEASON_TEAMS_ROT") || names.length % 2 === 0)
         && (id !== "SEASON_SPLIT" || names.length >= fin + 8));
       const [sid, , slabel] = pick(fits);
       formatChoice = Object.assign({}, formatChoice, { season: sid });
@@ -6584,7 +6772,7 @@ this.allianceTick(s);
       randomPremiereLabel = label;
     }
     // El estreno por equipos funciona con cualquier formato de temporada menos All Winners, Tournament, Split y Por equipos (9 o más reinas).
-    if (premiere === "PREMIERE_TEAMS3" && (["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS"].includes(formatChoice.season) || names.length < 9)) premiere = "PREMIERE_NORMAL";
+    if (premiere === "PREMIERE_TEAMS3" && (["SEASON_ALL_WINNERS", "SEASON_TOURNAMENT", "SEASON_SPLIT", "SEASON_TEAMS", "SEASON_TEAMS_ROT"].includes(formatChoice.season) || names.length < 9)) premiere = "PREMIERE_NORMAL";
     const sim = new Sim(names, statsByName, relNumeric, {
       opening: formatChoice.openingChallenge,
       finaleSize: FINALE_SIZE[finale] || 2,
@@ -6603,7 +6791,8 @@ this.allianceTick(s);
       premiereNoElim: premiere === "PREMIERE_NORMAL_NOELIM",
       premiereSlayers: premiere === "PREMIERE_SLAYERS",
       thailand: formatChoice.season === "SEASON_THAILAND" || formatChoice.season === "SEASON_THAILAND_LEGACY" || formatChoice.season === "SEASON_THAILAND_LFTW",
-      teams: formatChoice.season === "SEASON_TEAMS",
+      teams: formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_TEAMS_ROT",
+      teamsRot: formatChoice.season === "SEASON_TEAMS_ROT",
       legacy: formatChoice.season === "SEASON_LIPSYNC_LEGACY" || formatChoice.season === "SEASON_THAILAND_LEGACY",
       assassin: formatChoice.season === "SEASON_LIPSYNC_ASSASSIN",
       slaysian: formatChoice.season === "SEASON_SLAYSIAN",
@@ -6616,7 +6805,7 @@ this.allianceTick(s);
       chocolatePick: formatChoice.chocolatePick || "",
       badonkaLevers: formatChoice.badonkaLevers || [],
       claims: (formatChoice.twists || []).includes("CLAIM_QUEEN") ? (formatChoice.claims || {}) : {},
-      return: formatChoice.return === "RETURN_RANDOM_PICK" ? (formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_ALL_WINNERS" ? "RETURN_NONE" : pick(RANDOM_RETURN_POOL)) : formatChoice.return,
+      return: formatChoice.return === "RETURN_RANDOM_PICK" ? (formatChoice.season === "SEASON_TEAMS" || formatChoice.season === "SEASON_TEAMS_ROT" || formatChoice.season === "SEASON_ALL_WINNERS" ? "RETURN_NONE" : pick(RANDOM_RETURN_POOL)) : formatChoice.return,
       returnPick: formatChoice.returnPick || "",
       winners: formatChoice.season === "SEASON_ALL_WINNERS",
       tournament: formatChoice.season === "SEASON_TOURNAMENT" ? tournamentCfg(formatChoice.tournament) : null,

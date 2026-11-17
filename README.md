@@ -724,3 +724,10 @@ Una reina eliminada puede ganar **varios títulos a la vez** (Miss Simpatía, Mi
 ## Drag Race Egipto All Stars (temporada 1)
 
 14 reinas de varias temporadas de Egipto. Sus stats son los originales sumando entre -3 y +5 al azar (limitados a 0-15) y solo se usan con «Simular esta temporada»; su foto nueva (fondo #fe6d73, letras #fafa31) sustituye a la original en toda la web.
+
+## Formatos por equipos: parejas rotativas, dobles shantay/sashay y final impar
+
+- **Por equipos (parejas rotativas)** (nuevo, también tras la ronda de grupos del Tournament y en «Formato al azar»): como «Por equipos», pero las parejas cambian cada capítulo (A+B y C+D, después A+C y B+D...) evitando en lo posible repetir una pareja. Las eliminaciones son las del formato por equipos: se va el equipo perdedor del lip sync.
+- **Doble shantay y doble sashay** (en los dos formatos por equipos): si los dos lip syncs de abajo brillan se quedan los cuatro participantes; si los dos fracasan se van los cuatro (solo si quedan equipos suficientes para la final).
+- **Final impar** (Top 3, Top 5...; en los dos formatos): cuando queda una reina más que las de la final, el equipo del bottom hace lip sync entre sus dos integrantes, la perdedora se va, las parejas se disuelven y se juega la final elegida con reinas individuales.
+- **Golden Beaver** (solo parejas rotativas): el equipo ganador salva a una de las cuatro reinas del bottom; de las otras tres, una se salva en el lip sync y dos se van (cada reina por su cuenta).
