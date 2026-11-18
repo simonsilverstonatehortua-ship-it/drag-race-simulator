@@ -4760,8 +4760,6 @@ const ALL_SEASONS = [
     contestants: [
       { name: "Panti Bliss", finalPlacement: "Por determinar",
         image: "img/irlanda-s2-placeholder.svg", stats: { acting: 8, comedy: 5, dance: 13, design: 13, improv: 8, runway: 3, lipsync: 2, makeup: 0, singing: 15, verses: 8, strategy: 2, charisma: 1, uniqueness: 1, nerve: 14, talent: 5 } },
-      { name: "Shirley Temple Bar", finalPlacement: "Por determinar",
-        image: "img/irlanda-s2-placeholder.svg", stats: { acting: 4, comedy: 9, dance: 15, design: 9, improv: 8, runway: 1, lipsync: 9, makeup: 1, singing: 1, verses: 0, strategy: 10, charisma: 14, uniqueness: 15, nerve: 2, talent: 0 } },
       { name: "Barmbrack Bébé", finalPlacement: "Por determinar",
         image: "img/irlanda-s2-placeholder.svg", stats: { acting: 0, comedy: 9, dance: 2, design: 6, improv: 3, runway: 9, lipsync: 8, makeup: 15, singing: 6, verses: 1, strategy: 13, charisma: 15, uniqueness: 7, nerve: 1, talent: 13 } },
       { name: "Colcannon Cleavage", finalPlacement: "Por determinar",
@@ -4776,8 +4774,6 @@ const ALL_SEASONS = [
         image: "img/irlanda-s2-placeholder.svg", stats: { acting: 5, comedy: 10, dance: 6, design: 15, improv: 13, runway: 14, lipsync: 9, makeup: 15, singing: 6, verses: 13, strategy: 7, charisma: 1, uniqueness: 5, nerve: 14, talent: 15 } },
       { name: "Tayto Titania", finalPlacement: "Por determinar",
         image: "img/irlanda-s2-placeholder.svg", stats: { acting: 0, comedy: 0, dance: 8, design: 9, improv: 5, runway: 7, lipsync: 9, makeup: 7, singing: 7, verses: 3, strategy: 8, charisma: 7, uniqueness: 0, nerve: 7, talent: 7 } },
-      { name: "Lola Leprechaun", finalPlacement: "Por determinar",
-        image: "img/irlanda-s2-placeholder.svg", stats: { acting: 10, comedy: 8, dance: 11, design: 5, improv: 15, runway: 13, lipsync: 7, makeup: 0, singing: 4, verses: 10, strategy: 13, charisma: 15, uniqueness: 0, nerve: 6, talent: 2 } },
       { name: "Tartán Tease", finalPlacement: "Por determinar",
         image: "img/irlanda-s2-placeholder.svg", stats: { acting: 6, comedy: 7, dance: 15, design: 5, improv: 9, runway: 10, lipsync: 9, makeup: 5, singing: 10, verses: 7, strategy: 4, charisma: 8, uniqueness: 5, nerve: 1, talent: 6 } },
       { name: "Gráinne Gaga", finalPlacement: "Por determinar",
